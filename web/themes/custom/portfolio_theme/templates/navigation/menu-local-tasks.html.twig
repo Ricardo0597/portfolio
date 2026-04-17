@@ -1,0 +1,14 @@
+{% if primary or secondary %}
+  <nav class="local-tasks" aria-label="{{ 'Page actions'|t }}">
+    {% if primary %}
+      <ul class="local-tasks__list local-tasks__list--primary">
+        {{ primary }}
+      </ul>
+    {% endif %}
+    {% if secondary %}
+      <ul class="local-tasks__list local-tasks__list--secondary">
+        {{ secondary }}
+      </ul>
+    {% endif %}
+  </nav>
+{% endif %}
