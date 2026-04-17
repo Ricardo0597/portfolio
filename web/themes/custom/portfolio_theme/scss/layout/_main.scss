@@ -49,14 +49,30 @@
 }
 
 // Branding — output by block--system-branding-block.html.twig
-.site-branding__name {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  color: var(--color-text);
+.site-branding {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   opacity: 1;
-  white-space: nowrap;
 
-  &:hover { color: var(--color-highlight); opacity: 1; }
+  &:hover { opacity: 1; }
+  &:hover .site-branding__name { color: var(--color-highlight); }
+
+  &__logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+    flex-shrink: 0;
+  }
+
+  &__name {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    white-space: nowrap;
+    transition: color var(--transition-fast);
+  }
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
@@ -114,6 +130,22 @@ footer[role='contentinfo'] {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: var(--space-4);
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    opacity: 1;
+
+    &:hover { opacity: 0.75; }
+  }
+
+  &__logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: var(--border-radius);
   }
 
   &__copy {

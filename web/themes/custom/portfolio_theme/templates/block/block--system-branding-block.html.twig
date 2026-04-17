@@ -1,5 +1,11 @@
-{% if site_name %}
-  <a href="{{ path('<front>') }}" class="site-branding__name" rel="home">
-    {{- site_name -}}
-  </a>
-{% endif %}
+<a href="{{ path('<front>') }}" class="site-branding" rel="home" aria-label="{{ 'Home'|t }}">
+  <img class="site-branding__logo"
+       src="{{ base_path ~ directory }}/images/logo.png"
+       alt="{{ 'Site logo'|t }}"
+       width="48"
+       height="48"
+       loading="eager">
+  {% if site_name %}
+    <span class="site-branding__name">{{- site_name -}}</span>
+  {% endif %}
+</a>
