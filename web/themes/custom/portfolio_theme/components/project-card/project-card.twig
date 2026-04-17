@@ -10,9 +10,11 @@
         <a href="{{ path }}">{{ title }}</a>
       </h3>
       {% if status %}
-        <span class="project-card__status project-card__status--{{ status|lower|replace({' ': '-'}) }}">
+        <a href="/projects?field_status={{ status|url_encode }}"
+           class="project-card__status project-card__status--{{ status|lower|replace({' ': '-'}) }}"
+           title="{{ 'Filter by status: %status'|t({'%status': status}) }}">
           {{ status }}
-        </span>
+        </a>
       {% endif %}
     </header>
     {% if summary %}
@@ -21,7 +23,13 @@
     {% if stack %}
       <ul class="project-card__stack">
         {% for tech in stack %}
-          <li class="project-card__tech-badge">{{ tech }}</li>
+          <li>
+            <a href="/projects?field_stack={{ tech|url_encode }}"
+               class="project-card__tech-badge"
+               title="{{ 'Filter by technology: %tech'|t({'%tech': tech}) }}">
+              {{ tech }}
+            </a>
+          </li>
         {% endfor %}
       </ul>
     {% endif %}
