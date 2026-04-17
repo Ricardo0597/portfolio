@@ -1,0 +1,52 @@
+.skill-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--space-6);
+  transition: transform var(--transition-base), border-color var(--transition-base);
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-highlight);
+  }
+
+  &__icon {
+    display: block;
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-3);
+    color: var(--color-highlight);
+  }
+
+  &__name {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin: 0 0 var(--space-1);
+    color: var(--color-text);
+  }
+
+  &__category {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  &__level {
+    display: flex;
+    gap: var(--space-1);
+    margin-top: var(--space-4);
+  }
+
+  &__pip {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-border);
+    transition: background var(--transition-fast);
+
+    &--filled { background: var(--color-highlight); }
+  }
+
+  &:hover &__pip--filled {
+    background: #ed6b7e; // color.adjust(#e94560, $lightness: 10%)
+  }
+}

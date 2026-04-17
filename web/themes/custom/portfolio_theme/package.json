@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-theme",
+  "private": true,
+  "scripts": {
+    "build": "sass --no-source-map --style=compressed scss/main.scss:css/main.css components/article-teaser/article-teaser.scss:components/article-teaser/article-teaser.css components/project-card/project-card.scss:components/project-card/project-card.css components/skill-card/skill-card.scss:components/skill-card/skill-card.css components/feature-badge/feature-badge.scss:components/feature-badge/feature-badge.css",
+    "build:dev": "sass --style=expanded scss/main.scss:css/main.css components/article-teaser/article-teaser.scss:components/article-teaser/article-teaser.css components/project-card/project-card.scss:components/project-card/project-card.css components/skill-card/skill-card.scss:components/skill-card/skill-card.css components/feature-badge/feature-badge.scss:components/feature-badge/feature-badge.css",
+    "watch": "sass --watch scss/main.scss:css/main.css components/article-teaser/article-teaser.scss:components/article-teaser/article-teaser.css components/project-card/project-card.scss:components/project-card/project-card.css components/skill-card/skill-card.scss:components/skill-card/skill-card.css components/feature-badge/feature-badge.scss:components/feature-badge/feature-badge.css"
+  },
+  "devDependencies": {
+    "sass": "^1.77.0"
+  }
+}

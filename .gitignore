@@ -34,6 +34,11 @@ web/profiles/
 # Composer
 vendor/
 
+# Theme build
+web/themes/custom/portfolio_theme/node_modules/
+web/themes/custom/portfolio_theme/css/*.map
+web/themes/custom/portfolio_theme/components/**/*.map
+
 # IDE
 .idea/
 .vscode/

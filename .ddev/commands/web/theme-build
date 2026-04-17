@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
-## Description: Rebuild theme caches (extend here when adding CSS/JS compilation)
+## Description: Compile SCSS and rebuild Drupal theme caches
 ## Usage: theme-build
 ## Example: ddev theme-build
 
 set -e
 
-cd /var/www/html
+THEME_DIR=/var/www/html/web/themes/custom/portfolio_theme
+
+echo "Installing theme dependencies..."
+npm install --prefix "$THEME_DIR" --silent
+
+echo "Compiling SCSS..."
+npm run build --prefix "$THEME_DIR"
 
 echo "Rebuilding Drupal caches..."
-drush cr
+cd /var/www/html && drush cr
 
-echo "Done. Theme changes are live at https://portfolio.ddev.site"
+echo "Done. Theme live at https://portfolio.ddev.site"

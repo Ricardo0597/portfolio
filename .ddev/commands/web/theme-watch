@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+## Description: Watch SCSS for changes and recompile automatically
+## Usage: theme-watch
+## Example: ddev theme-watch
+
+THEME_DIR=/var/www/html/web/themes/custom/portfolio_theme
+
+npm install --prefix "$THEME_DIR" --silent
+echo "Watching SCSS — Ctrl+C to stop."
+npm run watch --prefix "$THEME_DIR"

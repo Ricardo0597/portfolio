@@ -1,11 +1,7 @@
 base:
   css:
-    base:
-      css/base/variables.css: {}
-      css/base/reset.css: {}
-      css/base/typography.css: {}
-    layout:
-      css/layout/main.css: {}
+    theme:
+      css/main.css: { minified: true }
   js:
     js/portfolio.js: {}
   dependencies:

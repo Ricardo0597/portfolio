@@ -1,0 +1,8 @@
+// Entry point — import order matters: tokens → reset → typography → layout.
+// Component CSS is compiled separately (co-located with each SDC component).
+
+@use 'abstracts/tokens';
+@use 'abstracts/mixins';
+@use 'base/reset';
+@use 'base/typography';
+@use 'layout/main';

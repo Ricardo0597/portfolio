@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -15,28 +17,26 @@ body {
   font-family: var(--font-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img,
 video {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
 a {
   color: var(--color-highlight);
   text-decoration: none;
   transition: opacity var(--transition-fast);
-}
 
-a:hover {
-  opacity: 0.8;
+  &:hover { opacity: 0.8; }
 }
 
 ul,
-ol {
-  list-style: none;
-}
+ol { list-style: none; }
 
 button {
   cursor: pointer;
@@ -44,3 +44,8 @@ button {
   background: none;
   font: inherit;
 }
+
+// Suppress Drupal scaffold noise visible on un-themed pages
+.feed-icon,
+.block-system-powered-by-block,
+.block-search-form-block { display: none; }
