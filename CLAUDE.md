@@ -40,6 +40,7 @@ ddev drush cex -y      # config export
 ddev drush cim -y      # config import
 ddev drush updb -y     # run update hooks
 ddev drush en <module> # enable module
+ddev ngrok             # expose site publicly via ngrok tunnel
 ```
 
 ---
@@ -49,7 +50,10 @@ ddev drush en <module> # enable module
 ```
 portfolio/                          ← project root
 ├── .ddev/
-│   └── config.yaml
+│   ├── config.yaml
+│   └── commands/
+│       └── host/
+│           └── ngrok               ← exposes site via ngrok tunnel
 ├── config/
 │   └── sync/                       ← exported config lives here
 ├── web/
@@ -66,6 +70,7 @@ portfolio/                          ← project root
 │       └── default/
 ├── CLAUDE.md                       ← this file
 ├── PROMPT.md                       ← build specification
+├── README.md
 ├── composer.json
 └── composer.lock
 ```
@@ -187,7 +192,6 @@ portfolio_core/
 │   ├── Plugin/
 │   │   ├── Block/
 │   │   └── rest/
-│   ├── EventSubscriber/
 │   ├── TwigExtension/
 │   └── Service/
 └── tests/
@@ -215,23 +219,30 @@ portfolio_theme/
 ├── portfolio_theme.theme
 ├── components/                     ← Single Directory Components
 │   ├── skill-card/
-│   │   ├── skill-card.component.yml
-│   │   ├── skill-card.twig
-│   │   └── skill-card.css
 │   ├── project-card/
 │   ├── article-teaser/
 │   └── feature-badge/
-├── css/
+├── scss/                           ← SCSS source files (compiled to css/)
+│   ├── main.scss                   ← entry point, @use imports only
+│   ├── abstracts/
+│   │   ├── _tokens.scss
+│   │   └── _mixins.scss
 │   ├── base/
-│   │   ├── variables.css
-│   │   ├── reset.css
-│   │   └── typography.css
+│   │   ├── _reset.scss
+│   │   └── _typography.scss
 │   └── layout/
-│       └── main.css
+│       ├── _main.scss
+│       ├── _forms.scss
+│       └── _project-full.scss
+├── css/                            ← compiled output (referenced by libraries.yml)
 ├── js/
 ├── images/
 └── templates/
     ├── content/
+    │   ├── node--project--full.html.twig
+    │   └── (teaser overrides per bundle)
+    ├── navigation/
+    │   └── menu-local-tasks.html.twig
     ├── block/
     └── page/
 ```

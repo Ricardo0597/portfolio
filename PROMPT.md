@@ -699,33 +699,25 @@ git commit -m "feat: add Projects REST resource endpoint"
 
 ## Phase 6 — Feature 03: Event Subscriber
 
-**Goal:** A `ProfileAccessSubscriber` that redirects any attempt to access
-`/node/{nid}` on the `profile` content type directly (i.e., not via its
-alias `/about`) to the canonical `/about` URL.
-
-**Pattern demonstrated:** Event Subscriber, KernelEvents::REQUEST, RouteMatch,
-RedirectResponse, service registration.
-
-### Implementation
-
-Create `web/modules/custom/portfolio_core/src/EventSubscriber/ProfileAccessSubscriber.php`.
-
-The subscriber must:
-- Listen on `KernelEvents::REQUEST` with priority 30.
-- Check if the current route is `entity.node.canonical`.
-- Load the node and check if type is `profile`.
-- If the current URL is not `/about`, issue a 301 redirect to `/about`.
-- Register in `portfolio_core.services.yml` with the
-  `event_subscriber` tag.
-
-### Commit
-
-```bash
-ddev drush cr
-git add web/modules/custom/portfolio_core/src/EventSubscriber/
-git add web/modules/custom/portfolio_core/portfolio_core.services.yml
-git commit -m "feat: add ProfileAccessSubscriber - redirect /node/x to /about"
-```
+> **Status: REMOVED — replaced by standard Drupal path alias behaviour.**
+>
+> A `ProfileAccessSubscriber` was initially built and then deliberately
+> removed. The subscriber redirected `/node/{nid}` → `/about` on every
+> request, which duplicated work already handled correctly by pathauto +
+> redirect module. The `/about` alias is now created as a `path_alias`
+> entity by pathauto (pattern: `/about` for the `profile` content type),
+> and the redirect module's `auto_redirect` setting issues canonical 301
+> redirects automatically when aliases change.
+>
+> **Lesson:** Do not build event subscribers to work around missing path
+> aliases. Generate the alias first; let the redirect module handle
+> canonicalisation.
+>
+> **Next event subscriber candidate:** A `NodePublishSubscriber` that
+> listens on `KernelEvents::RESPONSE` (or a hook_entity_presave equivalent)
+> to send a Slack or webhook notification when a `project` node is first
+> published. This demonstrates the pattern without duplicating core
+> functionality.
 
 ---
 
@@ -997,12 +989,14 @@ Track all implemented features here. Update after each phase.
 |---|---------|---------|-------|--------|
 | 01 | CurrentSkillsBlock | Block Plugin + DI | 4 | ✅ |
 | 02 | Projects REST endpoint | REST Resource Plugin | 5 | ✅ |
-| 03 | Profile redirect | Event Subscriber | 6 | ✅ |
-| 04 | Twig filters | Twig Extension | 7 | ✅ |
+| 03 | Profile redirect via Event Subscriber | Event Subscriber | 6 | ❌ removed — pathauto + redirect module used instead |
+| 04 | Twig filters (`skill_level_label`, `reading_time`) | Twig Extension | 7 | ✅ |
 | 05 | Project search | Search API + Facets | 8 | ✅ |
-| 06 | Node view modes | Preprocess + Templates | 9 | ✅ |
+| 06 | Node view modes — teaser + full | Preprocess hooks + Templates | 9 | ✅ |
 | 07 | SEO automation | Metatag + Sitemap | 10 | ✅ |
 | 08 | JSON:API demo | Core JSON:API | 11 | ✅ |
+| 09 | Project full-page template | `node--project--full.html.twig` + preprocess | — | ✅ |
+| 10 | Admin local task tabs | Template override + BEM CSS | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 
