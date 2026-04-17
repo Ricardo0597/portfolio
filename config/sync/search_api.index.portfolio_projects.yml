@@ -82,15 +82,16 @@ field_settings:
 datasource_settings:
   'entity:node':
     bundles:
-      default: true
-      selected: {  }
+      default: false
+      selected:
+        - project
     languages:
       default: true
       selected: {  }
     plugin_id: 'entity:node'
     settings:
       bundles:
-        default: true
+        default: false
         selected:
           - project
       languages:

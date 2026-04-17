@@ -1,0 +1,152 @@
+@use '../abstracts/tokens' as t;
+@use '../abstracts/mixins' as m;
+
+// ─── Base inputs ──────────────────────────────────────────────────────────────
+
+input[type='text'],
+input[type='search'],
+input[type='email'],
+input[type='url'],
+input[type='number'],
+select,
+textarea {
+  appearance: none;
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  padding: var(--space-2) var(--space-3);
+  transition: border-color var(--transition-fast);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-highlight);
+  }
+
+  &::placeholder { color: var(--color-text-muted); }
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a0a0b0' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+  padding-right: var(--space-8);
+  cursor: pointer;
+}
+
+// ─── Buttons ──────────────────────────────────────────────────────────────────
+
+%btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--border-radius);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity var(--transition-fast), border-color var(--transition-fast);
+  background: var(--color-highlight);
+  color: #fff;
+
+  &:hover { opacity: 0.85; }
+}
+
+.button,
+button.form-submit {
+  @extend %btn-base;
+
+  &--secondary {
+    background: var(--color-accent);
+    color: var(--color-text);
+  }
+
+  &--outline {
+    background: transparent;
+    border-color: var(--color-border);
+    color: var(--color-text-muted);
+
+    &:hover { border-color: var(--color-highlight); color: var(--color-text); }
+  }
+}
+
+input[type='submit'] { @extend %btn-base; }
+
+// ─── Views exposed filter form ────────────────────────────────────────────────
+
+.views-exposed-form {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-4) var(--space-6);
+  margin-bottom: var(--space-8);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-4);
+
+  .form-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 160px;
+  }
+
+  label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+  }
+
+  .form-actions {
+    padding-bottom: 1px; // align button baseline with inputs
+  }
+}
+
+// ─── Breadcrumb ───────────────────────────────────────────────────────────────
+
+.breadcrumb {
+  margin-bottom: var(--space-4);
+
+  ol {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+
+    &::after {
+      content: '/';
+      margin-left: var(--space-1);
+      color: var(--color-border);
+    }
+
+    &:last-child::after { display: none; }
+  }
+
+  a {
+    color: var(--color-text-muted);
+    opacity: 1;
+    transition: color var(--transition-fast);
+
+    &:hover { color: var(--color-highlight); }
+  }
+}
