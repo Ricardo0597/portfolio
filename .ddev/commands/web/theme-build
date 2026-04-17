@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+## Description: Rebuild theme caches (extend here when adding CSS/JS compilation)
+## Usage: theme-build
+## Example: ddev theme-build
+
+set -e
+
+cd /var/www/html
+
+echo "Rebuilding Drupal caches..."
+drush cr
+
+echo "Done. Theme changes are live at https://portfolio.ddev.site"
