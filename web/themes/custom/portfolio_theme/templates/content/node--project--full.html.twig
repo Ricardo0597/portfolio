@@ -1,0 +1,62 @@
+<article class="project-full">
+
+  {% if project_thumbnail_url %}
+    <div class="project-full__hero">
+      <img src="{{ project_thumbnail_url }}" alt="{{ node.label }}" class="project-full__hero-img">
+    </div>
+  {% endif %}
+
+  <div class="project-full__meta">
+    {% if project_status %}
+      <span class="project-full__status project-full__status--{{ project_status|lower|replace({' ': '-'}) }}">
+        {{ project_status }}
+      </span>
+    {% endif %}
+    {% if project_start_date %}
+      <span class="project-full__dates">
+        {{ project_start_date }}
+        {% if project_end_date %}
+          &ndash; {{ project_end_date }}
+        {% else %}
+          &ndash; Present
+        {% endif %}
+      </span>
+    {% endif %}
+  </div>
+
+  {% if project_summary %}
+    <p class="project-full__summary">{{ project_summary }}</p>
+  {% endif %}
+
+  {% if project_stack %}
+    <ul class="project-full__stack">
+      {% for tech in project_stack %}
+        <li>
+          <a href="/projects?field_stack={{ tech|url_encode }}" class="project-full__tech-badge">{{ tech }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if project_demo_url or project_repo_url %}
+    <div class="project-full__actions">
+      {% if project_demo_url %}
+        <a href="{{ project_demo_url }}" class="project-full__action" target="_blank" rel="noopener noreferrer">
+          Live Demo
+        </a>
+      {% endif %}
+      {% if project_repo_url %}
+        <a href="{{ project_repo_url }}" class="project-full__action project-full__action--secondary" target="_blank" rel="noopener noreferrer">
+          Source Code
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if content.field_content['#items'] is not empty %}
+    <div class="project-full__content">
+      {{ content.field_content }}
+    </div>
+  {% endif %}
+
+</article>

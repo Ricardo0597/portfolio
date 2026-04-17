@@ -16,16 +16,22 @@ function portfolio_core_preprocess_node(array &$variables): void {
   $node = $variables['node'];
   $view_mode = $variables['view_mode'];
 
-  if ($view_mode !== 'teaser') {
+  if ($view_mode === 'teaser') {
+    match ($node->bundle()) {
+      'project'      => _portfolio_core_preprocess_project_teaser($variables, $node),
+      'article'      => _portfolio_core_preprocess_article_teaser($variables, $node),
+      'feature_demo' => _portfolio_core_preprocess_feature_demo_teaser($variables, $node),
+      default        => NULL,
+    };
     return;
   }
 
-  match ($node->bundle()) {
-    'project'      => _portfolio_core_preprocess_project_teaser($variables, $node),
-    'article'      => _portfolio_core_preprocess_article_teaser($variables, $node),
-    'feature_demo' => _portfolio_core_preprocess_feature_demo_teaser($variables, $node),
-    default        => NULL,
-  };
+  if ($view_mode === 'full') {
+    match ($node->bundle()) {
+      'project' => _portfolio_core_preprocess_project_full($variables, $node),
+      default   => NULL,
+    };
+  }
 }
 
 /**
@@ -82,4 +88,23 @@ function _portfolio_core_preprocess_feature_demo_teaser(array &$variables, NodeI
   $variables['feature_pattern'] = $node->get('field_drupal_pattern')->value ?? '';
   $variables['feature_difficulty'] = $node->get('field_difficulty')->value ?? '';
   $variables['feature_path'] = $node->toUrl()->toString();
+}
+
+/**
+ * Prepares variables for project full template.
+ */
+function _portfolio_core_preprocess_project_full(array &$variables, NodeInterface $node): void {
+  _portfolio_core_preprocess_project_teaser($variables, $node);
+
+  $date_formatter = \Drupal::service('date.formatter');
+
+  $start = $node->get('field_start_date')->value;
+  $variables['project_start_date'] = $start
+    ? $date_formatter->format(strtotime($start), 'custom', 'M Y')
+    : '';
+
+  $end = $node->get('field_end_date')->value;
+  $variables['project_end_date'] = $end
+    ? $date_formatter->format(strtotime($end), 'custom', 'M Y')
+    : '';
 }
