@@ -1,0 +1,22 @@
+uuid: cc874380-abaf-4450-9cc9-4c18b2da7939
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: project_node
+label: 'Project URL pattern'
+type: 'canonical_entities:node'
+pattern: 'projects/[node:title]'
+selection_criteria:
+  34c3e032-aa2a-493c-96bf-5ec195f23f83:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 34c3e032-aa2a-493c-96bf-5ec195f23f83
+    context_mapping:
+      node: node
+    bundles:
+      project: project
+selection_logic: and
+weight: 0
+relationships: {  }

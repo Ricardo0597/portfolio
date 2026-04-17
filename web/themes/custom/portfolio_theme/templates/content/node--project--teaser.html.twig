@@ -1,0 +1,10 @@
+{% include 'portfolio_theme:project-card' with {
+  title:         node.label,
+  summary:       project_summary,
+  thumbnail_url: project_thumbnail_url,
+  stack:         project_stack,
+  status:        project_status,
+  demo_url:      project_demo_url,
+  repo_url:      project_repo_url,
+  path:          project_path,
+} only %}

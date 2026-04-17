@@ -1,0 +1,35 @@
+uuid: cd7d166c-092e-4745-85be-14c5eb725181
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.feature_demo.body
+    - field.field.node.feature_demo.field_content
+    - field.field.node.feature_demo.field_difficulty
+    - field.field.node.feature_demo.field_drupal_pattern
+    - field.field.node.feature_demo.field_source_path
+    - field.field.node.feature_demo.field_stack
+    - field.field.node.feature_demo.field_summary
+    - node.type.feature_demo
+  module:
+    - user
+id: node.feature_demo.full
+targetEntityType: node
+bundle: feature_demo
+mode: full
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  body: true
+  field_content: true
+  field_difficulty: true
+  field_drupal_pattern: true
+  field_source_path: true
+  field_stack: true
+  field_summary: true
+  search_api_excerpt: true

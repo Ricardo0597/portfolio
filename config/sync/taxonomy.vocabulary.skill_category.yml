@@ -1,0 +1,9 @@
+uuid: 802ee24b-9108-4a3a-8fd4-fd36cfbd664f
+langcode: en
+status: true
+dependencies: {  }
+name: 'Skill Category'
+vid: skill_category
+description: null
+weight: 0
+new_revision: false

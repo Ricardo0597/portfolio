@@ -1,0 +1,17 @@
+uuid: 8db849c4-c88e-4678-b6c1-3f4d828af501
+langcode: en
+status: true
+dependencies:
+  module:
+    - search_api_db
+id: portfolio_db
+name: 'Portfolio Database'
+description: 'Database search backend for the portfolio site.'
+backend: search_api_db
+backend_config:
+  database: 'default:default'
+  min_chars: 1
+  autocomplete:
+    suggest_suffix: true
+    suggest_words: true
+  partial_matches: false

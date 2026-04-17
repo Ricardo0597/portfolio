@@ -1,0 +1,10 @@
+uuid: fe6aaa4e-1fbd-4e10-bd79-50ee7332d9ed
+langcode: en
+status: true
+dependencies: {  }
+id: external_reference
+label: 'External Reference'
+icon_uuid: null
+icon_default: null
+description: null
+behavior_plugins: {  }

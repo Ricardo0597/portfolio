@@ -1,0 +1,24 @@
+uuid: 2e06f480-2a29-4ff7-84f0-4a16067c67b0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_category
+    - node.type.skill
+    - taxonomy.vocabulary.skill_category
+id: node.skill.field_category
+field_name: field_category
+entity_type: node
+bundle: skill
+label: Category
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      skill_category: skill_category
+field_type: entity_reference

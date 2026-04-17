@@ -1,0 +1,85 @@
+<?php
+declare(strict_types=1);
+
+/**
+ * @file
+ * Primary module hooks for Portfolio Core.
+ */
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function portfolio_core_preprocess_node(array &$variables): void {
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $variables['node'];
+  $view_mode = $variables['view_mode'];
+
+  if ($view_mode !== 'teaser') {
+    return;
+  }
+
+  match ($node->bundle()) {
+    'project'      => _portfolio_core_preprocess_project_teaser($variables, $node),
+    'article'      => _portfolio_core_preprocess_article_teaser($variables, $node),
+    'feature_demo' => _portfolio_core_preprocess_feature_demo_teaser($variables, $node),
+    default        => NULL,
+  };
+}
+
+/**
+ * Prepares variables for project teaser template.
+ */
+function _portfolio_core_preprocess_project_teaser(array &$variables, NodeInterface $node): void {
+  $stack_terms = $node->get('field_stack')->referencedEntities();
+  $variables['project_stack'] = array_map(fn($t) => $t->label(), $stack_terms);
+
+  $status_terms = $node->get('field_status')->referencedEntities();
+  $variables['project_status'] = !empty($status_terms) ? $status_terms[0]->label() : '';
+
+  $thumbnail = $node->get('field_thumbnail');
+  $variables['project_thumbnail_url'] = !$thumbnail->isEmpty()
+    ? \Drupal::service('file_url_generator')->generateAbsoluteString($thumbnail->entity->getFileUri())
+    : '';
+
+  $demo_url = $node->get('field_demo_url');
+  $variables['project_demo_url'] = !$demo_url->isEmpty()
+    ? $demo_url->first()->getUrl()->toString()
+    : '';
+
+  $repo_url = $node->get('field_repo_url');
+  $variables['project_repo_url'] = !$repo_url->isEmpty()
+    ? $repo_url->first()->getUrl()->toString()
+    : '';
+
+  $variables['project_path'] = $node->toUrl()->toString();
+  $variables['project_summary'] = $node->get('field_summary')->value ?? '';
+}
+
+/**
+ * Prepares variables for article teaser template.
+ */
+function _portfolio_core_preprocess_article_teaser(array &$variables, NodeInterface $node): void {
+  $tag_terms = $node->get('field_tags')->referencedEntities();
+  $variables['article_tags'] = array_map(fn($t) => $t->label(), $tag_terms);
+
+  $hero = $node->get('field_hero_image');
+  $variables['article_hero_url'] = !$hero->isEmpty()
+    ? \Drupal::service('file_url_generator')->generateAbsoluteString($hero->entity->getFileUri())
+    : '';
+
+  $variables['article_path'] = $node->toUrl()->toString();
+  $variables['article_summary'] = $node->get('field_summary')->value ?? '';
+  $variables['article_date'] = \Drupal::service('date.formatter')
+    ->format($node->getCreatedTime(), 'medium');
+}
+
+/**
+ * Prepares variables for feature_demo teaser template.
+ */
+function _portfolio_core_preprocess_feature_demo_teaser(array &$variables, NodeInterface $node): void {
+  $variables['feature_pattern'] = $node->get('field_drupal_pattern')->value ?? '';
+  $variables['feature_difficulty'] = $node->get('field_difficulty')->value ?? '';
+  $variables['feature_path'] = $node->toUrl()->toString();
+}

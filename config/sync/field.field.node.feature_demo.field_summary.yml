@@ -1,0 +1,19 @@
+uuid: 7953a5dc-4679-41b8-ad38-c7553d476420
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_summary
+    - node.type.feature_demo
+id: node.feature_demo.field_summary
+field_name: field_summary
+entity_type: node
+bundle: feature_demo
+label: Summary
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

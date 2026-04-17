@@ -1,0 +1,23 @@
+uuid: a505d523-fcb6-4909-8652-8a4842ce7ce6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_years_experience
+    - node.type.profile
+id: node.profile.field_years_experience
+field_name: field_years_experience
+entity_type: node
+bundle: profile
+label: 'Years of Experience'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

@@ -1,0 +1,23 @@
+uuid: 506b865e-6079-4bcd-8cff-e7aafb698bc6
+langcode: en
+status: true
+dependencies:
+  module:
+    - search
+  theme:
+    - portfolio_theme
+_core:
+  default_config_hash: pbbed0hdqGDF-_QWVVTWRAwgDIotFuAvWH5mWUZu0fA
+id: portfolio_theme_search_form_wide
+theme: portfolio_theme
+region: header
+weight: -5
+provider: null
+plugin: search_form_block
+settings:
+  id: search_form_block
+  label: 'Search form (wide)'
+  label_display: '0'
+  provider: search
+  page_id: null
+visibility: {  }

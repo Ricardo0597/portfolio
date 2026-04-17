@@ -1,0 +1,9 @@
+uuid: 97e85094-a623-44d5-9dfb-3ac4aedd9fa2
+langcode: en
+status: true
+dependencies: {  }
+name: 'Technology Stack'
+vid: technology_stack
+description: null
+weight: 0
+new_revision: false

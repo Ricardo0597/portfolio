@@ -1,0 +1,63 @@
+uuid: 7530269c-d783-478b-bb2d-0eef19636611
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_drupal_pattern
+field_name: field_drupal_pattern
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: 'Content Type'
+      label: 'Content Type'
+    -
+      value: Paragraph
+      label: Paragraph
+    -
+      value: 'Block Plugin'
+      label: 'Block Plugin'
+    -
+      value: 'REST Resource'
+      label: 'REST Resource'
+    -
+      value: 'Event Subscriber'
+      label: 'Event Subscriber'
+    -
+      value: 'Twig Extension'
+      label: 'Twig Extension'
+    -
+      value: 'SDC Component'
+      label: 'SDC Component'
+    -
+      value: Views
+      label: Views
+    -
+      value: 'Search API'
+      label: 'Search API'
+    -
+      value: 'Layout Builder'
+      label: 'Layout Builder'
+    -
+      value: 'Config Entity'
+      label: 'Config Entity'
+    -
+      value: 'Custom Service'
+      label: 'Custom Service'
+    -
+      value: 'Form API'
+      label: 'Form API'
+    -
+      value: Hook
+      label: Hook
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,32 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Project Card'
+description: 'Displays a portfolio project with thumbnail, stack badges, and links.'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: 'Project title'
+    summary:
+      type: string
+      title: 'Short description'
+    thumbnail_url:
+      type: string
+      title: 'Thumbnail image URL'
+    stack:
+      type: array
+      title: 'Technology stack labels'
+      items:
+        type: string
+    status:
+      type: string
+      title: 'Project status label'
+    demo_url:
+      type: string
+      title: 'Live demo URL'
+    repo_url:
+      type: string
+      title: 'Repository URL'
+    path:
+      type: string
+      title: 'Node path/alias'

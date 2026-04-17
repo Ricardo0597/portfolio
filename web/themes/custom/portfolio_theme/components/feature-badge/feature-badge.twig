@@ -1,0 +1,9 @@
+<a href="{{ path }}" class="feature-badge">
+  <span class="feature-badge__pattern">{{ pattern }}</span>
+  <span class="feature-badge__title">{{ title }}</span>
+  {% if difficulty %}
+    <span class="feature-badge__difficulty feature-badge__difficulty--{{ difficulty|lower }}">
+      {{ difficulty }}
+    </span>
+  {% endif %}
+</a>

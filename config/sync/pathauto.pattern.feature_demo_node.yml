@@ -1,0 +1,22 @@
+uuid: 0352d5b6-4b3b-400e-a474-63dd6ef75fbd
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: feature_demo_node
+label: 'Feature demo URL pattern'
+type: 'canonical_entities:node'
+pattern: 'features/[node:title]'
+selection_criteria:
+  49b5412c-6677-452c-b567-5c7d6c8cedb4:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: 49b5412c-6677-452c-b567-5c7d6c8cedb4
+    context_mapping:
+      node: node
+    bundles:
+      feature_demo: feature_demo
+selection_logic: and
+weight: 0
+relationships: {  }

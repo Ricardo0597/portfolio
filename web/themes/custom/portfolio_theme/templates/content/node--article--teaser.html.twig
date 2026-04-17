@@ -1,0 +1,8 @@
+{% include 'portfolio_theme:article-teaser' with {
+  title:    node.label,
+  summary:  article_summary,
+  date:     article_date,
+  tags:     article_tags,
+  path:     article_path,
+  hero_url: article_hero_url,
+} only %}

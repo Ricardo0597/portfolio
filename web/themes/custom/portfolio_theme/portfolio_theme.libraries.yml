@@ -1,0 +1,13 @@
+base:
+  css:
+    base:
+      css/base/variables.css: {}
+      css/base/reset.css: {}
+      css/base/typography.css: {}
+    layout:
+      css/layout/main.css: {}
+  js:
+    js/portfolio.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

@@ -1,0 +1,22 @@
+uuid: 4298a3e5-6bbd-464b-ab61-130e7b82d9ff
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - node.type.skill
+  module:
+    - text
+id: node.skill.field_description
+field_name: field_description
+entity_type: node
+bundle: skill
+label: Description
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

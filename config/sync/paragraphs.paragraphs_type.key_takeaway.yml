@@ -1,0 +1,10 @@
+uuid: 19f18c63-c8f9-4b7d-92de-bd3ffd7a6609
+langcode: en
+status: true
+dependencies: {  }
+id: key_takeaway
+label: 'Key Takeaway'
+icon_uuid: null
+icon_default: null
+description: null
+behavior_plugins: {  }

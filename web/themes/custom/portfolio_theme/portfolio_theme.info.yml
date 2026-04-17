@@ -1,0 +1,14 @@
+name: 'Portfolio Theme'
+type: theme
+description: 'Custom theme for the portfolio site.'
+core_version_requirement: ^11
+base theme: false
+libraries:
+  - portfolio_theme/base
+regions:
+  header: Header
+  primary_menu: 'Primary menu'
+  content: Content
+  sidebar: Sidebar
+  footer: Footer
+screenshot: images/screenshot.png

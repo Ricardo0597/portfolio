@@ -1,0 +1,19 @@
+uuid: ecb69815-cab9-45ec-b403-18861410aec8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_code
+    - paragraphs.paragraphs_type.code_snippet
+id: paragraph.code_snippet.field_code
+field_name: field_code
+entity_type: paragraph
+bundle: code_snippet
+label: Code
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

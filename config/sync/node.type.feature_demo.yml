@@ -1,0 +1,11 @@
+uuid: 4cd2510b-67fb-430c-800d-1701bec59071
+langcode: en
+status: true
+dependencies: {  }
+name: 'Feature Demo'
+type: feature_demo
+description: 'Drupal feature demo.'
+help: null
+new_revision: false
+preview_mode: 1
+display_submitted: true

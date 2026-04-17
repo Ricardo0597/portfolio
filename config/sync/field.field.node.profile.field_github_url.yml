@@ -1,0 +1,23 @@
+uuid: f0163db2-8705-4786-8bf5-05d773d32729
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_github_url
+    - node.type.profile
+  module:
+    - link
+id: node.profile.field_github_url
+field_name: field_github_url
+entity_type: node
+bundle: profile
+label: 'GitHub URL'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link

@@ -1,0 +1,41 @@
+uuid: 3f736d64-0b7d-4313-946a-89ed569a5f16
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.feature_demo.body
+    - field.field.node.feature_demo.field_content
+    - field.field.node.feature_demo.field_difficulty
+    - field.field.node.feature_demo.field_drupal_pattern
+    - field.field.node.feature_demo.field_source_path
+    - field.field.node.feature_demo.field_stack
+    - field.field.node.feature_demo.field_summary
+    - node.type.feature_demo
+  module:
+    - text
+    - user
+id: node.feature_demo.default
+targetEntityType: node
+bundle: feature_demo
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_content: true
+  field_difficulty: true
+  field_drupal_pattern: true
+  field_source_path: true
+  field_stack: true
+  field_summary: true
+  search_api_excerpt: true

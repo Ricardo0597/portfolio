@@ -1,0 +1,39 @@
+uuid: 14a78c00-9b8a-4ef9-97bc-69031c0eb2e3
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_language
+field_name: field_language
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: PHP
+      label: PHP
+    -
+      value: JS
+      label: JS
+    -
+      value: CSS
+      label: CSS
+    -
+      value: Twig
+      label: Twig
+    -
+      value: YAML
+      label: YAML
+    -
+      value: Bash
+      label: Bash
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

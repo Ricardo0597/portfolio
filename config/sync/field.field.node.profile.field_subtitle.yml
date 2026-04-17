@@ -1,0 +1,19 @@
+uuid: 45971d88-cb57-414d-b03e-b3c236c048f0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_subtitle
+    - node.type.profile
+id: node.profile.field_subtitle
+field_name: field_subtitle
+entity_type: node
+bundle: profile
+label: Subtitle
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

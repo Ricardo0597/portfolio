@@ -1,0 +1,43 @@
+uuid: c4db2cbb-0787-4c1f-8e10-d693ed468c4a
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.project.body
+    - field.field.node.project.field_content
+    - field.field.node.project.field_demo_url
+    - field.field.node.project.field_end_date
+    - field.field.node.project.field_featured
+    - field.field.node.project.field_repo_url
+    - field.field.node.project.field_stack
+    - field.field.node.project.field_start_date
+    - field.field.node.project.field_status
+    - field.field.node.project.field_summary
+    - field.field.node.project.field_thumbnail
+    - node.type.project
+  module:
+    - user
+id: node.project.full
+targetEntityType: node
+bundle: project
+mode: full
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  body: true
+  field_content: true
+  field_demo_url: true
+  field_end_date: true
+  field_featured: true
+  field_repo_url: true
+  field_stack: true
+  field_start_date: true
+  field_status: true
+  field_summary: true
+  field_thumbnail: true
+  search_api_excerpt: true

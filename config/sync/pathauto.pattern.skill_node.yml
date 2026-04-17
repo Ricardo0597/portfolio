@@ -1,0 +1,22 @@
+uuid: 21619118-704d-44dd-8e10-26ce01c4a935
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: skill_node
+label: 'Skill URL pattern'
+type: 'canonical_entities:node'
+pattern: 'skills/[node:title]'
+selection_criteria:
+  f1d48e5e-f8ff-4dd0-aea5-3af49c5eb5ce:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: f1d48e5e-f8ff-4dd0-aea5-3af49c5eb5ce
+    context_mapping:
+      node: node
+    bundles:
+      skill: skill
+selection_logic: and
+weight: 0
+relationships: {  }

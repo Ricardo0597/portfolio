@@ -1,0 +1,28 @@
+<article class="article-teaser">
+  {% if hero_url %}
+    <a href="{{ path }}" class="article-teaser__hero-link" tabindex="-1" aria-hidden="true">
+      <img class="article-teaser__hero" src="{{ hero_url }}" alt="{{ title }}" loading="lazy">
+    </a>
+  {% endif %}
+  <div class="article-teaser__body">
+    {% if tags %}
+      <ul class="article-teaser__tags">
+        {% for tag in tags %}
+          <li class="article-teaser__tag">{{ tag }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <h3 class="article-teaser__title">
+      <a href="{{ path }}">{{ title }}</a>
+    </h3>
+    {% if summary %}
+      <p class="article-teaser__summary">{{ summary }}</p>
+    {% endif %}
+    <footer class="article-teaser__meta">
+      {% if date %}
+        <time class="article-teaser__date">{{ date }}</time>
+      {% endif %}
+      <a href="{{ path }}" class="article-teaser__read-more">Read more →</a>
+    </footer>
+  </div>
+</article>

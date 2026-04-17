@@ -1,0 +1,167 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - search_api.index.portfolio_projects
+  module:
+    - node
+    - search_api
+    - user
+id: portfolio_projects
+label: 'Portfolio Projects'
+module: views
+description: 'Faceted listing of portfolio projects.'
+tag: portfolio
+base_table: search_api_index_portfolio_projects
+base_field: ''
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: Projects
+      fields: {  }
+      pager:
+        type: some
+        options:
+          offset: 0
+          items_per_page: 12
+      exposed_form:
+        type: basic
+        options:
+          submit_button: Filter
+          reset_button: true
+          reset_button_label: Reset
+      access:
+        type: none
+        options: {  }
+      cache:
+        type: none
+        options: {  }
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: text_custom
+          content: 'No projects found. Try adjusting your filters.'
+          tokenize: false
+      sorts:
+        field_start_date:
+          id: field_start_date
+          table: search_api_index_portfolio_projects
+          field: field_start_date
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_date
+          order: DESC
+          expose:
+            label: Date
+          exposed: true
+      arguments: {  }
+      filters:
+        status:
+          id: status
+          table: search_api_index_portfolio_projects
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_boolean
+          operator: '='
+          value: '1'
+          group: 1
+          exposed: false
+          is_grouped: false
+        field_stack:
+          id: field_stack
+          table: search_api_index_portfolio_projects
+          field: field_stack
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_string
+          operator: '='
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            operator_id: field_stack_op
+            label: Technology
+            identifier: field_stack
+            required: false
+            remember: false
+            multiple: true
+          is_grouped: false
+        field_status:
+          id: field_status
+          table: search_api_index_portfolio_projects
+          field: field_status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          plugin_id: search_api_string
+          operator: '='
+          value: {  }
+          group: 1
+          exposed: true
+          expose:
+            label: Status
+            identifier: field_status
+            required: false
+            remember: false
+            multiple: false
+          is_grouped: false
+      style:
+        type: default
+        options:
+          grouping: {  }
+          row_class: ''
+          default_row_class: true
+      row:
+        type: 'entity:node'
+        options:
+          relationship: none
+          view_mode: teaser
+      query:
+        type: views_query
+        options:
+          bypass_access: false
+          skip_access: false
+      relationships: {  }
+      use_ajax: true
+      header: {  }
+      footer: {  }
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - url.query_args
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }
+  page_1:
+    id: page_1
+    display_title: 'Projects page'
+    display_plugin: page
+    position: 1
+    display_options:
+      title: Projects
+      display_extenders: {  }
+      path: projects
+    cache_metadata:
+      max-age: -1
+      contexts:
+        - 'languages:language_interface'
+        - url
+        - url.query_args
+        - 'user.node_grants:view'
+        - user.permissions
+      tags: {  }

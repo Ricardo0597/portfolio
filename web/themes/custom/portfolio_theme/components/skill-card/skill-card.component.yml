@@ -1,0 +1,18 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Skill Card'
+description: 'Displays a single skill with level indicator.'
+props:
+  type: object
+  properties:
+    name:
+      type: string
+      title: 'Skill name'
+    level:
+      type: integer
+      title: 'Skill level (1-5)'
+    category:
+      type: string
+      title: 'Skill category label'
+    icon_class:
+      type: string
+      title: 'Icon CSS class'

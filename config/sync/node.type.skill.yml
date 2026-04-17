@@ -1,0 +1,11 @@
+uuid: 2944c7ff-c29e-4bca-af2f-b00170f532ae
+langcode: en
+status: true
+dependencies: {  }
+name: Skill
+type: skill
+description: 'Technical skill.'
+help: null
+new_revision: false
+preview_mode: 1
+display_submitted: true

@@ -1,0 +1,14 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - metatag
+    - node
+id: node__project
+label: 'Content: Project'
+tags:
+  title: '[node:title] | [site:name]'
+  description: '[node:field_summary]'
+  og_title: '[node:title]'
+  og_description: '[node:field_summary]'
+  og_type: article

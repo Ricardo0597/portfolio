@@ -1,0 +1,22 @@
+uuid: 5190f2a5-85b9-4716-98f6-6ceb7ddb611a
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - portfolio_theme
+_core:
+  default_config_hash: VfPFqqxfkomud5CO8DUijw85QIl9GIxh_nIxLOYESxg
+id: portfolio_theme_help
+theme: portfolio_theme
+region: header
+weight: 0
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  label_display: '0'
+  provider: help
+visibility: {  }

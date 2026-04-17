@@ -1,0 +1,17 @@
+uuid: 107c39b7-0bc2-4ae5-881c-0a3ea4977160
+langcode: en
+status: true
+dependencies:
+  module:
+    - portfolio_core
+    - serialization
+id: portfolio_projects
+plugin_id: portfolio_projects
+granularity: resource
+configuration:
+  methods:
+    - GET
+  formats:
+    - json
+  authentication:
+    - anon

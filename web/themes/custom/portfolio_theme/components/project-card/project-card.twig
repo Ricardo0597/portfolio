@@ -1,0 +1,38 @@
+<article class="project-card">
+  {% if thumbnail_url %}
+    <a href="{{ path }}" class="project-card__image-link" tabindex="-1" aria-hidden="true">
+      <img class="project-card__thumbnail" src="{{ thumbnail_url }}" alt="{{ title }}" loading="lazy">
+    </a>
+  {% endif %}
+  <div class="project-card__body">
+    <header class="project-card__header">
+      <h3 class="project-card__title">
+        <a href="{{ path }}">{{ title }}</a>
+      </h3>
+      {% if status %}
+        <span class="project-card__status project-card__status--{{ status|lower|replace({' ': '-'}) }}">
+          {{ status }}
+        </span>
+      {% endif %}
+    </header>
+    {% if summary %}
+      <p class="project-card__summary">{{ summary }}</p>
+    {% endif %}
+    {% if stack %}
+      <ul class="project-card__stack">
+        {% for tech in stack %}
+          <li class="project-card__tech-badge">{{ tech }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <footer class="project-card__actions">
+      {% if demo_url %}
+        <a href="{{ demo_url }}" class="project-card__action" target="_blank" rel="noopener noreferrer">Live demo</a>
+      {% endif %}
+      {% if repo_url %}
+        <a href="{{ repo_url }}" class="project-card__action project-card__action--secondary" target="_blank" rel="noopener noreferrer">Source</a>
+      {% endif %}
+      <a href="{{ path }}" class="project-card__action project-card__action--ghost">Details</a>
+    </footer>
+  </div>
+</article>

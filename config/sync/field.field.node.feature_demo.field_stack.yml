@@ -1,0 +1,24 @@
+uuid: e315673a-7e97-4500-87c4-d1b0296ebbcf
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_stack
+    - node.type.feature_demo
+    - taxonomy.vocabulary.technology_stack
+id: node.feature_demo.field_stack
+field_name: field_stack
+entity_type: node
+bundle: feature_demo
+label: 'Technology Stack'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      technology_stack: technology_stack
+field_type: entity_reference

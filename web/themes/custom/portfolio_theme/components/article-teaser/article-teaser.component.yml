@@ -1,0 +1,26 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Article Teaser'
+description: 'Teaser card for blog/TIL articles.'
+props:
+  type: object
+  properties:
+    title:
+      type: string
+      title: 'Article title'
+    summary:
+      type: string
+      title: 'Teaser text'
+    date:
+      type: string
+      title: 'Publication date (formatted)'
+    tags:
+      type: array
+      title: 'Tag labels'
+      items:
+        type: string
+    path:
+      type: string
+      title: 'Node path/alias'
+    hero_url:
+      type: string
+      title: 'Hero image URL (optional)'

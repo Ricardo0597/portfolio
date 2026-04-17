@@ -1,0 +1,5 @@
+name: 'Portfolio Core'
+type: module
+description: 'Core custom functionality for the portfolio site.'
+package: Portfolio
+core_version_requirement: ^11

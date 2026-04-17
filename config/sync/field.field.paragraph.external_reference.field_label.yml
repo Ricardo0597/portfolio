@@ -1,0 +1,19 @@
+uuid: c961f25e-7328-4ad8-99fb-15d05c738ba2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_label
+    - paragraphs.paragraphs_type.external_reference
+id: paragraph.external_reference.field_label
+field_name: field_label
+entity_type: paragraph
+bundle: external_reference
+label: Label
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

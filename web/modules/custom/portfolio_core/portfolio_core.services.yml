@@ -1,0 +1,13 @@
+services:
+  portfolio_core.twig_extension:
+    class: Drupal\portfolio_core\TwigExtension\PortfolioTwigExtension
+    tags:
+      - { name: twig.extension }
+
+  portfolio_core.profile_access_subscriber:
+    class: Drupal\portfolio_core\EventSubscriber\ProfileAccessSubscriber
+    arguments:
+      - '@current_route_match'
+      - '@entity_type.manager'
+    tags:
+      - { name: event_subscriber }

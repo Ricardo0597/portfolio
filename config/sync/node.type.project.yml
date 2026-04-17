@@ -1,0 +1,11 @@
+uuid: 5caf6c5e-6752-44a0-af7e-5d0f852e2bc1
+langcode: en
+status: true
+dependencies: {  }
+name: Project
+type: project
+description: 'Portfolio project.'
+help: null
+new_revision: false
+preview_mode: 1
+display_submitted: true
