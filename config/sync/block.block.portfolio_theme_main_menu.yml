@@ -12,7 +12,7 @@ _core:
   default_config_hash: KWAiziL39uEzmOJEql_wbUP2RtqGceL3WM2CfxhMelE
 id: portfolio_theme_main_menu
 theme: portfolio_theme
-region: primary_menu
+region: header
 weight: 0
 provider: null
 plugin: 'system_menu_block:main'

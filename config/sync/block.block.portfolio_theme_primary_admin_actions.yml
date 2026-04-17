@@ -8,7 +8,7 @@ _core:
   default_config_hash: Q9_2whdOj1YIomfvsIfopROW4FT_X5pY0DjdOiOaQ5U
 id: portfolio_theme_primary_admin_actions
 theme: portfolio_theme
-region: header
+region: content
 weight: -5
 provider: null
 plugin: local_actions_block

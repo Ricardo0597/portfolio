@@ -1,6 +1,27 @@
 @use '../abstracts/tokens' as t;
 @use '../abstracts/mixins' as m;
 
+// ─── Skip link ────────────────────────────────────────────────────────────────
+
+.skip-link {
+  @include m.sr-only;
+
+  &:focus {
+    position: fixed;
+    top: var(--space-2);
+    left: var(--space-2);
+    z-index: 9999;
+    width: auto;
+    height: auto;
+    clip: auto;
+    background: var(--color-highlight);
+    color: #fff;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--border-radius);
+    font-weight: 600;
+  }
+}
+
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 .layout-container {
@@ -11,7 +32,7 @@
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 
-header[role='banner'] {
+.site-header {
   background: var(--color-primary);
   border-bottom: 1px solid var(--color-border);
   padding: var(--space-4) 0;
@@ -19,8 +40,7 @@ header[role='banner'] {
   top: 0;
   z-index: 100;
 
-  // Wrap banner blocks into a flex row
-  .layout-container {
+  &__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -28,42 +48,28 @@ header[role='banner'] {
   }
 }
 
-// Site branding block
-.site-branding {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+// Branding — output by block--system-branding-block.html.twig
+.site-branding__name {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  opacity: 1;
+  white-space: nowrap;
 
-  &__name a {
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--color-text);
-    opacity: 1;
-
-    &:hover { color: var(--color-highlight); }
-  }
-
-  &__slogan {
-    font-size: var(--text-xs);
-    color: var(--color-text-muted);
-  }
-
-  // Hide placeholder logo image until one is uploaded
-  &__logo img { display: none; }
+  &:hover { color: var(--color-highlight); opacity: 1; }
 }
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
-nav[role='navigation'],
-.navigation {
-  ul {
+.site-nav {
+  &__list {
     display: flex;
     align-items: center;
     gap: var(--space-6);
     flex-wrap: nowrap;
   }
 
-  a {
+  &__link {
     color: var(--color-text-muted);
     font-size: var(--text-sm);
     font-weight: 500;
@@ -73,7 +79,7 @@ nav[role='navigation'],
     transition: color var(--transition-fast);
 
     &:hover,
-    &.is-active {
+    &--active {
       color: var(--color-text);
     }
   }
@@ -92,14 +98,42 @@ footer[role='contentinfo'] {
   background: var(--color-primary);
   border-top: 1px solid var(--color-border);
   padding: var(--space-8) 0;
-  text-align: center;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
 
   a {
     color: var(--color-text-muted);
-
     &:hover { color: var(--color-highlight); }
+  }
+}
+
+.site-footer {
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  &__copy {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+}
+
+// ─── Page header (page title block) ───────────────────────────────────────────
+
+.page-header {
+  margin-bottom: var(--space-8);
+
+  h1 {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.1;
+
+    @include m.respond-to('md') { font-size: var(--text-4xl); }
   }
 }
 

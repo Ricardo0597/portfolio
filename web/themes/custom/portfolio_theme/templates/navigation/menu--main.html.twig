@@ -1,0 +1,19 @@
+{% import _self as menus %}
+{{ menus.menu_links(items, attributes, 0) }}
+
+{% macro menu_links(items, attributes, menu_level) %}
+  {% if items %}
+    <ul class="site-nav__list">
+      {% for item in items %}
+        <li class="site-nav__item{{ item.is_expanded ? ' site-nav__item--expanded' }}">
+          {{ link(item.title, item.url, {
+            'class': ['site-nav__link', item.in_active_trail ? 'site-nav__link--active'],
+          }) }}
+          {% if item.below %}
+            {{ menus.menu_links(item.below, attributes, menu_level + 1) }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}
