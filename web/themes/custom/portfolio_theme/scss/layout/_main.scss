@@ -151,21 +151,9 @@ footer[role='contentinfo'] {
 
 // ─── Views / listing pages ────────────────────────────────────────────────────
 
-.view-content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-8);
-
-  // Drupal wraps each result in .views-row — ensure gap applies
-  .views-row {
-    display: contents; // let the card itself be the grid/flex item
-  }
-
-  @include m.respond-to('sm') {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: var(--space-6);
-  }
+// Views listing — gap between rows (no .view-content wrapper in this setup)
+.views-row + .views-row {
+  margin-top: var(--space-8);
 }
 
 // ─── Facets sidebar ───────────────────────────────────────────────────────────
