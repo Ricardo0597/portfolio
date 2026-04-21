@@ -1,8 +1,19 @@
+uuid: bcb0b1f4-3499-450c-99d3-9ef227d09213
 langcode: en
 status: true
 dependencies:
   config:
     - core.entity_view_mode.node.pdf
+    - field.field.node.profile.field_bio
+    - field.field.node.profile.field_cv_file
+    - field.field.node.profile.field_drupalorg_url
+    - field.field.node.profile.field_email
+    - field.field.node.profile.field_github_url
+    - field.field.node.profile.field_linkedin_url
+    - field.field.node.profile.field_location
+    - field.field.node.profile.field_photo
+    - field.field.node.profile.field_subtitle
+    - field.field.node.profile.field_years_experience
     - node.type.profile
   module:
     - node
@@ -10,8 +21,12 @@ id: node.profile.pdf
 targetEntityType: node
 bundle: profile
 mode: pdf
-content: {}
+content: {  }
 hidden:
+  body: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
   field_bio: true
   field_cv_file: true
   field_drupalorg_url: true
@@ -23,3 +38,4 @@ hidden:
   field_subtitle: true
   field_years_experience: true
   links: true
+  search_api_excerpt: true
