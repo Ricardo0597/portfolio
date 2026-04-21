@@ -1,0 +1,108 @@
+// ─── About / Profile page ─────────────────────────────────────────────────────
+
+.about {
+  max-width: 800px;
+
+  &__header {
+    margin-bottom: var(--space-12);
+    padding-bottom: var(--space-8);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__name {
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    margin: 0 0 var(--space-3);
+    color: var(--color-text);
+  }
+
+  &__subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin: 0 0 var(--space-6);
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    &--link {
+      color: var(--color-highlight);
+      transition: opacity var(--transition-fast);
+
+      &:hover { opacity: 0.75; }
+    }
+  }
+
+  &__actions {
+    margin: var(--space-6) 0;
+  }
+
+  &__download-btn {
+    display: inline-block;
+    padding: var(--space-2) var(--space-6);
+    background: var(--color-highlight);
+    color: var(--color-text);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: opacity var(--transition-fast);
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+
+  &__bio {
+    font-size: var(--text-base);
+    line-height: 1.8;
+    color: var(--color-text);
+
+    p {
+      margin: 0 0 var(--space-6);
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--color-text);
+      margin: var(--space-12) 0 var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    li {
+      padding-left: var(--space-6);
+      position: relative;
+      color: var(--color-text-muted);
+
+      &::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--color-highlight);
+        font-weight: 600;
+      }
+    }
+  }
+}

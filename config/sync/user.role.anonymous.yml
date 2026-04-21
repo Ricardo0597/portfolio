@@ -6,6 +6,7 @@ dependencies:
     - filter.format.restricted_html
   module:
     - comment
+    - entity_print
     - filter
     - search
     - system
@@ -18,5 +19,6 @@ is_admin: false
 permissions:
   - 'access comments'
   - 'access content'
+  - 'entity print access bundle profile'
   - 'search content'
   - 'use text format restricted_html'

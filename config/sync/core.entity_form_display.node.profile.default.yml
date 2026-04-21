@@ -6,6 +6,7 @@ dependencies:
     - field.field.node.profile.body
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
+    - field.field.node.profile.field_drupalorg_url
     - field.field.node.profile.field_email
     - field.field.node.profile.field_github_url
     - field.field.node.profile.field_linkedin_url
@@ -82,6 +83,7 @@ content:
 hidden:
   field_bio: true
   field_cv_file: true
+  field_drupalorg_url: true
   field_email: true
   field_github_url: true
   field_linkedin_url: true

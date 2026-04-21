@@ -1,0 +1,40 @@
+<article class="about">
+
+  <header class="about__header">
+    {% if profile_subtitle %}
+      <p class="about__subtitle">{{ profile_subtitle }}</p>
+    {% endif %}
+    <div class="about__meta">
+      {% if profile_location %}
+        <span class="about__meta-item">{{ profile_location }}</span>
+      {% endif %}
+      {% if profile_email %}
+        <a href="mailto:{{ profile_email }}" class="about__meta-item about__meta-item--link">{{ profile_email }}</a>
+      {% endif %}
+      {% if profile_github_url %}
+        <a href="{{ profile_github_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">GitHub</a>
+      {% endif %}
+      {% if profile_linkedin_url %}
+        <a href="{{ profile_linkedin_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      {% endif %}
+      {% if profile_drupalorg_url %}
+        <a href="{{ profile_drupalorg_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">Drupal.org</a>
+      {% endif %}
+    </div>
+  </header>
+
+  <div class="about__actions">
+    <a href="{{ path('entity_print.view', {export_type: 'pdf', entity_type: 'node', entity_id: node.id}) }}"
+       class="about__download-btn"
+       target="_blank">
+      Download CV (PDF)
+    </a>
+  </div>
+
+  {% if profile_bio %}
+    <div class="about__bio">
+      {{ profile_bio }}
+    </div>
+  {% endif %}
+
+</article>
