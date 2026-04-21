@@ -197,6 +197,8 @@ function _portfolio_core_preprocess_project_full(array &$variables, NodeInterfac
  * Prepares variables for profile PDF template.
  */
 function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface $node): void {
+  // Exposed explicitly here because the PDF template owns its full document
+  // structure; the full view mode uses node.label directly in the template.
   $variables['profile_name'] = $node->label();
   $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
   $variables['profile_location'] = $node->get('field_location')->value ?? '';
@@ -223,5 +225,10 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     ? $drupalorg->first()->getUrl()->toString()
     : '';
 
-  $variables['#cache']['tags'] = $node->getCacheTags();
+  // Entity Print bypasses the standard render cache; explicit cache tags
+  // ensure invalidation when the profile node is updated.
+  $variables['#cache']['tags'] = array_merge(
+    $variables['#cache']['tags'] ?? [],
+    $node->getCacheTags(),
+  );
 }
