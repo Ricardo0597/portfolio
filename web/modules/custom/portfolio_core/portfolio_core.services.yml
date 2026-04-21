@@ -5,7 +5,6 @@ services:
       - { name: twig.extension }
   portfolio_core.entity_print_css_subscriber:
     class: Drupal\portfolio_core\EventSubscriber\EntityPrintCssSubscriber
-    arguments: ['@extension.list.theme']
     tags:
       - { name: event_subscriber }
 

@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Drupal\portfolio_core\EventSubscriber;
 
-use Drupal\Core\Extension\ExtensionList;
 use Drupal\entity_print\Event\PrintCssAlterEvent;
 use Drupal\entity_print\Event\PrintEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -14,13 +13,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 final class EntityPrintCssSubscriber implements EventSubscriberInterface {
 
   /**
-   * Constructs an EntityPrintCssSubscriber.
-   */
-  public function __construct(
-    private readonly ExtensionList $themeList,
-  ) {}
-
-  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
@@ -29,6 +21,9 @@ final class EntityPrintCssSubscriber implements EventSubscriberInterface {
 
   /**
    * Attaches cv-pdf library when printing a profile node.
+   *
+   * @param \Drupal\entity_print\Event\PrintCssAlterEvent $event
+   *   The CSS alter event.
    */
   public function onCssAlter(PrintCssAlterEvent $event): void {
     foreach ($event->getEntities() as $entity) {
