@@ -207,7 +207,7 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
 
   $bio_field = $node->get('field_bio');
   $variables['profile_bio'] = !$bio_field->isEmpty()
-    ? strip_tags(check_markup($bio_field->value, $bio_field->format))
+    ? strip_tags((string) check_markup($bio_field->value, $bio_field->format))
     : '';
 
   $github = $node->get('field_github_url');
@@ -231,4 +231,12 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     $variables['#cache']['tags'] ?? [],
     $node->getCacheTags(),
   );
+}
+
+/**
+ * Implements hook_entity_print_css_alter().
+ */
+function portfolio_core_entity_print_css_alter(array &$css, \Drupal\Core\Entity\EntityInterface $entity): void {
+  $theme_path = \Drupal::service('extension.list.theme')->getPath('portfolio_theme');
+  $css[] = $theme_path . '/css/layout/cv-pdf.css';
 }

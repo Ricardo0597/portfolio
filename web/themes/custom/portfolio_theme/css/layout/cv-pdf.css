@@ -1,0 +1,72 @@
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  color: #1a1a1a;
+  margin: 0;
+  padding: 0;
+}
+
+.cv {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24pt;
+}
+
+.cv__header {
+  border-bottom: 2pt solid #1a1a1a;
+  padding-bottom: 12pt;
+  margin-bottom: 12pt;
+}
+
+.cv__name {
+  font-size: 22pt;
+  font-weight: 700;
+  margin: 0 0 4pt 0;
+  color: #1a1a1a;
+}
+
+.cv__subtitle {
+  font-size: 13pt;
+  color: #444444;
+  margin: 0 0 6pt 0;
+}
+
+.cv__meta {
+  font-size: 10pt;
+  color: #666666;
+}
+
+.cv__meta-item {
+  display: inline-block;
+  margin-right: 16pt;
+}
+
+.cv__contact {
+  margin-bottom: 16pt;
+}
+
+.cv__contact-item {
+  font-size: 10pt;
+  margin-bottom: 4pt;
+}
+
+.cv__section {
+  margin-bottom: 16pt;
+}
+
+.cv__section-title {
+  font-size: 13pt;
+  font-weight: 700;
+  color: #1a1a1a;
+  border-bottom: 1pt solid #cccccc;
+  padding-bottom: 4pt;
+  margin: 0 0 8pt 0;
+}
+
+.cv__bio {
+  font-size: 11pt;
+  line-height: 1.5;
+  color: #333333;
+  margin: 0;
+}
