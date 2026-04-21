@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ profile_name }} — CV</title>
+</head>
+<body>
+
+  <div class="cv">
+
+    <div class="cv__header">
+      <h1 class="cv__name">{{ profile_name }}</h1>
+      {% if profile_subtitle %}
+        <p class="cv__subtitle">{{ profile_subtitle }}</p>
+      {% endif %}
+      <div class="cv__meta">
+        {% if profile_location %}
+          <span class="cv__meta-item">{{ profile_location }}</span>
+        {% endif %}
+        {% if profile_years_experience %}
+          <span class="cv__meta-item">{{ profile_years_experience }} years experience</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="cv__contact">
+      {% if profile_email %}
+        <div class="cv__contact-item">
+          <strong>Email:</strong> {{ profile_email }}
+        </div>
+      {% endif %}
+      {% if profile_github_url %}
+        <div class="cv__contact-item">
+          <strong>GitHub:</strong> {{ profile_github_url }}
+        </div>
+      {% endif %}
+      {% if profile_linkedin_url %}
+        <div class="cv__contact-item">
+          <strong>LinkedIn:</strong> {{ profile_linkedin_url }}
+        </div>
+      {% endif %}
+      {% if profile_drupalorg_url %}
+        <div class="cv__contact-item">
+          <strong>Drupal.org:</strong> {{ profile_drupalorg_url }}
+        </div>
+      {% endif %}
+    </div>
+
+    {% if profile_bio %}
+      <div class="cv__section">
+        <h2 class="cv__section-title">About</h2>
+        <p class="cv__bio">{{ profile_bio }}</p>
+      </div>
+    {% endif %}
+
+  </div>
+
+</body>
+</html>
