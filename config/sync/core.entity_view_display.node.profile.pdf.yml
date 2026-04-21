@@ -1,0 +1,25 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.pdf
+    - node.type.profile
+  module:
+    - node
+id: node.profile.pdf
+targetEntityType: node
+bundle: profile
+mode: pdf
+content: {}
+hidden:
+  field_bio: true
+  field_cv_file: true
+  field_drupalorg_url: true
+  field_email: true
+  field_github_url: true
+  field_linkedin_url: true
+  field_location: true
+  field_photo: true
+  field_subtitle: true
+  field_years_experience: true
+  links: true
