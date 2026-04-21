@@ -7,3 +7,8 @@ base:
   dependencies:
     - core/drupal
     - core/once
+
+cv-pdf:
+  css:
+    theme:
+      css/layout/cv-pdf.css: {}
