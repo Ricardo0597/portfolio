@@ -40,6 +40,7 @@ ddev drush cex -y      # config export
 ddev drush cim -y      # config import
 ddev drush updb -y     # run update hooks
 ddev drush en <module> # enable module
+ddev theme-build       # compile SCSS → CSS (runs npm run build inside the theme)
 ddev ngrok             # expose site publicly via ngrok tunnel
 ```
 
