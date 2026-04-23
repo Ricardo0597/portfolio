@@ -1,0 +1,19 @@
+uuid: 96ead5d4-9cc5-471e-93ba-4a292e98e850
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+    - text
+id: paragraph.field_we_achievements
+field_name: field_we_achievements
+entity_type: paragraph
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
