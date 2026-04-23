@@ -1,0 +1,21 @@
+uuid: 4a124989-bc71-4d49-b8b6-60651ba29ebb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_we_end_date
+    - paragraphs.paragraphs_type.work_experience
+  module:
+    - datetime
+id: paragraph.work_experience.field_we_end_date
+field_name: field_we_end_date
+entity_type: paragraph
+bundle: work_experience
+label: 'End Date'
+description: 'Leave empty for current/present position.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

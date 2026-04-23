@@ -1,0 +1,21 @@
+uuid: 1fdc8716-5652-4c09-91f4-c70aa836068f
+langcode: en
+status: true
+dependencies:
+  config:
+    - paragraphs.paragraphs_type.work_experience
+  module:
+    - paragraphs
+id: paragraph.work_experience.default
+targetEntityType: paragraph
+bundle: work_experience
+mode: default
+content: {  }
+hidden:
+  field_we_job_title: true
+  field_we_company: true
+  field_we_location: true
+  field_we_start_date: true
+  field_we_end_date: true
+  field_we_employment_type: true
+  field_we_achievements: true

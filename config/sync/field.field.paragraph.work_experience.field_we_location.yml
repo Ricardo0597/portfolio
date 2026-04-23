@@ -1,0 +1,19 @@
+uuid: ea4a3d0d-060f-46b2-af50-e92ce2618147
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_we_location
+    - paragraphs.paragraphs_type.work_experience
+id: paragraph.work_experience.field_we_location
+field_name: field_we_location
+entity_type: paragraph
+bundle: work_experience
+label: Location
+description: 'City, Country or "Remote"'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

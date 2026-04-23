@@ -1,0 +1,22 @@
+uuid: a1249d25-a42f-4e98-9efb-042e19a6f5fc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_we_achievements
+    - paragraphs.paragraphs_type.work_experience
+  module:
+    - text
+id: paragraph.work_experience.field_we_achievements
+field_name: field_we_achievements
+entity_type: paragraph
+bundle: work_experience
+label: Achievements
+description: 'One achievement per line. These render as bullet points in the CV.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long
