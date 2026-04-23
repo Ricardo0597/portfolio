@@ -1,0 +1,19 @@
+uuid: 47f2306b-ff43-4bc6-b302-1194bc4ab24c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_edu_institution
+    - node.type.profile
+id: node.profile.field_edu_institution
+field_name: field_edu_institution
+entity_type: node
+bundle: profile
+label: Institution
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

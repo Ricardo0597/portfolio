@@ -1,0 +1,19 @@
+uuid: 68d670e7-d1a0-4f1d-b84f-1bc4aebec980
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_edu_degree
+    - node.type.profile
+id: node.profile.field_edu_degree
+field_name: field_edu_degree
+entity_type: node
+bundle: profile
+label: 'Degree & Major'
+description: 'e.g. Bachelor of Science — Computer Science'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

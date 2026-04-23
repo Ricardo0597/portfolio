@@ -1,0 +1,23 @@
+uuid: b6406bc9-e42d-41d2-b47e-38fdc8b991be
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_edu_start_year
+    - node.type.profile
+id: node.profile.field_edu_start_year
+field_name: field_edu_start_year
+entity_type: node
+bundle: profile
+label: 'Education Start Year'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer
