@@ -1,3 +1,4 @@
+{# node--profile--pdf.html.twig #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,54 +7,116 @@
 </head>
 <body>
 
-  <div class="cv">
+<div class="cv">
 
-    <div class="cv__header">
-      <h1 class="cv__name">{{ profile_name }}</h1>
-      {% if profile_subtitle %}
-        <p class="cv__subtitle">{{ profile_subtitle }}</p>
-      {% endif %}
-      <div class="cv__meta">
-        {% if profile_location %}
-          <span class="cv__meta-item">{{ profile_location }}</span>
-        {% endif %}
-        {% if profile_years_experience %}
-          <span class="cv__meta-item">{{ profile_years_experience }} years experience</span>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="cv__contact">
-      {% if profile_email %}
-        <div class="cv__contact-item">
-          <strong>Email:</strong> {{ profile_email }}
-        </div>
-      {% endif %}
-      {% if profile_github_url %}
-        <div class="cv__contact-item">
-          <strong>GitHub:</strong> {{ profile_github_url }}
-        </div>
-      {% endif %}
-      {% if profile_linkedin_url %}
-        <div class="cv__contact-item">
-          <strong>LinkedIn:</strong> {{ profile_linkedin_url }}
-        </div>
-      {% endif %}
-      {% if profile_drupalorg_url %}
-        <div class="cv__contact-item">
-          <strong>Drupal.org:</strong> {{ profile_drupalorg_url }}
-        </div>
-      {% endif %}
-    </div>
-
-    {% if profile_bio %}
-      <div class="cv__section">
-        <h2 class="cv__section-title">About</h2>
-        <p class="cv__bio">{{ profile_bio }}</p>
-      </div>
+  {# ── HEADER ─────────────────────────────────────────────── #}
+  <div class="cv__header">
+    <h1 class="cv__name">{{ profile_name }}</h1>
+    {% if profile_subtitle %}
+      <p class="cv__subtitle">{{ profile_subtitle }}</p>
     {% endif %}
-
   </div>
+
+  {# ── CONTACT INFO ────────────────────────────────────────── #}
+  {%- set contact_items = [] -%}
+  {%- if profile_location -%}{%- set contact_items = contact_items|merge([profile_location]) -%}{%- endif -%}
+  {%- if profile_email -%}{%- set contact_items = contact_items|merge([profile_email]) -%}{%- endif -%}
+  {%- if profile_github_url -%}{%- set contact_items = contact_items|merge([profile_github_url]) -%}{%- endif -%}
+  {%- if profile_linkedin_url -%}{%- set contact_items = contact_items|merge([profile_linkedin_url]) -%}{%- endif -%}
+  {%- if profile_drupalorg_url -%}{%- set contact_items = contact_items|merge([profile_drupalorg_url]) -%}{%- endif -%}
+  {% if contact_items %}
+    <div class="cv__contact-row">{{ contact_items|join(' · ') }}</div>
+  {% endif %}
+
+  {# ── PROFESSIONAL SUMMARY ────────────────────────────────── #}
+  {% if profile_bio %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Professional Summary</h2>
+      <p class="cv__bio">{{ profile_bio }}</p>
+    </div>
+  {% endif %}
+
+  {# ── CORE SKILLS ─────────────────────────────────────────── #}
+  {% if profile_skills %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Core Skills</h2>
+      <div class="cv__skills">
+        {% for category, labels in profile_skills %}
+          <div class="cv__skills-group">
+            <span class="cv__skills-category">{{ category }}:</span>
+            <span class="cv__skills-list">{{ labels|join(', ') }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {# ── WORK EXPERIENCE ─────────────────────────────────────── #}
+  {% if profile_work_experience %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Work Experience</h2>
+      {% for job in profile_work_experience %}
+        <div class="cv__work-item">
+          <div class="cv__work-header">
+            <strong>{{ job.job_title }}</strong>
+            {% if job.company %} — {{ job.company }}{% endif %}
+            {% if job.employment_type %}
+              <span class="cv__work-type">({{ job.employment_type }})</span>
+            {% endif %}
+          </div>
+          <div class="cv__work-meta">
+            {%- set meta_items = [] -%}
+            {%- if job.location -%}{%- set meta_items = meta_items|merge([job.location]) -%}{%- endif -%}
+            {%- if job.start -%}{%- set meta_items = meta_items|merge([job.start ~ ' – ' ~ job.end]) -%}{%- endif -%}
+            {{ meta_items|join(' | ') }}
+          </div>
+          {% if job.achievements %}
+            <ul class="cv__achievements">
+              {% for bullet in job.achievements %}
+                <li>{{ bullet }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# ── EDUCATION ───────────────────────────────────────────── #}
+  {% if profile_edu_degree or profile_edu_institution %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Education</h2>
+      <div class="cv__edu-item">
+        <div class="cv__edu-header">
+          {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
+          {% if profile_edu_institution %} — {{ profile_edu_institution }}{% endif %}
+        </div>
+        <div class="cv__edu-meta">
+          {%- set edu_meta = [] -%}
+          {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
+          {%- if profile_edu_start_year -%}
+            {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
+            {%- set edu_meta = edu_meta|merge([year_range]) -%}
+          {%- endif -%}
+          {{ edu_meta|join(' | ') }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {# ── LANGUAGES ───────────────────────────────────────────── #}
+  {% if profile_languages %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Languages</h2>
+      <ul class="cv__languages">
+        {% for lang in profile_languages %}
+          <li>{{ lang }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+</div>
 
 </body>
 </html>
