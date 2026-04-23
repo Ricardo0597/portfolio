@@ -16,6 +16,11 @@ body {
   padding: 0;
 }
 
+a {
+  color: #1d6a72;
+  text-decoration: underline;
+}
+
 .cv {
   width: 100%;
 }
@@ -44,15 +49,16 @@ body {
 .cv__contact-row {
   font-size: 10pt;
   color: #444;
-  margin-bottom: 14pt;
+  margin-bottom: 10pt;
   border-bottom: 0.5pt solid #ccc;
-  padding-bottom: 8pt;
+  padding-bottom: 6pt;
 }
 
 // ── Sections ─────────────────────────────────────────────────
 
 .cv__section {
-  margin-bottom: 14pt;
+  margin-bottom: 10pt;
+  page-break-inside: avoid;
 }
 
 .cv__section-title {
@@ -94,7 +100,8 @@ body {
 // ── Work Experience ───────────────────────────────────────────
 
 .cv__work-item {
-  margin-bottom: 10pt;
+  margin-bottom: 8pt;
+  page-break-inside: avoid;
 }
 
 .cv__work-header {

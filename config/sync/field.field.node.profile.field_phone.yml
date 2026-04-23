@@ -1,0 +1,19 @@
+uuid: 593b1838-6d24-44b7-89a1-687c3e6bfa39
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_phone
+    - node.type.profile
+id: node.profile.field_phone
+field_name: field_phone
+entity_type: node
+bundle: profile
+label: 'Phone Number'
+description: 'Include country code, e.g. +506 7246 6657'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

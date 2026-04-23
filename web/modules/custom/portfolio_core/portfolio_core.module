@@ -202,6 +202,7 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
   $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
   $variables['profile_location'] = $node->get('field_location')->value ?? '';
   $variables['profile_email'] = $node->get('field_email')->value ?? '';
+  $variables['profile_phone'] = $node->get('field_phone')->value ?? '';
   $variables['profile_years_experience'] = $node->get('field_years_experience')->value ?? '';
 
   // Bio as plain text for the Professional Summary section.
@@ -210,21 +211,18 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     ? strip_tags((string) check_markup($bio_field->value, $bio_field->format))
     : '';
 
-  // Contact links.
+  // Contact links — pass both URL (for href) and title (for display text).
   $github = $node->get('field_github_url');
-  $variables['profile_github_url'] = !$github->isEmpty()
-    ? $github->first()->getUrl()->toString()
-    : '';
+  $variables['profile_github_url'] = !$github->isEmpty() ? $github->first()->getUrl()->toString() : '';
+  $variables['profile_github_label'] = !$github->isEmpty() ? ($github->first()->title ?: 'GitHub') : '';
 
   $linkedin = $node->get('field_linkedin_url');
-  $variables['profile_linkedin_url'] = !$linkedin->isEmpty()
-    ? $linkedin->first()->getUrl()->toString()
-    : '';
+  $variables['profile_linkedin_url'] = !$linkedin->isEmpty() ? $linkedin->first()->getUrl()->toString() : '';
+  $variables['profile_linkedin_label'] = !$linkedin->isEmpty() ? ($linkedin->first()->title ?: 'LinkedIn') : '';
 
   $drupalorg = $node->get('field_drupalorg_url');
-  $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty()
-    ? $drupalorg->first()->getUrl()->toString()
-    : '';
+  $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
+  $variables['profile_drupalorg_label'] = !$drupalorg->isEmpty() ? ($drupalorg->first()->title ?: 'Drupal.org') : '';
 
   // Core Skills — grouped by category, sorted alphabetically within each group.
   $skill_nodes = \Drupal::entityTypeManager()

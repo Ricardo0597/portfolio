@@ -20,12 +20,21 @@
   {# ── CONTACT INFO ────────────────────────────────────────── #}
   {%- set contact_items = [] -%}
   {%- if profile_location -%}{%- set contact_items = contact_items|merge([profile_location]) -%}{%- endif -%}
-  {%- if profile_email -%}{%- set contact_items = contact_items|merge([profile_email]) -%}{%- endif -%}
-  {%- if profile_github_url -%}{%- set contact_items = contact_items|merge([profile_github_url]) -%}{%- endif -%}
-  {%- if profile_linkedin_url -%}{%- set contact_items = contact_items|merge([profile_linkedin_url]) -%}{%- endif -%}
-  {%- if profile_drupalorg_url -%}{%- set contact_items = contact_items|merge([profile_drupalorg_url]) -%}{%- endif -%}
+  {%- if profile_phone -%}{%- set contact_items = contact_items|merge([profile_phone]) -%}{%- endif -%}
+  {%- if profile_email -%}
+    {%- set contact_items = contact_items|merge(['<a href="mailto:' ~ profile_email ~ '">' ~ profile_email ~ '</a>']) -%}
+  {%- endif -%}
+  {%- if profile_github_url -%}
+    {%- set contact_items = contact_items|merge(['<a href="' ~ profile_github_url ~ '">' ~ profile_github_label ~ '</a>']) -%}
+  {%- endif -%}
+  {%- if profile_linkedin_url -%}
+    {%- set contact_items = contact_items|merge(['<a href="' ~ profile_linkedin_url ~ '">' ~ profile_linkedin_label ~ '</a>']) -%}
+  {%- endif -%}
+  {%- if profile_drupalorg_url -%}
+    {%- set contact_items = contact_items|merge(['<a href="' ~ profile_drupalorg_url ~ '">' ~ profile_drupalorg_label ~ '</a>']) -%}
+  {%- endif -%}
   {% if contact_items %}
-    <div class="cv__contact-row">{{ contact_items|join(' · ') }}</div>
+    <div class="cv__contact-row">{{ contact_items|join(' · ')|raw }}</div>
   {% endif %}
 
   {# ── PROFESSIONAL SUMMARY ────────────────────────────────── #}
@@ -60,9 +69,6 @@
           <div class="cv__work-header">
             <strong>{{ job.job_title }}</strong>
             {% if job.company %} — {{ job.company }}{% endif %}
-            {% if job.employment_type %}
-              <span class="cv__work-type">({{ job.employment_type }})</span>
-            {% endif %}
           </div>
           <div class="cv__work-meta">
             {%- set meta_items = [] -%}

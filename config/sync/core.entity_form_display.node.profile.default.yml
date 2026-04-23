@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.profile.field_edu_location
     - field.field.node.profile.field_edu_start_year
     - field.field.node.profile.field_email
+    - field.field.node.profile.field_phone
     - field.field.node.profile.field_github_url
     - field.field.node.profile.field_languages
     - field.field.node.profile.field_linkedin_url
@@ -148,6 +149,14 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_phone:
+    type: string_textfield
+    weight: 11
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. +506 7246 6657'
     third_party_settings: {  }
   field_photo:
     type: image_image
