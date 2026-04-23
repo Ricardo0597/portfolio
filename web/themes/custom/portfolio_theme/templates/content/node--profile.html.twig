@@ -8,6 +8,9 @@
       {% if profile_location %}
         <span class="about__meta-item">{{ profile_location }}</span>
       {% endif %}
+      {% if profile_phone %}
+        <span class="about__meta-item">{{ profile_phone }}</span>
+      {% endif %}
       {% if profile_email %}
         <a href="mailto:{{ profile_email }}" class="about__meta-item about__meta-item--link">{{ profile_email }}</a>
       {% endif %}
@@ -34,6 +37,87 @@
   {% if profile_bio %}
     <div class="about__bio">
       {{ profile_bio }}
+    </div>
+  {% endif %}
+
+  {# ── Core Skills ─────────────────────────────────────────────── #}
+  {% if profile_skills %}
+    <div class="about__section">
+      <h2 class="about__section-title">Core Skills</h2>
+      <div class="about__skills">
+        {% for category, labels in profile_skills %}
+          <div class="about__skills-group">
+            <span class="about__skills-category">{{ category }}</span>
+            <div class="about__skills-tags">
+              {% for label in labels %}
+                <span class="about__skill-tag">{{ label }}</span>
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  {# ── Work Experience ─────────────────────────────────────────── #}
+  {% if profile_work_experience %}
+    <div class="about__section">
+      <h2 class="about__section-title">Work Experience</h2>
+      {% for job in profile_work_experience %}
+        <div class="about__work-item">
+          <div class="about__work-header">
+            <strong>{{ job.job_title }}</strong>
+            {% if job.company %}<span class="about__work-company"> — {{ job.company }}</span>{% endif %}
+          </div>
+          <div class="about__work-meta">
+            {%- set meta_items = [] -%}
+            {%- if job.location -%}{%- set meta_items = meta_items|merge([job.location]) -%}{%- endif -%}
+            {%- if job.start -%}{%- set meta_items = meta_items|merge([job.start ~ ' – ' ~ job.end]) -%}{%- endif -%}
+            {{ meta_items|join(' · ') }}
+          </div>
+          {% if job.achievements %}
+            <ul class="about__achievements">
+              {% for bullet in job.achievements %}
+                <li class="about__achievement">{{ bullet }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# ── Education ───────────────────────────────────────────────── #}
+  {% if profile_edu_degree or profile_edu_institution %}
+    <div class="about__section">
+      <h2 class="about__section-title">Education</h2>
+      <div class="about__edu-item">
+        <div class="about__work-header">
+          {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
+          {% if profile_edu_institution %}<span class="about__work-company"> — {{ profile_edu_institution }}</span>{% endif %}
+        </div>
+        <div class="about__work-meta">
+          {%- set edu_meta = [] -%}
+          {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
+          {%- if profile_edu_start_year -%}
+            {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
+            {%- set edu_meta = edu_meta|merge([year_range]) -%}
+          {%- endif -%}
+          {{ edu_meta|join(' · ') }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {# ── Languages ───────────────────────────────────────────────── #}
+  {% if profile_languages %}
+    <div class="about__section">
+      <h2 class="about__section-title">Languages</h2>
+      <ul class="about__languages">
+        {% for lang in profile_languages %}
+          <li class="about__language">{{ lang }}</li>
+        {% endfor %}
+      </ul>
     </div>
   {% endif %}
 
