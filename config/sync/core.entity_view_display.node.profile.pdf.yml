@@ -7,12 +7,19 @@ dependencies:
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
     - field.field.node.profile.field_drupalorg_url
+    - field.field.node.profile.field_edu_degree
+    - field.field.node.profile.field_edu_end_year
+    - field.field.node.profile.field_edu_institution
+    - field.field.node.profile.field_edu_location
+    - field.field.node.profile.field_edu_start_year
     - field.field.node.profile.field_email
     - field.field.node.profile.field_github_url
+    - field.field.node.profile.field_languages
     - field.field.node.profile.field_linkedin_url
     - field.field.node.profile.field_location
     - field.field.node.profile.field_photo
     - field.field.node.profile.field_subtitle
+    - field.field.node.profile.field_work_experience
     - field.field.node.profile.field_years_experience
     - node.type.profile
   module:
@@ -30,12 +37,19 @@ hidden:
   field_bio: true
   field_cv_file: true
   field_drupalorg_url: true
+  field_edu_degree: true
+  field_edu_end_year: true
+  field_edu_institution: true
+  field_edu_location: true
+  field_edu_start_year: true
   field_email: true
   field_github_url: true
+  field_languages: true
   field_linkedin_url: true
   field_location: true
   field_photo: true
   field_subtitle: true
+  field_work_experience: true
   field_years_experience: true
   links: true
   search_api_excerpt: true
