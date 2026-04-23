@@ -180,8 +180,8 @@ content:
       form_display_mode: default
       default_paragraph_type: work_experience
       features:
-        duplicate: '0'
         collapse_edit_all: collapse_edit_all
+        duplicate: '0'
     third_party_settings: {  }
   field_years_experience:
     type: number

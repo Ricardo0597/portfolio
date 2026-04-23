@@ -19,13 +19,13 @@ targetEntityType: paragraph
 bundle: work_experience
 mode: default
 content:
-  field_we_job_title:
-    type: string_textfield
-    weight: 1
+  field_we_achievements:
+    type: text_textarea
+    weight: 7
     region: content
     settings:
-      size: 60
-      placeholder: 'e.g. Senior Drupal Developer'
+      rows: 6
+      placeholder: 'One achievement per line'
     third_party_settings: {  }
   field_we_company:
     type: string_textfield
@@ -43,6 +43,20 @@ content:
       size: 60
       placeholder: 'e.g. Full-time, Contract'
     third_party_settings: {  }
+  field_we_end_date:
+    type: datetime_default
+    weight: 6
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_we_job_title:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. Senior Drupal Developer'
+    third_party_settings: {  }
   field_we_location:
     type: string_textfield
     weight: 4
@@ -57,18 +71,6 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  field_we_end_date:
-    type: datetime_default
-    weight: 6
-    region: content
-    settings: {  }
-    third_party_settings: {  }
-  field_we_achievements:
-    type: text_textarea
-    weight: 7
-    region: content
-    settings:
-      rows: 6
-      placeholder: 'One achievement per line'
-    third_party_settings: {  }
-hidden: {  }
+hidden:
+  created: true
+  status: true
