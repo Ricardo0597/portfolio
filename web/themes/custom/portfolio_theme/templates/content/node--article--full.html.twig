@@ -1,0 +1,49 @@
+<article class="article-full">
+
+  {% if article_hero_url %}
+    <div class="article-full__hero">
+      <img src="{{ article_hero_url }}" alt="{{ node.label }}" class="article-full__hero-img">
+    </div>
+  {% endif %}
+
+  <header class="article-full__header">
+    {% if article_summary %}
+      <p class="article-full__summary">{{ article_summary }}</p>
+    {% endif %}
+
+    <div class="article-full__meta">
+      <span class="article-full__date">{{ article_date }}</span>
+
+      {% if article_reading_text %}
+        <span class="article-full__reading-time">{{ article_reading_text|reading_time }}</span>
+      {% endif %}
+
+      {% if article_stack %}
+        <div class="article-full__stack">
+          {% for tech in article_stack %}
+            <span class="article-full__tech-badge">{{ tech }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if article_tags %}
+        <div class="article-full__tags">
+          {% for tag in article_tags %}
+            <span class="article-full__tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  {% if content.field_content['#items'] is not empty %}
+    <div class="article-full__content">
+      {{ content.field_content }}
+    </div>
+  {% elseif content.body %}
+    <div class="article-full__content">
+      {{ content.body }}
+    </div>
+  {% endif %}
+
+</article>
