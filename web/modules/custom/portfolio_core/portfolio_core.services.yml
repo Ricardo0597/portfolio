@@ -3,4 +3,8 @@ services:
     class: Drupal\portfolio_core\TwigExtension\PortfolioTwigExtension
     tags:
       - { name: twig.extension }
+  portfolio_core.entity_print_css_subscriber:
+    class: Drupal\portfolio_core\EventSubscriber\EntityPrintCssSubscriber
+    tags:
+      - { name: event_subscriber }
 

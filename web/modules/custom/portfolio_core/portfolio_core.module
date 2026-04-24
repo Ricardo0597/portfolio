@@ -21,6 +21,7 @@ function portfolio_core_preprocess_node(array &$variables): void {
       'project'      => _portfolio_core_preprocess_project_teaser($variables, $node),
       'article'      => _portfolio_core_preprocess_article_teaser($variables, $node),
       'feature_demo' => _portfolio_core_preprocess_feature_demo_teaser($variables, $node),
+      'skill'        => _portfolio_core_preprocess_skill_teaser($variables, $node),
       default        => NULL,
     };
     return;
@@ -29,6 +30,16 @@ function portfolio_core_preprocess_node(array &$variables): void {
   if ($view_mode === 'full') {
     match ($node->bundle()) {
       'project' => _portfolio_core_preprocess_project_full($variables, $node),
+      'profile' => _portfolio_core_preprocess_profile_full($variables, $node),
+      'article' => _portfolio_core_preprocess_article_full($variables, $node),
+      default   => NULL,
+    };
+    return;
+  }
+
+  if ($view_mode === 'pdf') {
+    match ($node->bundle()) {
+      'profile' => _portfolio_core_preprocess_profile_pdf($variables, $node),
       default   => NULL,
     };
   }
@@ -64,6 +75,16 @@ function _portfolio_core_preprocess_project_teaser(array &$variables, NodeInterf
 }
 
 /**
+ * Prepares variables for skill teaser template.
+ */
+function _portfolio_core_preprocess_skill_teaser(array &$variables, NodeInterface $node): void {
+  $category_terms = $node->get('field_category')->referencedEntities();
+  $variables['skill_category'] = !empty($category_terms) ? $category_terms[0]->label() : '';
+  $variables['skill_level'] = (int) $node->get('field_skill_level')->value;
+  $variables['skill_icon_class'] = $node->get('field_icon_class')->value ?? '';
+}
+
+/**
  * Prepares variables for article teaser template.
  */
 function _portfolio_core_preprocess_article_teaser(array &$variables, NodeInterface $node): void {
@@ -91,6 +112,120 @@ function _portfolio_core_preprocess_feature_demo_teaser(array &$variables, NodeI
 }
 
 /**
+ * Prepares variables for article full template.
+ */
+function _portfolio_core_preprocess_article_full(array &$variables, NodeInterface $node): void {
+  $date_formatter = \Drupal::service('date.formatter');
+
+  $variables['article_summary'] = $node->get('field_summary')->value ?? '';
+  $variables['article_date'] = $date_formatter->format($node->getCreatedTime(), 'custom', 'F j, Y');
+
+  $tag_terms = $node->get('field_tags')->referencedEntities();
+  $variables['article_tags'] = array_map(fn($t) => $t->label(), $tag_terms);
+
+  $stack_terms = $node->get('field_stack')->referencedEntities();
+  $variables['article_stack'] = array_map(fn($t) => $t->label(), $stack_terms);
+
+  $hero = $node->get('field_hero_image');
+  $variables['article_hero_url'] = !$hero->isEmpty()
+    ? \Drupal::service('file_url_generator')->generateAbsoluteString($hero->entity->getFileUri())
+    : '';
+
+  // Collect paragraph text for reading time estimate.
+  $text = $node->get('field_summary')->value ?? '';
+  foreach ($node->get('field_content')->referencedEntities() as $paragraph) {
+    foreach ($paragraph->getFields() as $field) {
+      $definition = $field->getFieldDefinition();
+      if (in_array($definition->getType(), ['text', 'text_long', 'text_with_summary', 'string_long'])) {
+        $text .= ' ' . ($field->value ?? '');
+      }
+    }
+  }
+  $variables['article_reading_text'] = strip_tags($text);
+}
+
+/**
+ * Prepares variables for profile full template.
+ */
+function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterface $node): void {
+  $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
+  $variables['profile_location'] = $node->get('field_location')->value ?? '';
+  $variables['profile_phone'] = $node->get('field_phone')->value ?? '';
+  $variables['profile_email'] = $node->get('field_email')->value ?? '';
+
+  $bio_field = $node->get('field_bio');
+  $variables['profile_bio'] = !$bio_field->isEmpty()
+    ? check_markup($bio_field->value, $bio_field->format)
+    : '';
+
+  $github = $node->get('field_github_url');
+  $variables['profile_github_url'] = !$github->isEmpty() ? $github->first()->getUrl()->toString() : '';
+
+  $linkedin = $node->get('field_linkedin_url');
+  $variables['profile_linkedin_url'] = !$linkedin->isEmpty() ? $linkedin->first()->getUrl()->toString() : '';
+
+  $drupalorg = $node->get('field_drupalorg_url');
+  $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
+
+  // Core Skills — grouped by category, sorted alphabetically.
+  $skill_nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadByProperties(['type' => 'skill', 'status' => 1]);
+
+  $skills_by_category = [];
+  foreach ($skill_nodes as $skill) {
+    $category_terms = $skill->get('field_category')->referencedEntities();
+    $category = !empty($category_terms) ? $category_terms[0]->label() : 'Other';
+    $skills_by_category[$category][] = $skill->label();
+  }
+  ksort($skills_by_category);
+  foreach ($skills_by_category as $category => &$labels) {
+    sort($labels);
+  }
+  unset($labels);
+  $variables['profile_skills'] = $skills_by_category;
+
+  // Work Experience — iterate paragraphs, format dates, split achievements.
+  $date_formatter = \Drupal::service('date.formatter');
+  $work_items = [];
+  foreach ($node->get('field_work_experience')->referencedEntities() as $paragraph) {
+    $start_raw = $paragraph->get('field_we_start_date')->value;
+    $end_raw = $paragraph->get('field_we_end_date')->value;
+    $start_display = $start_raw ? $date_formatter->format(strtotime($start_raw), 'custom', 'M Y') : '';
+    $end_display = $end_raw ? $date_formatter->format(strtotime($end_raw), 'custom', 'M Y') : 'Present';
+    $achievements_raw = $paragraph->get('field_we_achievements')->value ?? '';
+    $achievements = array_values(
+      array_filter(
+        array_map('trim', preg_split('/\r\n|\r|\n/', $achievements_raw)),
+        fn(string $line): bool => $line !== '',
+      ),
+    );
+    $work_items[] = [
+      'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
+      'company' => $paragraph->get('field_we_company')->value ?? '',
+      'location' => $paragraph->get('field_we_location')->value ?? '',
+      'start' => $start_display,
+      'end' => $end_display,
+      'achievements' => $achievements,
+    ];
+  }
+  $variables['profile_work_experience'] = $work_items;
+
+  // Education.
+  $variables['profile_edu_degree'] = $node->get('field_edu_degree')->value ?? '';
+  $variables['profile_edu_institution'] = $node->get('field_edu_institution')->value ?? '';
+  $variables['profile_edu_location'] = $node->get('field_edu_location')->value ?? '';
+  $variables['profile_edu_start_year'] = $node->get('field_edu_start_year')->value ?? '';
+  $variables['profile_edu_end_year'] = $node->get('field_edu_end_year')->value ?? '';
+
+  // Languages.
+  $variables['profile_languages'] = array_map(
+    fn($item) => $item->value,
+    iterator_to_array($node->get('field_languages')),
+  );
+}
+
+/**
  * Prepares variables for project full template.
  */
 function _portfolio_core_preprocess_project_full(array &$variables, NodeInterface $node): void {
@@ -107,4 +242,108 @@ function _portfolio_core_preprocess_project_full(array &$variables, NodeInterfac
   $variables['project_end_date'] = $end
     ? $date_formatter->format(strtotime($end), 'custom', 'M Y')
     : '';
+}
+
+/**
+ * Prepares variables for profile PDF template.
+ */
+function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface $node): void {
+  // Profile identity.
+  $variables['profile_name'] = $node->label();
+  $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
+  $variables['profile_location'] = $node->get('field_location')->value ?? '';
+  $variables['profile_email'] = $node->get('field_email')->value ?? '';
+  $variables['profile_phone'] = $node->get('field_phone')->value ?? '';
+  $variables['profile_years_experience'] = $node->get('field_years_experience')->value ?? '';
+
+  // Bio as plain text for the Professional Summary section.
+  $bio_field = $node->get('field_bio');
+  $variables['profile_bio'] = !$bio_field->isEmpty()
+    ? strip_tags((string) check_markup($bio_field->value, $bio_field->format))
+    : '';
+
+  // Contact links — pass both URL (for href) and title (for display text).
+  $github = $node->get('field_github_url');
+  $variables['profile_github_url'] = !$github->isEmpty() ? $github->first()->getUrl()->toString() : '';
+  $variables['profile_github_label'] = !$github->isEmpty() ? ($github->first()->title ?: 'GitHub') : '';
+
+  $linkedin = $node->get('field_linkedin_url');
+  $variables['profile_linkedin_url'] = !$linkedin->isEmpty() ? $linkedin->first()->getUrl()->toString() : '';
+  $variables['profile_linkedin_label'] = !$linkedin->isEmpty() ? ($linkedin->first()->title ?: 'LinkedIn') : '';
+
+  $drupalorg = $node->get('field_drupalorg_url');
+  $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
+  $variables['profile_drupalorg_label'] = !$drupalorg->isEmpty() ? ($drupalorg->first()->title ?: 'Drupal.org') : '';
+
+  // Core Skills — grouped by category, sorted alphabetically within each group.
+  $skill_nodes = \Drupal::entityTypeManager()
+    ->getStorage('node')
+    ->loadByProperties(['type' => 'skill', 'status' => 1]);
+
+  $skills_by_category = [];
+  foreach ($skill_nodes as $skill) {
+    $category_terms = $skill->get('field_category')->referencedEntities();
+    $category = !empty($category_terms) ? $category_terms[0]->label() : 'Other';
+    $skills_by_category[$category][] = $skill->label();
+  }
+  ksort($skills_by_category);
+  foreach ($skills_by_category as $category => &$labels) {
+    sort($labels);
+  }
+  unset($labels);
+  $variables['profile_skills'] = $skills_by_category;
+
+  // Work Experience — iterate paragraphs, format dates, split achievements.
+  $date_formatter = \Drupal::service('date.formatter');
+  $work_items = [];
+  foreach ($node->get('field_work_experience')->referencedEntities() as $paragraph) {
+    $start_raw = $paragraph->get('field_we_start_date')->value;
+    $end_raw = $paragraph->get('field_we_end_date')->value;
+
+    $start_display = $start_raw
+      ? $date_formatter->format(strtotime($start_raw), 'custom', 'M Y')
+      : '';
+    $end_display = $end_raw
+      ? $date_formatter->format(strtotime($end_raw), 'custom', 'M Y')
+      : 'Present';
+
+    $achievements_raw = $paragraph->get('field_we_achievements')->value ?? '';
+    $achievements = array_values(
+      array_filter(
+        array_map('trim', preg_split('/\r\n|\r|\n/', $achievements_raw)),
+        fn(string $line): bool => $line !== '',
+      ),
+    );
+
+    $work_items[] = [
+      'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
+      'company' => $paragraph->get('field_we_company')->value ?? '',
+      'location' => $paragraph->get('field_we_location')->value ?? '',
+      'employment_type' => $paragraph->get('field_we_employment_type')->value ?? '',
+      'start' => $start_display,
+      'end' => $end_display,
+      'achievements' => $achievements,
+    ];
+  }
+  $variables['profile_work_experience'] = $work_items;
+
+  // Education.
+  $variables['profile_edu_degree'] = $node->get('field_edu_degree')->value ?? '';
+  $variables['profile_edu_institution'] = $node->get('field_edu_institution')->value ?? '';
+  $variables['profile_edu_location'] = $node->get('field_edu_location')->value ?? '';
+  $variables['profile_edu_start_year'] = $node->get('field_edu_start_year')->value ?? '';
+  $variables['profile_edu_end_year'] = $node->get('field_edu_end_year')->value ?? '';
+
+  // Languages — collect all multi-value string items.
+  $variables['profile_languages'] = array_map(
+    fn($item) => $item->value,
+    iterator_to_array($node->get('field_languages')),
+  );
+
+  // Entity Print bypasses the standard render cache; explicit cache tags
+  // ensure invalidation when the profile node is updated.
+  $variables['#cache']['tags'] = array_merge(
+    $variables['#cache']['tags'] ?? [],
+    $node->getCacheTags(),
+  );
 }

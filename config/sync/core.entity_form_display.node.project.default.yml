@@ -14,9 +14,11 @@ dependencies:
     - field.field.node.project.field_status
     - field.field.node.project.field_summary
     - field.field.node.project.field_thumbnail
+    - image.style.thumbnail
     - node.type.project
   module:
     - datetime
+    - image
     - link
     - paragraphs
     - path
@@ -115,6 +117,22 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  field_summary:
+    type: string_textarea
+    weight: 2
+    region: content
+    settings:
+      rows: 4
+      placeholder: ''
+    third_party_settings: {  }
+  field_thumbnail:
+    type: image_image
+    weight: 3
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
   path:
     type: path
     weight: 4
@@ -164,6 +182,4 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
-  field_summary: true
-  field_thumbnail: true
   sticky: true

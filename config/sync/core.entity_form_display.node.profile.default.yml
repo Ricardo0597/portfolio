@@ -6,15 +6,27 @@ dependencies:
     - field.field.node.profile.body
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
+    - field.field.node.profile.field_drupalorg_url
+    - field.field.node.profile.field_edu_degree
+    - field.field.node.profile.field_edu_end_year
+    - field.field.node.profile.field_edu_institution
+    - field.field.node.profile.field_edu_location
+    - field.field.node.profile.field_edu_start_year
     - field.field.node.profile.field_email
+    - field.field.node.profile.field_phone
     - field.field.node.profile.field_github_url
+    - field.field.node.profile.field_languages
     - field.field.node.profile.field_linkedin_url
     - field.field.node.profile.field_location
     - field.field.node.profile.field_photo
     - field.field.node.profile.field_subtitle
+    - field.field.node.profile.field_work_experience
     - field.field.node.profile.field_years_experience
     - node.type.profile
   module:
+    - datetime
+    - entity_reference_revisions
+    - paragraphs
     - path
     - text
 id: node.profile.default
@@ -37,6 +49,155 @@ content:
     weight: 10
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_bio:
+    type: text_textarea
+    weight: 5
+    region: content
+    settings:
+      rows: 12
+      placeholder: ''
+    third_party_settings: {  }
+  field_cv_file:
+    type: file_generic
+    weight: 20
+    region: content
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
+  field_drupalorg_url:
+    type: link_default
+    weight: 14
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_edu_degree:
+    type: string_textfield
+    weight: 30
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. Bachelor of Science — Computer Science'
+    third_party_settings: {  }
+  field_edu_end_year:
+    type: number
+    weight: 34
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_edu_institution:
+    type: string_textfield
+    weight: 31
+    region: content
+    settings:
+      size: 60
+      placeholder: 'University or institution name'
+    third_party_settings: {  }
+  field_edu_location:
+    type: string_textfield
+    weight: 32
+    region: content
+    settings:
+      size: 60
+      placeholder: 'City, Country'
+    third_party_settings: {  }
+  field_edu_start_year:
+    type: number
+    weight: 33
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_email:
+    type: email_default
+    weight: 10
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_github_url:
+    type: link_default
+    weight: 12
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_languages:
+    type: string_textfield
+    weight: 40
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. Spanish — Native'
+    third_party_settings: {  }
+  field_linkedin_url:
+    type: link_default
+    weight: 13
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_location:
+    type: string_textfield
+    weight: 11
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_phone:
+    type: string_textfield
+    weight: 11
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. +506 7246 6657'
+    third_party_settings: {  }
+  field_photo:
+    type: image_image
+    weight: 4
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+  field_subtitle:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_work_experience:
+    type: paragraphs
+    weight: 25
+    region: content
+    settings:
+      title: 'Work Experience'
+      title_plural: 'Work Experience entries'
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: work_experience
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: '0'
+    third_party_settings: {  }
+  field_years_experience:
+    type: number
+    weight: 2
+    region: content
+    settings:
+      placeholder: ''
     third_party_settings: {  }
   path:
     type: path
@@ -80,14 +241,5 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
-  field_bio: true
-  field_cv_file: true
-  field_email: true
-  field_github_url: true
-  field_linkedin_url: true
-  field_location: true
-  field_photo: true
-  field_subtitle: true
-  field_years_experience: true
   promote: true
   sticky: true

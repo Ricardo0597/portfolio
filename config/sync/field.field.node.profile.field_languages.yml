@@ -1,0 +1,19 @@
+uuid: 5fd2974f-69ff-4915-b6b7-fe8f9d055cd8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_languages
+    - node.type.profile
+id: node.profile.field_languages
+field_name: field_languages
+entity_type: node
+bundle: profile
+label: Languages
+description: 'One entry per language, e.g. "Spanish — Native" or "English — Fluent (C1)"'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

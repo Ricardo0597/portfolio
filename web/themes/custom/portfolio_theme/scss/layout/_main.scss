@@ -145,8 +145,8 @@ footer[role='contentinfo'] {
   }
 
   &__logo {
-    width: 36px;
-    height: 36px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
     border-radius: var(--border-radius);
   }
@@ -189,6 +189,21 @@ footer[role='contentinfo'] {
 // Views listing — gap between rows (no .view-content wrapper in this setup)
 .views-row + .views-row {
   margin-top: var(--space-8);
+}
+
+// Skills view — render cards in a responsive grid
+.view-portfolio-skills .view-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+
+  @include m.respond-to('sm') {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+.view-portfolio-skills .views-row {
+  margin-top: 0;
 }
 
 // ─── Facets sidebar ───────────────────────────────────────────────────────────

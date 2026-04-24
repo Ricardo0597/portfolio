@@ -12,6 +12,7 @@ dependencies:
     - field.field.node.feature_demo.field_summary
     - node.type.feature_demo
   module:
+    - paragraphs
     - path
     - text
 id: node.feature_demo.default
@@ -35,9 +36,66 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_content:
+    type: paragraphs
+    weight: 10
+    region: content
+    settings:
+      title: 'Content block'
+      title_plural: 'Content blocks'
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: '0'
+    third_party_settings: {  }
+  field_difficulty:
+    type: options_select
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_drupal_pattern:
+    type: options_select
+    weight: 2
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_source_path:
+    type: string_textfield
+    weight: 4
+    region: content
+    settings:
+      size: 60
+      placeholder: 'e.g. web/modules/custom/portfolio_core/src/Plugin/Block/'
+    third_party_settings: {  }
+  field_stack:
+    type: options_select
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_summary:
+    type: string_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 4
+      placeholder: ''
+    third_party_settings: {  }
   path:
     type: path
     weight: 30
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  simple_sitemap:
+    weight: 10
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -72,11 +130,5 @@ content:
     settings: {  }
     third_party_settings: {  }
 hidden:
-  field_content: true
-  field_difficulty: true
-  field_drupal_pattern: true
-  field_source_path: true
-  field_stack: true
-  field_summary: true
   promote: true
   sticky: true

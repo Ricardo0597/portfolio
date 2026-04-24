@@ -1,0 +1,27 @@
+uuid: 5f84a5c9-cec9-4149-ad40-3121b9b8f65a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_work_experience
+    - node.type.profile
+    - paragraphs.paragraphs_type.work_experience
+  module:
+    - entity_reference_revisions
+id: node.profile.field_work_experience
+field_name: field_work_experience
+entity_type: node
+bundle: profile
+label: 'Work Experience'
+description: 'Add jobs most-recent-first. Empty End Date renders as "Present".'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      work_experience: work_experience
+    negate: 0
+field_type: entity_reference_revisions

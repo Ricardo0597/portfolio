@@ -997,6 +997,8 @@ Track all implemented features here. Update after each phase.
 | 08 | JSON:API demo | Core JSON:API | 11 | ✅ |
 | 09 | Project full-page template | `node--project--full.html.twig` + preprocess | — | ✅ |
 | 10 | Admin local task tabs | Template override + BEM CSS | — | ✅ |
+| 11 | PDF CV export (Phase A) | Entity Print + dompdf + pdf view mode + preprocess + EventSubscriber CSS | — | ✅ |
+| 12 | Anonymous PDF access | Role permission config for `entity print access bundle profile` | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 

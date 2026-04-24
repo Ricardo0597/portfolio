@@ -16,10 +16,8 @@
   <div class="layout-container site-footer__inner">
     <a href="{{ path('<front>') }}" class="site-footer__brand" rel="home" aria-label="{{ 'Home'|t }}">
       <img class="site-footer__logo"
-           src="/{{ active_theme_path() }}/images/logo.png"
+           src="{{ logo }}"
            alt="{{ 'Site logo'|t }}"
-           width="36"
-           height="36"
            loading="lazy">
     </a>
     <span class="site-footer__copy">

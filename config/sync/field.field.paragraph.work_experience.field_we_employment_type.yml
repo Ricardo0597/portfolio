@@ -1,0 +1,19 @@
+uuid: e507355b-b4eb-43b9-8bed-6f3b3d31d746
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_we_employment_type
+    - paragraphs.paragraphs_type.work_experience
+id: paragraph.work_experience.field_we_employment_type
+field_name: field_we_employment_type
+entity_type: paragraph
+bundle: work_experience
+label: 'Employment Type'
+description: 'e.g. Full-time, Contract, Freelance'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
