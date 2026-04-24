@@ -5,3 +5,10 @@ declare(strict_types=1);
  * @file
  * Functions to support theming in the portfolio_theme theme.
  */
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function portfolio_theme_preprocess_page(array &$variables): void {
+  $variables['logo'] = theme_get_setting('logo.url');
+}
