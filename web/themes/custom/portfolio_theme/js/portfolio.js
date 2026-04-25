@@ -32,6 +32,7 @@
         updateButton();
 
         btn.addEventListener('click', () => {
+          if (btn.classList.contains('is-spinning')) return;
           const switchingToLight = !isLight();
 
           // Start spin animation.
