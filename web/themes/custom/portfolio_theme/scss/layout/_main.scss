@@ -200,7 +200,11 @@ footer[role='contentinfo'] {
   gap: var(--space-6);
 
   @include m.respond-to('sm') {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include m.respond-to('lg') {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
