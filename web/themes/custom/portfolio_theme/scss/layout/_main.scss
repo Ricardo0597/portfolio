@@ -22,20 +22,6 @@
   }
 }
 
-// ─── Mode-switch colour fade ───────────────────────────────────────────────────
-
-body {
-  transition:
-    background-color 300ms ease,
-    color 300ms ease;
-}
-
-footer[role='contentinfo'] {
-  transition:
-    background-color 300ms ease,
-    border-color 300ms ease;
-}
-
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 .layout-container {
@@ -134,6 +120,7 @@ footer[role='contentinfo'] {
   padding: var(--space-8) 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
+  transition: background-color 300ms ease, border-color 300ms ease;
 
   a {
     color: var(--color-text-muted);
@@ -403,6 +390,11 @@ footer[role='contentinfo'] {
   &:hover {
     border-color: var(--color-border);
     color: var(--color-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-highlight);
+    outline-offset: 2px;
   }
 
   &.is-spinning {
