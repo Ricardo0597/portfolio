@@ -363,6 +363,15 @@ footer[role='contentinfo'] {
   }
 }
 
+// ─── Light mode overrides ─────────────────────────────────────────────────────
+
+[data-theme='light'] {
+  .site-branding__logo,
+  .site-footer__logo {
+    filter: invert(1);
+  }
+}
+
 // ─── Theme mode toggle ────────────────────────────────────────────────────────
 
 @keyframes spin-once {
