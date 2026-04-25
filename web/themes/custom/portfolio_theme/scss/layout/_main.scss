@@ -22,6 +22,20 @@
   }
 }
 
+// ─── Mode-switch colour fade ───────────────────────────────────────────────────
+
+body {
+  transition:
+    background-color 300ms ease,
+    color 300ms ease;
+}
+
+footer[role='contentinfo'] {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease;
+}
+
 // ─── Page shell ───────────────────────────────────────────────────────────────
 
 .layout-container {
@@ -39,6 +53,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background-color 300ms ease, border-color 300ms ease;
 
   &__inner {
     display: flex;
@@ -358,5 +373,39 @@ footer[role='contentinfo'] {
       border-color: var(--color-highlight);
       color: #fff;
     }
+  }
+}
+
+// ─── Theme mode toggle ────────────────────────────────────────────────────────
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+
+  &:hover {
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
+  &.is-spinning {
+    animation: spin-once 400ms ease forwards;
   }
 }
