@@ -12,17 +12,3 @@ declare(strict_types=1);
 function portfolio_theme_preprocess_page(array &$variables): void {
   $variables['logo'] = theme_get_setting('logo.url');
 }
-
-/**
- * Implements hook_page_attachments().
- */
-function portfolio_theme_page_attachments(array &$attachments): void {
-  $attachments['#attached']['html_head'][] = [
-    [
-      '#type' => 'html_tag',
-      '#tag' => 'script',
-      '#value' => "try{if(localStorage.getItem('theme')==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}",
-    ],
-    'portfolio-theme-mode-init',
-  ];
-}

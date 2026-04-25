@@ -45,11 +45,11 @@
             } else {
               html.removeAttribute('data-theme');
             }
+            const themeValue = switchingToLight ? 'light' : 'dark';
+            try { localStorage.setItem('theme', themeValue); } catch (e) {}
             try {
-              localStorage.setItem('theme', switchingToLight ? 'light' : 'dark');
-            } catch (e) {
-              // Storage unavailable; theme applies for this session only.
-            }
+              document.cookie = 'theme=' + themeValue + ';path=/;max-age=31536000;SameSite=Lax';
+            } catch (e) {}
             updateButton();
           }, 200);
 
