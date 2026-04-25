@@ -42,10 +42,13 @@
           setTimeout(() => {
             if (switchingToLight) {
               html.setAttribute('data-theme', 'light');
-              localStorage.setItem('theme', 'light');
             } else {
               html.removeAttribute('data-theme');
-              localStorage.setItem('theme', 'dark');
+            }
+            try {
+              localStorage.setItem('theme', switchingToLight ? 'light' : 'dark');
+            } catch (e) {
+              // Storage unavailable; theme applies for this session only.
             }
             updateButton();
           }, 200);

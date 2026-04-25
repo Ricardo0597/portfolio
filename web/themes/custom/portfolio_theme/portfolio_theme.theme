@@ -21,7 +21,7 @@ function portfolio_theme_page_attachments(array &$attachments): void {
     [
       '#type' => 'html_tag',
       '#tag' => 'script',
-      '#value' => "if(localStorage.getItem('theme')==='light'){document.documentElement.setAttribute('data-theme','light');}",
+      '#value' => "try{if(localStorage.getItem('theme')==='light'){document.documentElement.setAttribute('data-theme','light');}}catch(e){}",
     ],
     'portfolio-theme-mode-init',
   ];
