@@ -142,6 +142,75 @@
     },
   };
 
+  Drupal.behaviors.projectFilter = {
+    attach(context) {
+      once('project-filter', '.view-id-portfolio-projects .view-content', context).forEach((grid) => {
+        const cards = [...grid.querySelectorAll('.project-card')];
+        if (!cards.length) return;
+
+        const stacks = new Set();
+        const statuses = new Set();
+
+        cards.forEach((card) => {
+          (card.dataset.stack || '').split('|').filter(Boolean).forEach((t) => stacks.add(t));
+          if (card.dataset.status) statuses.add(card.dataset.status);
+        });
+
+        if (!stacks.size && !statuses.size) return;
+
+        const bar = document.createElement('div');
+        bar.className = 'project-filter';
+        bar.setAttribute('role', 'group');
+        bar.setAttribute('aria-label', Drupal.t('Filter projects'));
+
+        function makeBtn(label, attr, value) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'project-filter__btn';
+          btn.textContent = label;
+          btn.dataset.filterAttr = attr;
+          btn.dataset.filterValue = value;
+          return btn;
+        }
+
+        const allBtn = makeBtn(Drupal.t('All'), '', '');
+        allBtn.classList.add('is-active');
+        bar.appendChild(allBtn);
+
+        statuses.forEach((s) => {
+          bar.appendChild(makeBtn(s.replace(/-/g, ' '), 'status', s));
+        });
+
+        stacks.forEach((t) => {
+          bar.appendChild(makeBtn(t, 'stack', t));
+        });
+
+        grid.parentNode.insertBefore(bar, grid);
+
+        bar.addEventListener('click', (e) => {
+          const btn = e.target.closest('.project-filter__btn');
+          if (!btn) return;
+
+          [...bar.querySelectorAll('.project-filter__btn')].forEach((b) => b.classList.remove('is-active'));
+          btn.classList.add('is-active');
+
+          const { filterAttr, filterValue } = btn.dataset;
+
+          cards.forEach((card) => {
+            if (!filterAttr) {
+              card.classList.remove('is-hidden');
+              return;
+            }
+            const haystack = filterAttr === 'stack'
+              ? (card.dataset.stack || '').split('|')
+              : [card.dataset.status || ''];
+            card.classList.toggle('is-hidden', !haystack.includes(filterValue));
+          });
+        });
+      });
+    },
+  };
+
   Drupal.behaviors.scrollReveal = {
     attach(context) {
       const selectors = [
