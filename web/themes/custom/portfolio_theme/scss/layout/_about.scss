@@ -18,9 +18,12 @@
 
   &__subtitle {
     font-size: var(--text-lg);
-    color: var(--color-text-muted);
     line-height: 1.6;
     margin: 0 0 var(--space-6);
+    background: linear-gradient(135deg, var(--color-highlight) 0%, #4a9eff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   &__meta {
