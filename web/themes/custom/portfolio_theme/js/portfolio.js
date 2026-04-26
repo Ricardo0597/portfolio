@@ -19,6 +19,22 @@
     },
   };
 
+  Drupal.behaviors.readingProgress = {
+    attach(context) {
+      once('reading-progress', '.article-full', context).forEach(() => {
+        const bar = document.createElement('div');
+        bar.className = 'reading-progress';
+        document.body.prepend(bar);
+
+        window.addEventListener('scroll', () => {
+          const scrolled = window.scrollY;
+          const total = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.width = total > 0 ? `${(scrolled / total) * 100}%` : '0%';
+        }, { passive: true });
+      });
+    },
+  };
+
   Drupal.behaviors.scrollReveal = {
     attach(context) {
       const selectors = [

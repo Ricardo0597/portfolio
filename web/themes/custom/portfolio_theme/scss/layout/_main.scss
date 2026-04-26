@@ -370,6 +370,20 @@ footer[role='contentinfo'] {
   }
 }
 
+// ─── Reading progress bar ─────────────────────────────────────────────────────
+
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-highlight), #4a9eff);
+  z-index: 200;
+  pointer-events: none;
+  transition: width 80ms linear;
+}
+
 // ─── Scroll-reveal animations ────────────────────────────────────────────────
 
 .js-reveal {
