@@ -30,23 +30,23 @@
     color: var(--color-text-muted);
   }
 
-  &__level {
-    display: flex;
-    gap: var(--space-1);
+  &__bar-track {
+    height: 4px;
+    background: var(--color-border);
+    border-radius: 999px;
+    overflow: hidden;
     margin-top: var(--space-4);
   }
 
-  &__pip {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-border);
-    transition: background var(--transition-fast);
+  &__bar-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--color-highlight), #4a9eff);
+    border-radius: 999px;
+    transition: width 700ms cubic-bezier(0.4, 0, 0.2, 1);
 
-    &--filled { background: var(--color-highlight); }
-  }
-
-  &:hover &__pip--filled {
-    background: #ed6b7e; // color.adjust(#e94560, $lightness: 10%)
+    .skill-card.is-visible & {
+      width: var(--bar-width);
+    }
   }
 }
