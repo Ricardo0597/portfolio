@@ -9,6 +9,77 @@ declare(strict_types=1);
 use Drupal\node\NodeInterface;
 
 /**
+ * Implements hook_page_attachments().
+ */
+function portfolio_core_page_attachments(array &$attachments): void {
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if (!$node instanceof NodeInterface) {
+    return;
+  }
+
+  $json_ld = NULL;
+
+  if ($node->bundle() === 'profile') {
+    $email = $node->get('field_email')->value ?? '';
+    $github = $node->get('field_github_url');
+    $linkedin = $node->get('field_linkedin_url');
+    $sameAs = [];
+    if (!$github->isEmpty()) {
+      $sameAs[] = $github->first()->getUrl()->toString();
+    }
+    if (!$linkedin->isEmpty()) {
+      $sameAs[] = $linkedin->first()->getUrl()->toString();
+    }
+    $json_ld = array_filter([
+      '@context'  => 'https://schema.org',
+      '@type'     => 'Person',
+      'name'      => $node->label(),
+      'jobTitle'  => $node->get('field_subtitle')->value ?? '',
+      'email'     => $email,
+      'url'       => \Drupal::request()->getSchemeAndHttpHost(),
+      'sameAs'    => $sameAs ?: NULL,
+    ]);
+  }
+
+  if ($node->bundle() === 'project') {
+    $demo = $node->get('field_demo_url');
+    $repo = $node->get('field_repo_url');
+    $json_ld = array_filter([
+      '@context'    => 'https://schema.org',
+      '@type'       => 'SoftwareSourceCode',
+      'name'        => $node->label(),
+      'description' => $node->get('field_summary')->value ?? '',
+      'url'         => !$demo->isEmpty() ? $demo->first()->getUrl()->toString() : NULL,
+      'codeRepository' => !$repo->isEmpty() ? $repo->first()->getUrl()->toString() : NULL,
+    ]);
+  }
+
+  if ($node->bundle() === 'article') {
+    $json_ld = array_filter([
+      '@context'         => 'https://schema.org',
+      '@type'            => 'TechArticle',
+      'headline'         => $node->label(),
+      'description'      => $node->get('field_summary')->value ?? '',
+      'datePublished'    => date('c', $node->getCreatedTime()),
+      'dateModified'     => date('c', $node->getChangedTime()),
+      'author'           => ['@type' => 'Person', 'name' => 'Ricardo Garcia'],
+    ]);
+  }
+
+  if ($json_ld) {
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#type'       => 'html_tag',
+        '#tag'        => 'script',
+        '#value'      => json_encode($json_ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        '#attributes' => ['type' => 'application/ld+json'],
+      ],
+      'portfolio-json-ld',
+    ];
+  }
+}
+
+/**
  * Implements hook_preprocess_node().
  */
 function portfolio_core_preprocess_node(array &$variables): void {
