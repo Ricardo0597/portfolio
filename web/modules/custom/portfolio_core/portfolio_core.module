@@ -60,8 +60,8 @@ function portfolio_core_page_attachments(array &$attachments): void {
       '@type'            => 'TechArticle',
       'headline'         => $node->label(),
       'description'      => $node->get('field_summary')->value ?? '',
-      'datePublished'    => date('c', $node->getCreatedTime()),
-      'dateModified'     => date('c', $node->getChangedTime()),
+      'datePublished'    => date('c', (int) $node->getCreatedTime()),
+      'dateModified'     => date('c', (int) $node->getChangedTime()),
       'author'           => ['@type' => 'Person', 'name' => 'Ricardo Garcia'],
     ]);
   }
