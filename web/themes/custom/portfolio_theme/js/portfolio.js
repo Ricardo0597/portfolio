@@ -1,6 +1,14 @@
 (function (Drupal, once) {
   'use strict';
 
+  Drupal.behaviors.pageTransition = {
+    attach(context) {
+      once('page-transition', 'body', context).forEach((body) => {
+        body.style.opacity = '1';
+      });
+    },
+  };
+
   Drupal.behaviors.portfolioNav = {
     attach(context) {
       once('portfolio-nav', '.site-nav__link', context).forEach((link) => {

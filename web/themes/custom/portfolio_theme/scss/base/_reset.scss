@@ -18,9 +18,11 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  opacity: 0;
   transition:
     background-color 300ms ease,
-    color 300ms ease;
+    color 300ms ease,
+    opacity 200ms ease;
 }
 
 img,
