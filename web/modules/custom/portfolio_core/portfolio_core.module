@@ -223,6 +223,15 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
     fn($item) => $item->value,
     iterator_to_array($node->get('field_languages')),
   );
+
+  // Stats for the counter strip.
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $variables['profile_stats'] = [
+    'experience' => (int) ($node->get('field_years_experience')->value ?? 0),
+    'projects'   => count($node_storage->loadByProperties(['type' => 'project', 'status' => 1])),
+    'skills'     => count($node_storage->loadByProperties(['type' => 'skill',   'status' => 1])),
+    'articles'   => count($node_storage->loadByProperties(['type' => 'article', 'status' => 1])),
+  ];
 }
 
 /**

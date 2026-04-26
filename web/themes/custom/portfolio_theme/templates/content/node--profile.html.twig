@@ -26,6 +26,35 @@
     </div>
   </header>
 
+  {% if profile_stats %}
+    <div class="stats-strip">
+      {% if profile_stats.experience %}
+        <div class="stats-strip__item">
+          <span class="stats-strip__number" data-count="{{ profile_stats.experience }}">0</span>
+          <span class="stats-strip__label">{{ 'Years Experience'|t }}</span>
+        </div>
+      {% endif %}
+      {% if profile_stats.projects %}
+        <div class="stats-strip__item">
+          <span class="stats-strip__number" data-count="{{ profile_stats.projects }}">0</span>
+          <span class="stats-strip__label">{{ 'Projects Shipped'|t }}</span>
+        </div>
+      {% endif %}
+      {% if profile_stats.skills %}
+        <div class="stats-strip__item">
+          <span class="stats-strip__number" data-count="{{ profile_stats.skills }}">0</span>
+          <span class="stats-strip__label">{{ 'Skills'|t }}</span>
+        </div>
+      {% endif %}
+      {% if profile_stats.articles %}
+        <div class="stats-strip__item">
+          <span class="stats-strip__number" data-count="{{ profile_stats.articles }}">0</span>
+          <span class="stats-strip__label">{{ 'Articles Written'|t }}</span>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+
   <div class="about__actions">
     <a href="{{ path('entity_print.view', {export_type: 'pdf', entity_type: 'node', entity_id: node.id}) }}"
        class="about__download-btn"

@@ -19,6 +19,43 @@
     },
   };
 
+  Drupal.behaviors.statsCounter = {
+    attach(context) {
+      once('stats-counter', '.stats-strip', context).forEach((strip) => {
+        const counters = [...strip.querySelectorAll('[data-count]')];
+
+        const run = () => {
+          counters.forEach((el) => {
+            const target = parseInt(el.dataset.count, 10);
+            const duration = 1200;
+            const startTime = performance.now();
+
+            const tick = (now) => {
+              const progress = Math.min((now - startTime) / duration, 1);
+              const ease = 1 - Math.pow(1 - progress, 3);
+              el.textContent = Math.floor(ease * target);
+              if (progress < 1) requestAnimationFrame(tick);
+              else el.textContent = target;
+            };
+
+            requestAnimationFrame(tick);
+          });
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              run();
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.5 });
+
+        observer.observe(strip);
+      });
+    },
+  };
+
   Drupal.behaviors.readingProgress = {
     attach(context) {
       once('reading-progress', '.article-full', context).forEach(() => {

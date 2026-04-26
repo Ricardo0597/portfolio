@@ -1,3 +1,40 @@
+// ─── Stats counter strip ──────────────────────────────────────────────────────
+
+.stats-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6) var(--space-8);
+  padding: var(--space-6) 0;
+  margin-bottom: var(--space-8);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 80px;
+  }
+
+  &__number {
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--color-highlight) 0%, #4a9eff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__label {
+    font-size: var(--text-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+}
+
 // ─── About / Profile page ─────────────────────────────────────────────────────
 
 .about {
