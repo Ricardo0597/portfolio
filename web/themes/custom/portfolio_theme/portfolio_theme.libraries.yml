@@ -8,6 +8,19 @@ base:
     - core/drupal
     - core/once
 
+syntax-highlight:
+  css:
+    theme:
+      css/prism-tomorrow.min.css: { minified: true }
+  js:
+    js/prism.min.js: { minified: true }
+    js/prism-php.min.js: { minified: true }
+    js/prism-bash.min.js: { minified: true }
+    js/prism-javascript.min.js: { minified: true }
+  dependencies:
+    - core/drupal
+    - core/once
+
 cv-pdf:
   css:
     theme:

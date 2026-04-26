@@ -6,9 +6,22 @@ declare(strict_types=1);
  * Functions to support theming in the portfolio_theme theme.
  */
 
+use Drupal\node\NodeInterface;
+
 /**
  * Implements hook_preprocess_page().
  */
 function portfolio_theme_preprocess_page(array &$variables): void {
   $variables['logo'] = theme_get_setting('logo.url');
+
+  // Attach Prism syntax highlighting only on pages that have code snippets.
+  $node = \Drupal::routeMatch()->getParameter('node');
+  if ($node instanceof NodeInterface && $node->hasField('field_content')) {
+    foreach ($node->get('field_content')->referencedEntities() as $paragraph) {
+      if ($paragraph->bundle() === 'code_snippet') {
+        $variables['#attached']['library'][] = 'portfolio_theme/syntax-highlight';
+        break;
+      }
+    }
+  }
 }

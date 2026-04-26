@@ -19,6 +19,37 @@
     },
   };
 
+  Drupal.behaviors.codeHighlight = {
+    attach(context) {
+      once('code-highlight', '.paragraph--type--code-snippet', context).forEach((block) => {
+        const codeEl = block.querySelector('.field--name-field-code');
+        if (!codeEl) return;
+
+        // Detect language from the language label field.
+        const langEl = block.querySelector('.field--name-field-language');
+        const lang = langEl ? langEl.textContent.trim().toLowerCase() : 'none';
+        codeEl.innerHTML = `<code class="language-${lang}">${codeEl.textContent}</code>`;
+
+        if (window.Prism) window.Prism.highlightElement(codeEl.querySelector('code'));
+
+        // Copy button.
+        const btn = document.createElement('button');
+        btn.className = 'code-copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('aria-label', Drupal.t('Copy code'));
+        block.style.position = 'relative';
+        block.appendChild(btn);
+
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(codeEl.textContent.trim()).then(() => {
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+          });
+        });
+      });
+    },
+  };
+
   Drupal.behaviors.statsCounter = {
     attach(context) {
       once('stats-counter', '.stats-strip', context).forEach((strip) => {
