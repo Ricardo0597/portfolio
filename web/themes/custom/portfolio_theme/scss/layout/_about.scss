@@ -209,6 +209,24 @@
     }
   }
 
+  // ── Timeline (Work Experience) ─────────────────────────────────
+
+  &__section--timeline {
+    position: relative;
+    padding-left: var(--space-8);
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: calc(var(--space-8) + 1.5rem); // below section title
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--color-highlight), var(--color-border));
+      border-radius: 999px;
+    }
+  }
+
   // ── Work Experience & Education (shared row styles) ────────────
 
   &__work-item,
@@ -216,6 +234,27 @@
     margin-bottom: var(--space-8);
 
     &:last-child { margin-bottom: 0; }
+  }
+
+  &__section--timeline &__work-item {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--space-8) + var(--space-1));
+      top: 6px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-highlight);
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px var(--color-highlight);
+      transition: box-shadow var(--transition-fast);
+    }
+
+    &:hover::before {
+      box-shadow: 0 0 0 3px var(--color-bg), 0 0 0 5px #4a9eff;
+    }
   }
 
   &__work-header {
