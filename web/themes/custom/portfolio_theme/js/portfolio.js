@@ -19,6 +19,44 @@
     },
   };
 
+  Drupal.behaviors.scrollReveal = {
+    attach(context) {
+      const selectors = [
+        '.project-card',
+        '.article-teaser',
+        '.skill-card',
+        '.about__section',
+        '.about__work-item',
+        '.about__edu-item',
+      ].join(',');
+
+      const targets = context === document
+        ? [...document.querySelectorAll(selectors)]
+        : [...context.querySelectorAll(selectors)];
+
+      if (!targets.length) return;
+
+      if (!('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('js-reveal', 'is-visible'));
+        return;
+      }
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      targets.forEach((el) => {
+        el.classList.add('js-reveal');
+        observer.observe(el);
+      });
+    },
+  };
+
   Drupal.behaviors.themeToggle = {
     attach(context) {
       once('theme-toggle', '.theme-toggle', context).forEach((btn) => {

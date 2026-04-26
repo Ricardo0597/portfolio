@@ -370,6 +370,31 @@ footer[role='contentinfo'] {
   }
 }
 
+// ─── Scroll-reveal animations ────────────────────────────────────────────────
+
+.js-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 500ms ease,
+    transform 500ms ease;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Stagger siblings inside grids
+.grid-cards,
+.view-portfolio-skills .view-content {
+  .js-reveal:nth-child(2) { transition-delay: 80ms; }
+  .js-reveal:nth-child(3) { transition-delay: 160ms; }
+  .js-reveal:nth-child(4) { transition-delay: 240ms; }
+  .js-reveal:nth-child(5) { transition-delay: 320ms; }
+  .js-reveal:nth-child(6) { transition-delay: 400ms; }
+}
+
 // ─── Light mode overrides ─────────────────────────────────────────────────────
 
 [data-theme='light'] {
