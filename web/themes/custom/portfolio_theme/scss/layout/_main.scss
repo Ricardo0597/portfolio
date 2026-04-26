@@ -105,6 +105,117 @@
   }
 }
 
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+.hero {
+  padding: var(--space-16) 0 var(--space-12);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 60% 40%, rgba(233, 69, 96, 0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 80% at 80% 80%, rgba(74, 158, 255, 0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  &__inner {
+    position: relative;
+  }
+
+  &__greeting {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  &__name {
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: var(--space-4);
+    background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__roles {
+    font-size: clamp(1.25rem, 3.5vw, 2rem);
+    font-weight: 600;
+    margin-bottom: var(--space-4);
+    min-height: 1.4em;
+  }
+
+  &__roles-prefix {
+    color: var(--color-text-muted);
+  }
+
+  &__typing {
+    background: linear-gradient(135deg, var(--color-highlight) 0%, #4a9eff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__cursor {
+    display: inline-block;
+    color: var(--color-highlight);
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+
+  &__subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--border-radius);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+    background: var(--color-highlight);
+    color: #fff;
+
+    &:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    &--outline {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+
+      &:hover {
+        border-color: var(--color-highlight);
+        color: var(--color-text);
+      }
+    }
+  }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 main[role='main'] {

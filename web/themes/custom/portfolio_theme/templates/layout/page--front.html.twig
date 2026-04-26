@@ -1,0 +1,61 @@
+<a href="#main-content" class="skip-link visually-hidden focusable">Skip to main content</a>
+
+<header role="banner" class="site-header">
+  <div class="layout-container site-header__inner">
+    {{ page.header }}
+    <button class="theme-toggle"
+            type="button"
+            aria-label="{{ 'Toggle theme'|t }}"
+            aria-live="polite">🌙</button>
+  </div>
+</header>
+
+<section class="hero" aria-label="{{ 'Introduction'|t }}">
+  <div class="layout-container hero__inner">
+    <div class="hero__text">
+      <p class="hero__greeting">{{ 'Hi, I\'m'|t }}</p>
+      {% if hero_name %}
+        <h1 class="hero__name">{{ hero_name }}</h1>
+      {% endif %}
+      {% if hero_roles %}
+        <p class="hero__roles">
+          <span class="hero__roles-prefix">{{ 'I build '|t }}</span><span
+            class="hero__typing js-typing"
+            data-roles="{{ hero_roles|join('|') }}"
+            aria-label="{{ hero_roles|first }}">{{ hero_roles|first }}</span><span
+            class="hero__cursor" aria-hidden="true">|</span>
+        </p>
+      {% endif %}
+      {% if hero_subtitle %}
+        <p class="hero__subtitle">{{ hero_subtitle }}</p>
+      {% endif %}
+      <div class="hero__actions">
+        <a href="/projects" class="hero__cta">{{ 'View Projects'|t }}</a>
+        {% if hero_about_path %}
+          <a href="{{ hero_about_path }}" class="hero__cta hero__cta--outline">{{ 'About Me'|t }}</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<main id="main-content" role="main" class="site-main">
+  <div class="layout-container">
+    {{ page.content }}
+  </div>
+</main>
+
+<footer role="contentinfo" class="site-footer">
+  <div class="layout-container site-footer__inner">
+    <a href="{{ path('<front>') }}" class="site-footer__brand" rel="home" aria-label="{{ 'Home'|t }}">
+      <img class="site-footer__logo"
+           src="{{ logo }}"
+           alt="{{ 'Site logo'|t }}"
+           loading="lazy">
+    </a>
+    <span class="site-footer__copy">
+      &copy; {{ "now"|date("Y") }} Ricardo Garcia
+    </span>
+    {{ page.footer }}
+  </div>
+</footer>

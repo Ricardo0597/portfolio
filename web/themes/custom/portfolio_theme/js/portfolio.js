@@ -19,6 +19,45 @@
     },
   };
 
+  Drupal.behaviors.typingEffect = {
+    attach(context) {
+      once('typing-effect', '.js-typing', context).forEach((el) => {
+        const roles = el.dataset.roles.split('|');
+        let roleIndex = 0;
+        let charIndex = roles[0].length;
+        let isDeleting = false;
+
+        function tick() {
+          const current = roles[roleIndex];
+
+          if (isDeleting) {
+            el.textContent = current.slice(0, charIndex - 1);
+            charIndex--;
+          } else {
+            el.textContent = current.slice(0, charIndex + 1);
+            charIndex++;
+          }
+
+          let delay = isDeleting ? 35 : 75;
+
+          if (!isDeleting && charIndex === current.length) {
+            delay = 2200;
+            isDeleting = true;
+          } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            roleIndex = (roleIndex + 1) % roles.length;
+            delay = 300;
+          }
+
+          setTimeout(tick, delay);
+        }
+
+        // Start deleting the initial text so the loop begins naturally.
+        setTimeout(tick, 2200);
+      });
+    },
+  };
+
   Drupal.behaviors.codeHighlight = {
     attach(context) {
       once('code-highlight', '.paragraph--type--code-snippet', context).forEach((block) => {

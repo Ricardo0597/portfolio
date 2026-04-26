@@ -24,4 +24,22 @@ function portfolio_theme_preprocess_page(array &$variables): void {
       }
     }
   }
+
+  // Hero data — only on the front page.
+  if (\Drupal::service('path.matcher')->isFrontPage()) {
+    $profile_nodes = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadByProperties(['type' => 'profile', 'status' => 1]);
+    if ($profile_node = reset($profile_nodes)) {
+      $variables['hero_name']       = $profile_node->label();
+      $variables['hero_subtitle']   = $profile_node->get('field_subtitle')->value ?? '';
+      $variables['hero_about_path'] = $profile_node->toUrl()->toString();
+    }
+    $variables['hero_roles'] = [
+      'Drupal Applications',
+      'REST APIs',
+      'Headless Experiences',
+      'Clean, Fast Code',
+    ];
+  }
 }
