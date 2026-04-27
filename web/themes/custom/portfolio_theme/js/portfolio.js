@@ -204,6 +204,13 @@
           if (match) match.click();
         });
 
+        // Empty-state element shown when no cards match the active filter.
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'project-filter-empty';
+        emptyMsg.textContent = Drupal.t('No projects match this filter.');
+        emptyMsg.hidden = true;
+        container.appendChild(emptyMsg);
+
         bar.addEventListener('click', (e) => {
           const btn = e.target.closest('.project-filter__btn');
           if (!btn) return;
@@ -223,6 +230,8 @@
               : [card.dataset.status || ''];
             card.classList.toggle('is-hidden', !haystack.includes(filterValue));
           });
+
+          emptyMsg.hidden = cards.some((c) => !c.classList.contains('is-hidden'));
         });
       });
     },

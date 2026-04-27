@@ -519,9 +519,19 @@ footer[role='contentinfo'] {
 }
 
 .project-card {
+  transition: opacity var(--transition-base), transform var(--transition-base);
+
   &.is-hidden {
     display: none;
   }
+}
+
+.project-filter-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
 }
 
 // ─── Code copy button ─────────────────────────────────────────────────────────
