@@ -642,3 +642,81 @@ footer[role='contentinfo'] {
     animation: spin-once var(--duration-slow) ease forwards;
   }
 }
+
+// ─── Mobile navigation ────────────────────────────────────────────────────────
+
+// Hamburger button — hidden on desktop, visible below md breakpoint.
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast);
+  margin-left: auto;
+
+  &:hover { border-color: var(--color-highlight); }
+
+  &__bar {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--color-text-muted);
+    border-radius: 1px;
+    transition:
+      transform var(--transition-base),
+      opacity   var(--transition-base);
+  }
+
+  &[aria-expanded='true'] {
+    border-color: var(--color-highlight);
+
+    .nav-toggle__bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle__bar:nth-child(2) { opacity: 0; }
+    .nav-toggle__bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+}
+
+// Below md: hide nav list by default, show hamburger.
+@media (max-width: 767px) {
+  .nav-toggle { display: flex; }
+
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-primary);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) var(--space-6);
+    transform: translateY(-8px);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity   var(--transition-base),
+      transform var(--transition-base);
+
+    &.is-open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    &__list {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-4);
+    }
+  }
+
+  // Header needs position:relative for the absolute nav to anchor to it.
+  .site-header { position: relative; }
+}

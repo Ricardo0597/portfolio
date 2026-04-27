@@ -287,6 +287,31 @@
     },
   };
 
+  Drupal.behaviors.mobileNav = {
+    attach(context) {
+      once('mobile-nav', '.nav-toggle', context).forEach((toggle) => {
+        const nav = document.getElementById(toggle.getAttribute('aria-controls'));
+        if (!nav) return;
+
+        toggle.addEventListener('click', () => {
+          const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!isOpen));
+          toggle.setAttribute('aria-label', isOpen ? Drupal.t('Open navigation') : Drupal.t('Close navigation'));
+          nav.classList.toggle('is-open', !isOpen);
+        });
+
+        // Close drawer when clicking outside the header.
+        document.addEventListener('click', (e) => {
+          if (!toggle.closest('.site-header').contains(e.target)) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', Drupal.t('Open navigation'));
+            nav.classList.remove('is-open');
+          }
+        });
+      });
+    },
+  };
+
   Drupal.behaviors.themeToggle = {
     attach(context) {
       once('theme-toggle', '.theme-toggle', context).forEach((btn) => {

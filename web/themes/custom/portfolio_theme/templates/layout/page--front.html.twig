@@ -3,6 +3,15 @@
 <header role="banner" class="site-header">
   <div class="layout-container site-header__inner">
     {{ page.header }}
+    <button class="nav-toggle"
+            type="button"
+            aria-label="{{ 'Open navigation'|t }}"
+            aria-expanded="false"
+            aria-controls="site-nav">
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+      <span class="nav-toggle__bar"></span>
+    </button>
     <button class="theme-toggle"
             type="button"
             aria-label="{{ 'Toggle theme'|t }}"
