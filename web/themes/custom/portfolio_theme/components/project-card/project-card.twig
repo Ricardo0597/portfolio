@@ -13,7 +13,9 @@
       </h3>
       {% if status %}
         <a href="/projects?field_status={{ status|url_encode }}"
-           class="project-card__status project-card__status--{{ status|lower|replace({' ': '-'}) }}">
+           class="project-card__status project-card__status--{{ status|lower|replace({' ': '-'}) }}"
+           data-filter-attr="status"
+           data-filter-value="{{ status|lower|replace({' ': '-'}) }}">
           {{ status }}
         </a>
       {% endif %}
@@ -26,7 +28,9 @@
         {% for tech in stack %}
           <li>
             <a href="/projects?field_stack={{ tech|url_encode }}"
-               class="project-card__tech-badge">{{ tech }}</a>
+               class="project-card__tech-badge"
+               data-filter-attr="stack"
+               data-filter-value="{{ tech }}">{{ tech }}</a>
           </li>
         {% endfor %}
       </ul>

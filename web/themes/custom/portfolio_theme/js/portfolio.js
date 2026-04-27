@@ -144,9 +144,13 @@
 
   Drupal.behaviors.projectFilter = {
     attach(context) {
-      once('project-filter', '.view-id-portfolio-projects .view-content', context).forEach((grid) => {
-        const cards = [...grid.querySelectorAll('.project-card')];
+      once('project-filter', '.views-element-container', context).forEach((container) => {
+        const cards = [...container.querySelectorAll('.project-card')];
         if (!cards.length) return;
+
+        // Hide the server-side exposed filter form — pills replace it.
+        const exposedForm = container.querySelector('.views-exposed-form');
+        if (exposedForm) exposedForm.hidden = true;
 
         const stacks = new Set();
         const statuses = new Set();
@@ -185,7 +189,20 @@
           bar.appendChild(makeBtn(t, 'stack', t));
         });
 
-        grid.parentNode.insertBefore(bar, grid);
+        // Insert pill bar before the first project row.
+        const firstRow = container.querySelector('.views-row');
+        container.insertBefore(bar, firstRow);
+
+        // Intercept card-level pill links and delegate to the filter bar.
+        container.addEventListener('click', (e) => {
+          const pill = e.target.closest('[data-filter-attr]');
+          if (!pill || pill.classList.contains('project-filter__btn')) return;
+          e.preventDefault();
+          const { filterAttr, filterValue } = pill.dataset;
+          const match = [...bar.querySelectorAll('.project-filter__btn')]
+            .find((b) => b.dataset.filterAttr === filterAttr && b.dataset.filterValue === filterValue);
+          if (match) match.click();
+        });
 
         bar.addEventListener('click', (e) => {
           const btn = e.target.closest('.project-filter__btn');
