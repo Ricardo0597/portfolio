@@ -50,6 +50,11 @@ button {
   font: inherit;
 }
 
+:focus-visible {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: 2px;
+}
+
 // Suppress Drupal scaffold noise visible on un-themed pages
 .feed-icon,
 .block-system-powered-by-block,
