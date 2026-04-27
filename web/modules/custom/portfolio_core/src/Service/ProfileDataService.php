@@ -107,6 +107,9 @@ class ProfileDataService {
    * Returns the absolute URL for a file field, or empty string if unset.
    */
   public function fileUrl(NodeInterface $node, string $field_name): string {
+    if (!$node->hasField($field_name)) {
+      return '';
+    }
     $field = $node->get($field_name);
     if ($field->isEmpty() || !$field->entity) {
       return '';
