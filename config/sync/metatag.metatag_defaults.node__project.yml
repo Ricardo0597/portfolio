@@ -1,14 +1,26 @@
+uuid: null
 langcode: en
 status: true
 dependencies:
   module:
     - metatag
+    - metatag_open_graph
+    - metatag_twitter_cards
     - node
 id: node__project
 label: 'Content: Project'
 tags:
   title: '[node:title] | [site:name]'
   description: '[node:field_summary]'
+  canonical_url: '[node:url]'
   og_title: '[node:title]'
   og_description: '[node:field_summary]'
-  og_type: article
+  og_type: website
+  og_url: '[node:url]'
+  og_image: '[node:field_thumbnail:entity:file-reference:url]'
+  og_image_alt: '[node:title]'
+  twitter_cards_type: summary_large_image
+  twitter_cards_title: '[node:title]'
+  twitter_cards_description: '[node:field_summary]'
+  twitter_cards_image: '[node:field_thumbnail:entity:file-reference:url]'
+  twitter_cards_image_alt: '[node:title]'
