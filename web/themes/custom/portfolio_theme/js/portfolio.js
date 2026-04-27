@@ -204,6 +204,14 @@
           if (match) match.click();
         });
 
+        // Screen-reader live region — announces filter result counts.
+        const liveRegion = document.createElement('div');
+        liveRegion.setAttribute('role', 'status');
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.className = 'visually-hidden';
+        container.appendChild(liveRegion);
+
         // Empty-state element shown when no cards match the active filter.
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'project-filter-empty';
@@ -231,7 +239,11 @@
             card.classList.toggle('is-hidden', !haystack.includes(filterValue));
           });
 
-          emptyMsg.hidden = cards.some((c) => !c.classList.contains('is-hidden'));
+          const visible = cards.filter((c) => !c.classList.contains('is-hidden')).length;
+          emptyMsg.hidden = visible > 0;
+          liveRegion.textContent = visible > 0
+            ? Drupal.t('@count projects shown', { '@count': visible })
+            : Drupal.t('No projects match this filter.');
         });
       });
     },
