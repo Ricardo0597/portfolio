@@ -219,6 +219,9 @@ function _portfolio_core_preprocess_article_full(array &$variables, NodeInterfac
  * Prepares variables for profile full template.
  */
 function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterface $node): void {
+  /** @var \Drupal\portfolio_core\Service\ProfileDataService $profile_data */
+  $profile_data = \Drupal::service('portfolio_core.profile_data');
+
   $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
   $variables['profile_location'] = $node->get('field_location')->value ?? '';
   $variables['profile_phone'] = $node->get('field_phone')->value ?? '';
@@ -238,49 +241,9 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
   $drupalorg = $node->get('field_drupalorg_url');
   $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
 
-  // Core Skills — grouped by category, sorted alphabetically.
-  $skill_nodes = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->loadByProperties(['type' => 'skill', 'status' => 1]);
-
-  $skills_by_category = [];
-  foreach ($skill_nodes as $skill) {
-    $category_terms = $skill->get('field_category')->referencedEntities();
-    $category = !empty($category_terms) ? $category_terms[0]->label() : 'Other';
-    $skills_by_category[$category][] = $skill->label();
-  }
-  ksort($skills_by_category);
-  foreach ($skills_by_category as $category => &$labels) {
-    sort($labels);
-  }
-  unset($labels);
-  $variables['profile_skills'] = $skills_by_category;
-
-  // Work Experience — iterate paragraphs, format dates, split achievements.
-  $date_formatter = \Drupal::service('date.formatter');
-  $work_items = [];
-  foreach ($node->get('field_work_experience')->referencedEntities() as $paragraph) {
-    $start_raw = $paragraph->get('field_we_start_date')->value;
-    $end_raw = $paragraph->get('field_we_end_date')->value;
-    $start_display = $start_raw ? $date_formatter->format(strtotime($start_raw), 'custom', 'M Y') : '';
-    $end_display = $end_raw ? $date_formatter->format(strtotime($end_raw), 'custom', 'M Y') : 'Present';
-    $achievements_raw = $paragraph->get('field_we_achievements')->value ?? '';
-    $achievements = array_values(
-      array_filter(
-        array_map('trim', preg_split('/\r\n|\r|\n/', $achievements_raw)),
-        fn(string $line): bool => $line !== '',
-      ),
-    );
-    $work_items[] = [
-      'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
-      'company' => $paragraph->get('field_we_company')->value ?? '',
-      'location' => $paragraph->get('field_we_location')->value ?? '',
-      'start' => $start_display,
-      'end' => $end_display,
-      'achievements' => $achievements,
-    ];
-  }
-  $variables['profile_work_experience'] = $work_items;
+  $variables['profile_skills']          = $profile_data->getSkillsByCategory();
+  $variables['profile_work_experience'] = $profile_data->getWorkExperience($node);
+  $variables['profile_stats']           = $profile_data->getContentStats($node);
 
   // Education.
   $variables['profile_edu_degree'] = $node->get('field_edu_degree')->value ?? '';
@@ -294,15 +257,6 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
     fn($item) => $item->value,
     iterator_to_array($node->get('field_languages')),
   );
-
-  // Stats for the counter strip.
-  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
-  $variables['profile_stats'] = [
-    'experience' => (int) ($node->get('field_years_experience')->value ?? 0),
-    'projects'   => count($node_storage->loadByProperties(['type' => 'project', 'status' => 1])),
-    'skills'     => count($node_storage->loadByProperties(['type' => 'skill',   'status' => 1])),
-    'articles'   => count($node_storage->loadByProperties(['type' => 'article', 'status' => 1])),
-  ];
 }
 
 /**
@@ -328,6 +282,9 @@ function _portfolio_core_preprocess_project_full(array &$variables, NodeInterfac
  * Prepares variables for profile PDF template.
  */
 function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface $node): void {
+  /** @var \Drupal\portfolio_core\Service\ProfileDataService $profile_data */
+  $profile_data = \Drupal::service('portfolio_core.profile_data');
+
   // Profile identity.
   $variables['profile_name'] = $node->label();
   $variables['profile_subtitle'] = $node->get('field_subtitle')->value ?? '';
@@ -355,57 +312,8 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
   $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
   $variables['profile_drupalorg_label'] = !$drupalorg->isEmpty() ? ($drupalorg->first()->title ?: 'Drupal.org') : '';
 
-  // Core Skills — grouped by category, sorted alphabetically within each group.
-  $skill_nodes = \Drupal::entityTypeManager()
-    ->getStorage('node')
-    ->loadByProperties(['type' => 'skill', 'status' => 1]);
-
-  $skills_by_category = [];
-  foreach ($skill_nodes as $skill) {
-    $category_terms = $skill->get('field_category')->referencedEntities();
-    $category = !empty($category_terms) ? $category_terms[0]->label() : 'Other';
-    $skills_by_category[$category][] = $skill->label();
-  }
-  ksort($skills_by_category);
-  foreach ($skills_by_category as $category => &$labels) {
-    sort($labels);
-  }
-  unset($labels);
-  $variables['profile_skills'] = $skills_by_category;
-
-  // Work Experience — iterate paragraphs, format dates, split achievements.
-  $date_formatter = \Drupal::service('date.formatter');
-  $work_items = [];
-  foreach ($node->get('field_work_experience')->referencedEntities() as $paragraph) {
-    $start_raw = $paragraph->get('field_we_start_date')->value;
-    $end_raw = $paragraph->get('field_we_end_date')->value;
-
-    $start_display = $start_raw
-      ? $date_formatter->format(strtotime($start_raw), 'custom', 'M Y')
-      : '';
-    $end_display = $end_raw
-      ? $date_formatter->format(strtotime($end_raw), 'custom', 'M Y')
-      : 'Present';
-
-    $achievements_raw = $paragraph->get('field_we_achievements')->value ?? '';
-    $achievements = array_values(
-      array_filter(
-        array_map('trim', preg_split('/\r\n|\r|\n/', $achievements_raw)),
-        fn(string $line): bool => $line !== '',
-      ),
-    );
-
-    $work_items[] = [
-      'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
-      'company' => $paragraph->get('field_we_company')->value ?? '',
-      'location' => $paragraph->get('field_we_location')->value ?? '',
-      'employment_type' => $paragraph->get('field_we_employment_type')->value ?? '',
-      'start' => $start_display,
-      'end' => $end_display,
-      'achievements' => $achievements,
-    ];
-  }
-  $variables['profile_work_experience'] = $work_items;
+  $variables['profile_skills']          = $profile_data->getSkillsByCategory();
+  $variables['profile_work_experience'] = $profile_data->getWorkExperience($node, includeEmploymentType: TRUE);
 
   // Education.
   $variables['profile_edu_degree'] = $node->get('field_edu_degree')->value ?? '';

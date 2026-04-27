@@ -1,4 +1,11 @@
 services:
+  portfolio_core.profile_data:
+    class: Drupal\portfolio_core\Service\ProfileDataService
+    arguments:
+      - '@entity_type.manager'
+      - '@date.formatter'
+      - '@file_url_generator'
+
   portfolio_core.twig_extension:
     class: Drupal\portfolio_core\TwigExtension\PortfolioTwigExtension
     tags:
