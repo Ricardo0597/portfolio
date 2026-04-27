@@ -7,6 +7,7 @@ declare(strict_types=1);
  */
 
 use Drupal\node\NodeInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_page_attachments().
@@ -18,51 +19,68 @@ function portfolio_core_page_attachments(array &$attachments): void {
   }
 
   $json_ld = NULL;
+  /** @var \Drupal\portfolio_core\Service\ProfileDataService $profile_data */
+  $profile_data = \Drupal::service('portfolio_core.profile_data');
 
   if ($node->bundle() === 'profile') {
-    $email = $node->get('field_email')->value ?? '';
-    $github = $node->get('field_github_url');
+    $github   = $node->get('field_github_url');
     $linkedin = $node->get('field_linkedin_url');
-    $sameAs = [];
-    if (!$github->isEmpty()) {
-      $sameAs[] = $github->first()->getUrl()->toString();
-    }
-    if (!$linkedin->isEmpty()) {
-      $sameAs[] = $linkedin->first()->getUrl()->toString();
-    }
+    $sameAs   = [];
+    if (!$github->isEmpty())   { $sameAs[] = $github->first()->getUrl()->toString(); }
+    if (!$linkedin->isEmpty()) { $sameAs[] = $linkedin->first()->getUrl()->toString(); }
+
+    $thumbnail_url = $profile_data->fileUrl($node, 'field_thumbnail');
+
     $json_ld = array_filter([
-      '@context'  => 'https://schema.org',
-      '@type'     => 'Person',
-      'name'      => $node->label(),
-      'jobTitle'  => $node->get('field_subtitle')->value ?? '',
-      'email'     => $email,
-      'url'       => \Drupal::request()->getSchemeAndHttpHost(),
-      'sameAs'    => $sameAs ?: NULL,
+      '@context'   => 'https://schema.org',
+      '@type'      => 'Person',
+      'name'       => $node->label(),
+      'jobTitle'   => $node->get('field_subtitle')->value ?? '',
+      'email'      => $node->get('field_email')->value ?? '',
+      'url'        => Url::fromRoute('<front>')->setAbsolute()->toString(),
+      'image'      => $thumbnail_url ?: NULL,
+      'description'=> strip_tags($node->get('field_bio')->value ?? ''),
+      'sameAs'     => $sameAs ?: NULL,
     ]);
   }
 
   if ($node->bundle() === 'project') {
-    $demo = $node->get('field_demo_url');
-    $repo = $node->get('field_repo_url');
+    $demo      = $node->get('field_demo_url');
+    $repo      = $node->get('field_repo_url');
+    $stack     = array_map(fn($t) => $t->label(), $node->get('field_stack')->referencedEntities());
+    $thumbnail = $profile_data->fileUrl($node, 'field_thumbnail');
+
     $json_ld = array_filter([
-      '@context'    => 'https://schema.org',
-      '@type'       => 'SoftwareSourceCode',
-      'name'        => $node->label(),
-      'description' => $node->get('field_summary')->value ?? '',
-      'url'         => !$demo->isEmpty() ? $demo->first()->getUrl()->toString() : NULL,
-      'codeRepository' => !$repo->isEmpty() ? $repo->first()->getUrl()->toString() : NULL,
+      '@context'          => 'https://schema.org',
+      '@type'             => 'SoftwareSourceCode',
+      'name'              => $node->label(),
+      'description'       => $node->get('field_summary')->value ?? '',
+      'url'               => $node->toUrl()->setAbsolute()->toString(),
+      'image'             => $thumbnail ?: NULL,
+      'codeRepository'    => !$repo->isEmpty() ? $repo->first()->getUrl()->toString() : NULL,
+      'runtimePlatform'   => !$demo->isEmpty() ? $demo->first()->getUrl()->toString() : NULL,
+      'programmingLanguage' => $stack ?: NULL,
+      'author'            => ['@type' => 'Person', 'name' => $node->getOwner()->getDisplayName()],
     ]);
   }
 
   if ($node->bundle() === 'article') {
+    $tags     = array_map(fn($t) => $t->label(), $node->get('field_tags')->referencedEntities());
+    $hero_url = $profile_data->fileUrl($node, 'field_hero_image');
+    $site_url = Url::fromRoute('<front>')->setAbsolute()->toString();
+
     $json_ld = array_filter([
-      '@context'         => 'https://schema.org',
-      '@type'            => 'TechArticle',
-      'headline'         => $node->label(),
-      'description'      => $node->get('field_summary')->value ?? '',
-      'datePublished'    => date('c', (int) $node->getCreatedTime()),
-      'dateModified'     => date('c', (int) $node->getChangedTime()),
-      'author'           => ['@type' => 'Person', 'name' => 'Ricardo Garcia'],
+      '@context'       => 'https://schema.org',
+      '@type'          => 'TechArticle',
+      'headline'       => $node->label(),
+      'description'    => $node->get('field_summary')->value ?? '',
+      'datePublished'  => date('c', (int) $node->getCreatedTime()),
+      'dateModified'   => date('c', (int) $node->getChangedTime()),
+      'url'            => $node->toUrl()->setAbsolute()->toString(),
+      'image'          => $hero_url ?: NULL,
+      'keywords'       => $tags ?: NULL,
+      'author'         => ['@type' => 'Person', 'name' => $node->getOwner()->getDisplayName()],
+      'publisher'      => ['@type' => 'Person', 'name' => $node->getOwner()->getDisplayName(), 'url' => $site_url],
     ]);
   }
 
