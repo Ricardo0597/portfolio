@@ -162,6 +162,28 @@ git add config/sync/
 - No CSS frameworks (Bootstrap, Tailwind) unless explicitly requested.
 - BEM naming convention for all custom classes.
 
+### Light/Dark mode compatibility
+
+The site has a light/dark mode toggle. Dark is the default. Light mode is activated by `[data-theme="light"]` on `<html>`, which overrides nine colour tokens in `scss/abstracts/_tokens.scss`.
+
+**Rules for every new component:**
+
+1. **Always use colour tokens** (`var(--color-*)`) — never hardcode colours except for static values that must be the same in both modes (e.g. `color: #fff` on a coloured background, status badge colours).
+
+2. **`--color-accent` stays dark navy in both modes** (`#0f3460` dark / `#1e3a5f` light). Any text placed on an `--color-accent` background must be `color: #fff`, never `color: var(--color-text)` — which becomes near-black in light mode and is unreadable.
+
+3. **`--color-highlight` (`#e94560`) is the same in both modes.** Text on it should always be `color: #fff`.
+
+4. **SVG assets with hardcoded `stroke="white"` or `fill="white"` are invisible in light mode.** Either author the SVG with `currentColor` (and set `color` via CSS), or add `filter: invert(1)` under `[data-theme='light']` in `_main.scss`.
+
+5. **Do not add `[data-theme="light"]` overrides inside component SCSS files.** Light-mode-specific fixes that cannot be expressed through tokens belong in the `[data-theme='light']` block in `scss/layout/_main.scss`.
+
+**Quick self-check before committing any component:**
+
+- Does it use `var(--color-text)` or `var(--color-text-muted)` on a dark fixed background? → Replace with `#fff`.
+- Does it use a hardcoded light colour on any surface? → Replace with the appropriate token.
+- Does it contain an SVG or `<img>` with hardcoded white strokes? → Use `currentColor` or add a light-mode `filter`.
+
 ---
 
 ## Custom Module: portfolio_core

@@ -4,9 +4,7 @@
   {% endif %}
   <h3 class="skill-card__name">{{ name }}</h3>
   <span class="skill-card__category">{{ category }}</span>
-  <div class="skill-card__level" aria-label="Level {{ level }} of 5">
-    {% for i in 1..5 %}
-      <span class="skill-card__pip{% if i <= level %} skill-card__pip--filled{% endif %}"></span>
-    {% endfor %}
+  <div class="skill-card__bar-track" aria-label="Level {{ level }} of 5" role="img">
+    <div class="skill-card__bar-fill" style="--bar-width: {{ (level / 5 * 100)|round }}%"></div>
   </div>
 </article>

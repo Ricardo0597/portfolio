@@ -91,3 +91,15 @@ $transition-base: 250ms ease;
   --transition-fast: #{$transition-fast};
   --transition-base: #{$transition-base};
 }
+
+[data-theme='light'] {
+  --color-bg:         #f0f4f8;
+  --color-primary:    #ffffff;
+  --color-secondary:  #e8edf4;
+  --color-accent:     #1e3a5f;
+  --color-highlight:  #e94560;
+  --color-text:       #0d1117;
+  --color-text-muted: #57606a;
+  --color-surface:    #ffffff;
+  --color-border:     #d8dee4;
+}

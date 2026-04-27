@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html{{ html_attributes }}>
+  <head>
+    <script>try{var t=localStorage.getItem('theme');if(!t){var m=document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);if(m)t=m[1];}if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+    <head-placeholder token="{{ placeholder_token }}">
+    <title>{{ head_title|safe_join(' | ') }}</title>
+    <css-placeholder token="{{ placeholder_token }}">
+    <js-placeholder token="{{ placeholder_token }}">
+  </head>
+  <body{{ attributes }}>
+    <a href="#main-content" class="visually-hidden focusable">
+      {{ 'Skip to main content'|t }}
+    </a>
+    {{ page_top }}
+    {{ page }}
+    {{ page_bottom }}
+    <js-bottom-placeholder token="{{ placeholder_token }}">
+  </body>
+</html>
