@@ -20,9 +20,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   opacity: 0;
   transition:
-    background-color 300ms ease,
-    color 300ms ease,
-    opacity 200ms ease;
+    background-color var(--duration-slow) ease,
+    color var(--duration-slow) ease,
+    opacity var(--duration-base) ease;
 }
 
 img,

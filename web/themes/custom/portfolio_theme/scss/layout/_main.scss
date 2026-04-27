@@ -39,7 +39,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: background-color 300ms ease, border-color 300ms ease;
+  transition: background-color var(--duration-slow) ease, border-color var(--duration-slow) ease;
 
   &__inner {
     display: flex;
@@ -231,7 +231,7 @@ footer[role='contentinfo'] {
   padding: var(--space-8) 0;
   color: var(--color-text-muted);
   font-size: var(--text-sm);
-  transition: background-color 300ms ease, border-color 300ms ease;
+  transition: background-color var(--duration-slow) ease, border-color var(--duration-slow) ease;
 
   a {
     color: var(--color-text-muted);
@@ -572,7 +572,7 @@ footer[role='contentinfo'] {
   background: linear-gradient(90deg, var(--color-highlight), #4a9eff);
   z-index: 200;
   pointer-events: none;
-  transition: width 80ms linear;
+  transition: width var(--duration-fast) linear;
 }
 
 // ─── Scroll-reveal animations ────────────────────────────────────────────────
@@ -581,8 +581,8 @@ footer[role='contentinfo'] {
   opacity: 0;
   transform: translateY(24px);
   transition:
-    opacity 500ms ease,
-    transform 500ms ease;
+    opacity calc(var(--duration-slow) * 1.25) ease,
+    transform calc(var(--duration-slow) * 1.25) ease;
 
   &.is-visible {
     opacity: 1;
@@ -639,6 +639,6 @@ footer[role='contentinfo'] {
   }
 
   &.is-spinning {
-    animation: spin-once 400ms ease forwards;
+    animation: spin-once var(--duration-slow) ease forwards;
   }
 }
