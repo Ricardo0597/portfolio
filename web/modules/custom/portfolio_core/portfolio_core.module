@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 use Drupal\node\NodeInterface;
 use Drupal\Core\Url;
+use Drupal\views\Plugin\views\cache\CachePluginBase;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_page_attachments().
@@ -352,4 +354,70 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     $variables['#cache']['tags'] ?? [],
     $node->getCacheTags(),
   );
+}
+
+/**
+ * Implements hook_views_post_render().
+ */
+function portfolio_core_views_post_render(ViewExecutable $view, array &$output, CachePluginBase $cache): void {
+  if (!in_array($view->id(), ['portfolio_projects', 'portfolio_skills'], TRUE)) {
+    return;
+  }
+  if (empty($view->result)) {
+    return;
+  }
+
+  $items = [];
+  $position = 1;
+  foreach ($view->result as $row) {
+    if (!$row->_entity instanceof NodeInterface) {
+      continue;
+    }
+    $node = $row->_entity;
+
+    if ($view->id() === 'portfolio_projects') {
+      $stack = array_map(fn($t) => $t->label(), $node->get('field_stack')->referencedEntities());
+      $item = array_filter([
+        '@type'               => 'SoftwareSourceCode',
+        'name'                => $node->label(),
+        'url'                 => $node->toUrl()->setAbsolute()->toString(),
+        'description'         => $node->get('field_summary')->value ?? '',
+        'programmingLanguage' => $stack ?: NULL,
+      ]);
+    }
+    else {
+      $item = [
+        '@type' => 'DefinedTerm',
+        'name'  => $node->label(),
+        'url'   => $node->toUrl()->setAbsolute()->toString(),
+      ];
+    }
+
+    $items[] = [
+      '@type'    => 'ListItem',
+      'position' => $position++,
+      'item'     => $item,
+    ];
+  }
+
+  $list_name = $view->id() === 'portfolio_projects' ? 'Projects' : 'Skills';
+  $key       = 'portfolio-json-ld-' . str_replace('portfolio_', '', $view->id()) . '-list';
+
+  $output['#attached']['html_head'][] = [
+    [
+      '#type'       => 'html_tag',
+      '#tag'        => 'script',
+      '#value'      => json_encode(
+        [
+          '@context'        => 'https://schema.org',
+          '@type'           => 'ItemList',
+          'name'            => $list_name,
+          'itemListElement' => $items,
+        ],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+      ),
+      '#attributes' => ['type' => 'application/ld+json'],
+    ],
+    $key,
+  ];
 }
