@@ -184,6 +184,118 @@ The site has a light/dark mode toggle. Dark is the default. Light mode is activa
 - Does it use a hardcoded light colour on any surface? → Replace with the appropriate token.
 - Does it contain an SVG or `<img>` with hardcoded white strokes? → Use `currentColor` or add a light-mode `filter`.
 
+### SCSS patterns for theme-compatible components
+
+#### Token dual-layer system
+
+`_tokens.scss` defines two layers:
+
+- **SCSS variables** (`$color-*`) — compile-time only. Use these inside SCSS
+  functions and mixins (e.g. `rgba(t.$color-highlight, 0.15)`). The output is a
+  hardcoded hex/rgba value baked into the CSS; it does **not** respond to the
+  `[data-theme='light']` override at runtime.
+- **CSS custom properties** (`var(--color-*)`) — runtime. These are what the
+  toggle swaps. Use them for all component colours that need to adapt.
+
+Rule: **components use `var(--color-*)`. SCSS variables (`t.$`) are only for
+feeding SCSS-level functions where a CSS custom property is not accepted.**
+
+#### Canonical component pattern
+
+```scss
+// Good — all surfaces and text use runtime tokens.
+.my-component {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+
+  &__label {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+  }
+
+  &:hover {
+    border-color: var(--color-highlight);
+  }
+}
+```
+
+#### Static colour exceptions
+
+Some colours are intentionally the same in both modes and should be hardcoded:
+
+| Value | Use case |
+|-------|----------|
+| `#fff` | Text on `--color-accent`, `--color-highlight`, or any fixed-colour background |
+| `t.$color-status-live` / `t.$color-status-wip` / `t.$color-status-archived` | Status badge backgrounds — same in both modes |
+| `t.$color-diff-beginner` / `t.$color-diff-intermediate` / `t.$color-diff-advanced` | Difficulty badge backgrounds |
+
+```scss
+// Good — status badge uses SCSS token directly (same in both modes).
+.status-badge--live {
+  background: t.$color-status-live;
+  color: #fff;   // always white — token background is a fixed dark green
+}
+
+// Bad — using the CSS custom property for a surface with fixed-colour text.
+.status-badge--live {
+  background: t.$color-status-live;
+  color: var(--color-text);   // becomes near-black in light mode → unreadable
+}
+```
+
+#### The rgba() pattern
+
+When you need a semi-transparent tint of a colour, SCSS `rgba()` requires a
+compile-time value — CSS custom properties cannot be passed to it directly.
+Use the SCSS token, and only for colours that are the same in both modes:
+
+```scss
+// Correct — highlight and status colours are static.
+background: rgba(t.$color-highlight, 0.15);
+background: rgba(t.$color-status-live, 0.15);
+
+// Wrong — token value is dark-mode only; the tint will not adapt.
+background: rgba(t.$color-bg, 0.5);   // use var(--color-bg) with opacity instead
+```
+
+For adaptive semi-transparent tints, use `color-mix()` or `opacity` on a child
+element instead of `rgba()` with a theme token.
+
+#### Gradient text
+
+The `background-clip: text` gradient pattern works in both modes as long as
+the gradient colours are CSS custom properties:
+
+```scss
+// Good — gradient adapts because it uses runtime tokens.
+.heading {
+  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-text-muted) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+```
+
+#### Light-mode overrides
+
+If a component has an edge case that cannot be expressed through tokens (e.g.
+an image or SVG with hardcoded white strokes), add the fix to the
+`[data-theme='light']` block at the bottom of `scss/layout/_main.scss`.
+**Never** add a `[data-theme='light']` selector inside a component SCSS file.
+
+```scss
+// In scss/layout/_main.scss — the single override block.
+[data-theme='light'] {
+  .site-branding__logo,
+  .site-footer__logo {
+    filter: invert(1);
+  }
+
+  // Add new light-mode exceptions here, not in component files.
+}
+```
+
 ---
 
 ## Custom Module: portfolio_core
@@ -376,6 +488,50 @@ contact
 - Return JSON responses using `JsonResponse` or `CacheableJsonResponse`.
 - Always implement `CacheableResponseInterface` on cacheable endpoints.
 - Document each endpoint in PROMPT.md under "Feature Inventory".
+
+---
+
+## Structured Data / JSON-LD
+
+The site emits schema.org JSON-LD on every page type where it adds value. All
+JSON-LD is attached to `$*['#attached']['html_head']` — never printed directly
+in a Twig template.
+
+### Hooks and locations
+
+| Hook | File | Fires on |
+|------|------|----------|
+| `hook_page_attachments` | `portfolio_core.module` | Individual node pages |
+| `hook_views_post_render` | `portfolio_core.module` | Views listing pages |
+
+### Schema types in use
+
+| Page / context | Schema type |
+|----------------|-------------|
+| `profile` node | `Person` |
+| `project` node | `SoftwareSourceCode` |
+| `article` node | `TechArticle` |
+| `/projects` listing | `ItemList` of `SoftwareSourceCode` |
+| `/skills` listing | `ItemList` of `DefinedTerm` |
+
+### Attachment key naming
+
+Keys must be unique per page. Conventions:
+- Node pages: `portfolio-json-ld` (single block, no suffix needed)
+- Listing pages: `portfolio-json-ld-{view-slug}-list` — e.g. `portfolio-json-ld-projects-list`
+
+### Rules for adding new JSON-LD
+
+1. **Node pages:** Add a new `if ($node->bundle() === '...')` block inside
+   `portfolio_core_page_attachments()`.
+2. **Listing pages:** Add the view ID to the `in_array()` allowlist in
+   `portfolio_core_views_post_render()`, then add a branch for the new item type.
+3. Use `array_filter()` to omit null/empty fields — never emit empty properties.
+4. Always pass `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE` to `json_encode()`.
+5. URLs must be absolute: `$node->toUrl()->setAbsolute()->toString()`.
+6. Validate with **https://validator.schema.org** — not Google's Rich Results Test,
+   which only detects Google-renderable rich result types and will show "No items
+   detected" for valid markup that doesn't map to a visual SERP feature.
 
 ---
 

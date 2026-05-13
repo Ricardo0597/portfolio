@@ -50,7 +50,7 @@ ddev theme-build        # install deps, compile SCSS, rebuild cache
 ddev theme-watch        # watch mode for SCSS
 
 # Expose site publicly (ngrok)
-ddev ngrok              # prints a public URL, tunnel runs in background
+ddev share              # expose site via ngrok tunnel, prints a public URL
 ```
 
 ## Project Structure
@@ -85,12 +85,16 @@ Each feature is an intentional showcase of a different Drupal pattern:
 |---|---|
 | Featured skills block | Block Plugin + Dependency Injection |
 | `/api/portfolio/projects` | REST Resource Plugin + CacheableJsonResponse |
-| Profile page redirect | Event Subscriber (KernelEvents::REQUEST) |
 | `skill_level_label`, `reading_time` Twig filters | Twig Extension service |
 | Project search + filters | Search API + Facets + Views |
 | Project/Article listings | Preprocess hooks + SDC view mode templates |
 | SEO metadata | Metatag + Simple Sitemap config |
 | Headless pattern | JSON:API with filters, sparse fieldsets, includes |
+| PDF CV export | Entity Print + dompdf + `pdf` view mode + preprocess hook |
+| Structured data (node pages) | `hook_page_attachments` + JSON-LD (`SoftwareSourceCode`, `Article`) |
+| Structured data (listing pages) | `hook_views_post_render` + JSON-LD `ItemList` |
+| Light/dark mode toggle | CSS custom property token swap + `localStorage` persistence |
+| Mobile navigation | Animated hamburger drawer + `aria-expanded` + Drupal behavior |
 
 ## Content Types
 
@@ -109,3 +113,4 @@ Each feature is an intentional showcase of a different Drupal pattern:
 - Stage files explicitly — no `git add .`
 - One custom module only: `portfolio_core`
 - Commit format: [Conventional Commits](https://www.conventionalcommits.org/)
+- All component colours must use `var(--color-*)` tokens — the light/dark toggle swaps nine CSS custom properties at runtime; hardcoded colours break light mode. See CLAUDE.md for full SCSS patterns.

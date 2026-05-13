@@ -1,7 +1,7 @@
 # Design: ItemList Schema Markup on Listing Pages
 
 **Date:** 2026-04-27
-**Status:** Approved
+**Status:** Implemented — 2026-05-13
 
 ---
 
