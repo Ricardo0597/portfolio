@@ -999,6 +999,7 @@ Track all implemented features here. Update after each phase.
 | 10 | Admin local task tabs | Template override + BEM CSS | — | ✅ |
 | 11 | PDF CV export (Phase A) | Entity Print + dompdf + pdf view mode + preprocess + EventSubscriber CSS | — | ✅ |
 | 12 | Anonymous PDF access | Role permission config for `entity print access bundle profile` | — | ✅ |
+| 13 | ItemList schema on listing pages | `hook_views_post_render` + JSON-LD `ItemList` | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 
