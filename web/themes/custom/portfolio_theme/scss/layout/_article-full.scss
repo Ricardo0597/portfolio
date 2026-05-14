@@ -122,8 +122,8 @@
     }
 
     pre {
-      background: var(--color-primary);
-      border: 1px solid var(--color-border);
+      background: #1a1a2e; // hardcoded — code blocks are always dark in both modes
+      border: 1px solid #2a2a4a;
       border-radius: var(--border-radius);
       padding: var(--space-4) var(--space-6);
       overflow-x: auto;
