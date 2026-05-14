@@ -48,7 +48,7 @@ Adds a `location /headless` block that `proxy_pass`es to `http://nodejs:3000`. S
 
 - `basePath: '/headless'` in `next.config.js` — all routes and assets are automatically prefixed
 - `output: 'standalone'` for production builds (future deployment)
-- API calls target `https://portfolio.ddev.site` in local dev, configurable via `NEXT_PUBLIC_DRUPAL_BASE_URL` env var
+- All JSON:API requests use **relative URLs** (`/jsonapi/node/project`, not `https://portfolio.ddev.site/jsonapi/...`). Since the Next.js app is served through the same DDEV nginx as Drupal, the browser resolves relative paths against whatever host it is currently on — `portfolio.ddev.site` locally, the ngrok URL when shared via `ddev share`, or a production domain when deployed. No env var or hardcoded host needed.
 
 ### Drupal changes
 
@@ -194,7 +194,7 @@ Cosine similarity between the query embedding and each item embedding produces t
 portfolio-headless/                 ← separate GitHub repo
 ├── next.config.js                  ← basePath: '/headless'
 ├── package.json
-├── .env.local.example              ← NEXT_PUBLIC_DRUPAL_BASE_URL=https://portfolio.ddev.site
+├── .env.local.example              ← placeholder for future env vars (none required in this phase)
 ├── src/
 │   ├── app/
 │   │   ├── layout.js               ← root layout, banner, global styles
@@ -241,8 +241,6 @@ services:
     command: sh -c "npm install && npm run dev"
     expose:
       - "3000"
-    environment:
-      - NEXT_PUBLIC_DRUPAL_BASE_URL=https://portfolio.ddev.site
     networks:
       - ddev_default
 ```
