@@ -8,8 +8,8 @@ Everything used to build the `/headless` section of the portfolio: what each tec
 
 1. [Architecture: What "Headless CMS" Means](#1-architecture)
 2. [JSON:API — Drupal as a Data Source](#2-jsonapi)
-3. [Next.js 16 — The Frontend Framework](#3-nextjs)
-4. [React 18 — UI Layer](#4-react)
+3. [Next.js 16 — The Frontend Framework](#3-nextjs-16)
+4. [React 18 — UI Layer](#4-react-18)
 5. [D3.js — Force-Directed Graph Visualisation](#5-d3js)
 6. [Transformers.js — In-Browser AI](#6-transformersjs)
 7. [WebAssembly — Running ML Models in the Browser](#7-webassembly)
