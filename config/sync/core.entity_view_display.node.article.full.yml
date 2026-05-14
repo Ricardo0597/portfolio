@@ -14,20 +14,30 @@ dependencies:
     - field.field.node.article.field_tags
     - node.type.article
   module:
+    - text
     - user
 id: node.article.full
 targetEntityType: node
 bundle: article
 mode: full
 content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 10
+    region: content
   links:
     settings: {  }
     third_party_settings: {  }
     weight: 100
     region: content
 hidden:
-  body: true
   comment: true
+  entity_print_view_epub: true
+  entity_print_view_pdf: true
+  entity_print_view_word_docx: true
   field_content: true
   field_hero_image: true
   field_image: true
