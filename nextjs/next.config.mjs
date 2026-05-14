@@ -2,6 +2,8 @@
 const nextConfig = {
   basePath: '/headless',
   output: 'standalone',
+  turbopack: {},
+  allowedDevOrigins: ['portfolio.ddev.site', '*.ngrok-free.dev', '*.ngrok-free.app'],
 
   webpack: (config) => {
     config.resolve.alias = {
