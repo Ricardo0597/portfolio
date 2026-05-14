@@ -2,7 +2,12 @@
 const nextConfig = {
   basePath: '/headless',
   output: 'standalone',
-  turbopack: {},
+  turbopack: {
+    resolveAlias: {
+      sharp: { browser: false },
+      'onnxruntime-node': { browser: false },
+    },
+  },
   webpack: (config) => {
     config.resolve.alias = {
       ...config.resolve.alias,
