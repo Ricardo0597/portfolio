@@ -46,3 +46,6 @@ web/themes/custom/portfolio_theme/components/**/*.map
 # OS
 .DS_Store
 Thumbs.db
+
+# Next.js headless app (separate repo, cloned locally)
+nextjs/
