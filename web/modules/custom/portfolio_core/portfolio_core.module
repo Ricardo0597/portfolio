@@ -222,8 +222,12 @@ function _portfolio_core_preprocess_article_full(array &$variables, NodeInterfac
     ? \Drupal::service('file_url_generator')->generateAbsoluteString($hero->entity->getFileUri())
     : '';
 
-  // Collect paragraph text for reading time estimate.
+  // Collect text for reading time: summary, body, and any paragraphs.
   $text = $node->get('field_summary')->value ?? '';
+  $body = $node->get('body');
+  if (!$body->isEmpty()) {
+    $text .= ' ' . ($body->value ?? '');
+  }
   foreach ($node->get('field_content')->referencedEntities() as $paragraph) {
     foreach ($paragraph->getFields() as $field) {
       $definition = $field->getFieldDefinition();
