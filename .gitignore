@@ -49,3 +49,6 @@ Thumbs.db
 
 # Next.js headless app (separate repo, cloned locally)
 nextjs/
+
+# Local secrets (LLM API keys)
+.ddev/.env

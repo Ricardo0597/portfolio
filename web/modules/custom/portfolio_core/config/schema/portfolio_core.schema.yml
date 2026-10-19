@@ -14,3 +14,29 @@ portfolio_core.settings:
       sequence:
         type: string
         label: 'Route name'
+
+portfolio_core.assistant:
+  type: config_object
+  label: 'Droopy AI assistant settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Show the assistant and accept questions'
+    providers:
+      type: sequence
+      label: 'LLM providers, tried in order'
+      sequence:
+        type: string
+        label: 'Provider id'
+    groq_model:
+      type: string
+      label: 'Groq model id'
+    gemini_model:
+      type: string
+      label: 'Gemini model id'
+    max_tokens_chat:
+      type: integer
+      label: 'Max answer tokens (chat)'
+    max_tokens_fit:
+      type: integer
+      label: 'Max answer tokens (fit mode)'

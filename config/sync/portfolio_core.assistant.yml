@@ -1,0 +1,8 @@
+enabled: true
+providers:
+  - groq
+  - gemini
+groq_model: 'openai/gpt-oss-120b'
+gemini_model: 'gemini-2.5-flash'
+max_tokens_chat: 400
+max_tokens_fit: 700

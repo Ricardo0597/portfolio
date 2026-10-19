@@ -22,3 +22,7 @@ services:
       - '@current_user'
     tags:
       - { name: event_subscriber }
+  portfolio_core.assistant_keys:
+    class: Drupal\portfolio_core\Assistant\AssistantKeys
+    arguments:
+      - '@settings'
