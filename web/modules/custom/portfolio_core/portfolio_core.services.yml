@@ -47,3 +47,9 @@ services:
       - '@config.factory'
       - !tagged_iterator portfolio_core.llm_client
       - '@logger.channel.portfolio_core'
+  portfolio_core.assistant_context:
+    class: Drupal\portfolio_core\Assistant\AssistantContextBuilder
+    arguments:
+      - '@entity_type.manager'
+      - '@portfolio_core.profile_data'
+      - '@cache.default'
