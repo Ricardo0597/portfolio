@@ -477,6 +477,31 @@ removing it from the config and running `ddev drush cim -y`.
 
 ---
 
+## AI Assistant (Droopy)
+
+Droopy (`components/droopy-guide/`) is the floating mascot that answers
+questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
+
+- **Config:** `portfolio_core.assistant` — `enabled` (kill switch: hides the
+  widget, endpoint returns 404), `providers` order, model ids, max tokens.
+- **Keys:** never in config or git. `$settings['portfolio_assistant']['groq_api_key']`
+  / `['gemini_api_key']`, else env vars `GROQ_API_KEY` / `GEMINI_API_KEY`.
+  Locally put them in `.ddev/.env` (git-ignored) and run `ddev restart`.
+- **Services** (`src/Assistant/`): `AssistantKeys`, `AssistantContextBuilder`
+  (system prompt from profile facts, cached with profile tags),
+  `GroqClient` / `GeminiClient` (`LlmClientInterface`), `LlmChain`
+  (fallback; NULL → "napping" answer), `AnswerParser` (whitelisted
+  `[[scroll:…]]`, `[[cv]]`, `[[email]]` action tags), `AskRequestValidator`.
+- **Limits:** 10 questions/minute and 60/day per IP (core flood), question
+  ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
+- Answers are rendered as text only (`textContent`), never HTML.
+- Availability facts live on the profile node (`field_available_from`,
+  `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
+- Note: in this environment `drush cset` does not persist; change config via
+  the UI, `drush php:eval`, or `config/sync` + `drush cim`.
+
+---
+
 ## Config Management
 
 - Config sync directory: `config/sync/`

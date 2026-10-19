@@ -1003,6 +1003,8 @@ Track all implemented features here. Update after each phase.
 | 14 | Single-page profile at `/` (hero + anchored sections + contact, sticky section nav with scroll-spy) | Front page = profile node, `node--profile.html.twig`, shared header partial, `social-links` SDC | — | ✅ |
 | 15 | Disabled sections (projects, articles, features, skills → 302 `/`; `/about` → 301 `/`) | Config-driven Event Subscriber (`portfolio_core.settings`) + unit tests | — | ✅ |
 | 16 | Light/dark switch following OS preference | `theme-toggle` SDC + inline head script + Drupal behavior | — | ✅ |
+| 17 | Availability fields (start date, work mode, engagement types, schedule) shown in hero badge + Contact | List/string fields + `ProfileDataService::getAvailability()` + unit tests | — | ✅ |
+| 18 | Droopy AI guide — floating mascot answering questions about Ricardo (`POST /api/portfolio/ask`) | SDC with JS + custom JSON endpoint + provider-agnostic LLM chain (Groq → Gemini, free tiers) + flood control + unit tests | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 
