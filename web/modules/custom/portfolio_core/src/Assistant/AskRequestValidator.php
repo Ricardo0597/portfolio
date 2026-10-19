@@ -62,20 +62,31 @@ final class AskRequestValidator {
    * Whether a browser Origin header belongs to this site.
    *
    * Compares hosts only, so a TLS-terminating proxy (browser https, PHP http)
-   * does not cause false rejections. A missing Origin (non-browser client) is
+   * does not cause false rejections. Callers pass the request host and any
+   * X-Forwarded-Host (tunnels such as ngrok rewrite Host); a cross-site
+   * browser request cannot set that header without a CORS preflight, which
+   * this endpoint never approves. A missing Origin (non-browser client) is
    * allowed: flood control, not this check, is the quota protection.
    *
    * @param string|null $origin
    *   The Origin header, if any.
-   * @param string $host
-   *   The request host as Drupal sees it.
+   * @param array<string|null> $hosts
+   *   Hosts this site is reachable as for the current request.
    */
-  public function isAllowedOrigin(?string $origin, string $host): bool {
+  public function isAllowedOrigin(?string $origin, array $hosts): bool {
     if ($origin === NULL) {
       return TRUE;
     }
     $origin_host = parse_url($origin, PHP_URL_HOST);
-    return is_string($origin_host) && strcasecmp($origin_host, $host) === 0;
+    if (!is_string($origin_host)) {
+      return FALSE;
+    }
+    foreach ($hosts as $host) {
+      if (is_string($host) && $host !== '' && strcasecmp($origin_host, $host) === 0) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }

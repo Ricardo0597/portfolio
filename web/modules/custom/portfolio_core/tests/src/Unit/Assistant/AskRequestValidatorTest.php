@@ -105,42 +105,57 @@ final class AskRequestValidatorTest extends UnitTestCase {
    * Requests without an Origin header (non-browser clients) are allowed.
    */
   public function testMissingOriginAllowed(): void {
-    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin(NULL, 'example.com'));
+    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin(NULL, ['example.com']));
   }
 
   /**
    * Same host is allowed even when a TLS-terminating proxy changes the scheme.
    */
   public function testSameHostDifferentSchemeAllowed(): void {
-    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://example.com', 'example.com'));
+    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://example.com', ['example.com']));
   }
 
   /**
    * Host comparison ignores case.
    */
   public function testHostCaseInsensitive(): void {
-    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://Example.COM', 'example.com'));
+    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://Example.COM', ['example.com']));
   }
 
   /**
    * A foreign site is rejected.
    */
   public function testForeignOriginRejected(): void {
-    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('https://evil.example', 'example.com'));
+    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('https://evil.example', ['example.com']));
   }
 
   /**
    * Look-alike hosts are rejected.
    */
   public function testLookAlikeOriginRejected(): void {
-    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('https://example.com.evil.example', 'example.com'));
+    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('https://example.com.evil.example', ['example.com']));
   }
 
   /**
    * Opaque origins ("null") are rejected.
    */
   public function testNullOriginRejected(): void {
-    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('null', 'example.com'));
+    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('null', ['example.com']));
+  }
+
+
+  /**
+   * A tunnel/proxy that rewrites Host still matches its forwarded host.
+   */
+  public function testForwardedHostAllowed(): void {
+    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://demo.ngrok-free.dev', ['portfolio.ddev.site', 'demo.ngrok-free.dev']));
+  }
+
+  /**
+   * Empty candidate hosts are ignored.
+   */
+  public function testEmptyHostsRejected(): void {
+    $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('https://example.com', ['', NULL]));
   }
 
 }

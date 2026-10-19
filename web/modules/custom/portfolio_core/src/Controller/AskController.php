@@ -63,7 +63,9 @@ final class AskController implements ContainerInjectionInterface {
       throw new NotFoundHttpException();
     }
 
-    if (!$this->validator->isAllowedOrigin($request->headers->get('Origin'), $request->getHost())) {
+    $forwarded_host = trim(explode(',', (string) $request->headers->get('X-Forwarded-Host'))[0]);
+    $forwarded_host = (string) preg_replace('/:\d+$/', '', $forwarded_host);
+    if (!$this->validator->isAllowedOrigin($request->headers->get('Origin'), [$request->getHost(), $forwarded_host])) {
       return $this->json(['error' => 'Forbidden origin.'], 403);
     }
 
