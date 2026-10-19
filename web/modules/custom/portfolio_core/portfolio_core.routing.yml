@@ -1,1 +1,9 @@
-# Routes defined here in later phases.
+portfolio_core.ask:
+  path: '/api/portfolio/ask'
+  defaults:
+    _controller: '\Drupal\portfolio_core\Controller\AskController::ask'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
