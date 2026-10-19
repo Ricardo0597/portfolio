@@ -26,3 +26,5 @@ services:
     class: Drupal\portfolio_core\Assistant\AssistantKeys
     arguments:
       - '@settings'
+  portfolio_core.answer_parser:
+    class: Drupal\portfolio_core\Assistant\AnswerParser
