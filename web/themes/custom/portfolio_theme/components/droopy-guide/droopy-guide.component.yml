@@ -1,0 +1,25 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Droopy Guide'
+description: 'Floating animated mascot that answers questions about Ricardo via /api/portfolio/ask.'
+props:
+  type: object
+  required: [endpoint]
+  properties:
+    endpoint:
+      type: string
+      title: 'Ask endpoint URL'
+    cv_url:
+      type: string
+      title: 'CV download URL'
+    email:
+      type: string
+      title: 'Contact email'
+    chips:
+      type: array
+      title: 'Suggested questions (the last one switches to fit mode)'
+      items:
+        type: string
+libraryOverrides:
+  dependencies:
+    - core/drupal
+    - core/once

@@ -42,4 +42,35 @@ function portfolio_theme_preprocess_page(array &$variables): void {
     ['label' => t('Headless'), 'url' => Url::fromUserInput('/headless')->toString(), 'separated' => TRUE],
   ];
   $variables['#cache']['contexts'][] = 'url.path.is_front';
+
+  // Droopy AI guide: on every public page while the assistant is enabled.
+  $assistant = \Drupal::config('portfolio_core.assistant');
+  $variables['#cache']['tags'][] = 'config:portfolio_core.assistant';
+  if ($assistant->get('enabled') && !\Drupal::service('router.admin_context')->isAdminRoute()) {
+    $profiles = \Drupal::entityTypeManager()->getStorage('node')
+      ->loadByProperties(['type' => 'profile', 'status' => 1]);
+    $profile = reset($profiles);
+    $variables['droopy'] = [
+      '#type' => 'component',
+      '#component' => 'portfolio_theme:droopy-guide',
+      '#props' => [
+        'endpoint' => Url::fromRoute('portfolio_core.ask')->toString(),
+        'cv_url' => $profile ? Url::fromRoute('entity_print.view', [
+          'export_type' => 'pdf',
+          'entity_type' => 'node',
+          'entity_id' => $profile->id(),
+        ])->toString() : '',
+        'email' => $profile ? (string) $profile->get('field_email')->value : '',
+        'chips' => [
+          (string) t('Is he available?'),
+          (string) t("What's his Drupal experience?"),
+          (string) t('What has he built?'),
+          (string) t('Is he a fit for my role?'),
+        ],
+      ],
+    ];
+    if ($profile) {
+      $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'], $profile->getCacheTags());
+    }
+  }
 }
