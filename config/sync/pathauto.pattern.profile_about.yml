@@ -2,17 +2,18 @@ uuid: 3caf44b0-2441-42ee-8c73-8651fb883c37
 langcode: en
 status: true
 dependencies:
+  config:
+    - node.type.profile
   module:
     - node
 id: profile_about
 label: 'Profile URL pattern'
 type: 'canonical_entities:node'
-pattern: about
+pattern: /about
 selection_criteria:
   349ee57d-eb35-43ec-b107-0962811df066:
     id: 'entity_bundle:node'
     negate: false
-    uuid: 349ee57d-eb35-43ec-b107-0962811df066
     context_mapping:
       node: node
     bundles:
