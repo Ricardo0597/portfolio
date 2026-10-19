@@ -123,9 +123,11 @@ git add config/sync/
 - Use dependency injection. No `\Drupal::service()` static calls inside classes.
 - Static calls are acceptable only inside procedural hooks (`.module` files)
   where DI is not available.
-- Strict types declaration required on all PHP files:
+- Strict types declaration required on all PHP files (blank line after
+  `<?php`, as the Drupal coding standard requires):
   ```php
   <?php
+
   declare(strict_types=1);
   ```
 - Type hints and return types required on all methods.
@@ -595,8 +597,22 @@ Keys must be unique per page. Conventions:
 ## Testing
 
 - Unit tests go in `web/modules/custom/portfolio_core/tests/src/Unit/`
-- Run with: `ddev exec ./vendor/bin/phpunit web/modules/custom/portfolio_core/`
+- Run with: `ddev exec ./vendor/bin/phpunit -c web/core web/modules/custom/portfolio_core/`
+  (`drupal/core-dev` is a dev dependency; `-c web/core` loads core's PHPUnit config).
+- Coding standards (must pass before committing):
+  ```bash
+  ddev exec ./vendor/bin/phpcs --standard=Drupal,DrupalPractice \
+    --extensions=php,module,inc,install,theme,yml --ignore=node_modules,*.css,*.js \
+    web/modules/custom web/themes/custom/portfolio_theme
+  ```
+  `phpcbf` with the same arguments fixes most violations automatically.
 - At minimum, write unit tests for any custom service or plugin logic.
+- **CI:** `.github/workflows/ci.yml` runs `composer audit`, the unit tests and
+  phpcs on every push to `main` and every pull request. It never deploys.
+- **Dependency updates:** keep core on the current minor
+  (`--with "drupal/core:~11.3.0"` etc.) unless a security fix requires the next
+  one; `drupal/admin_toolbar` needs core ≥ 11.4 to be re-resolved, so exclude it
+  from `composer update` until core moves to 11.4.
 
 ---
 
