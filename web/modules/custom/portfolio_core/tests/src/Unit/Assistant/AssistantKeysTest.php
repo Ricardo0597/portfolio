@@ -19,6 +19,15 @@ final class AssistantKeysTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
+  protected function setUp(): void {
+    parent::setUp();
+    // Real keys may exist in the environment (.ddev/.env).
+    putenv('GROQ_API_KEY');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function tearDown(): void {
     putenv('GROQ_API_KEY');
     parent::tearDown();

@@ -86,4 +86,13 @@ final class AnswerParserTest extends UnitTestCase {
     $this->assertSame("Hi there.\n\nNext", $result['text']);
   }
 
+
+  /**
+   * Markdown emphasis and headings are flattened to plain text.
+   */
+  public function testStripsMarkdownFormatting(): void {
+    $result = (new AnswerParser())->parse("**Strengths**\n- Drupal 8–11\n## Verdict\nA __good__ fit.");
+    $this->assertSame("Strengths\n- Drupal 8–11\nVerdict\nA good fit.", $result['text']);
+  }
+
 }

@@ -53,5 +53,6 @@ services:
       - '@entity_type.manager'
       - '@portfolio_core.profile_data'
       - '@cache.default'
+      - '@datetime.time'
   portfolio_core.ask_validator:
     class: Drupal\portfolio_core\Assistant\AskRequestValidator

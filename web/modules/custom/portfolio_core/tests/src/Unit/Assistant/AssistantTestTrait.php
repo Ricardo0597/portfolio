@@ -30,7 +30,7 @@ trait AssistantTestTrait {
       'enabled' => TRUE,
       'providers' => ['groq', 'gemini'],
       'groq_model' => 'openai/gpt-oss-120b',
-      'gemini_model' => 'gemini-2.5-flash',
+      'gemini_model' => 'gemini-flash-lite-latest',
       'max_tokens_chat' => 400,
       'max_tokens_fit' => 700,
     ];
@@ -45,6 +45,10 @@ trait AssistantTestTrait {
    * Returns a key lookup with the given provider keys.
    */
   protected function keys(array $keys): AssistantKeys {
+    // Real keys may exist in the environment (.ddev/.env); tests must not
+    // see them.
+    putenv('GROQ_API_KEY');
+    putenv('GEMINI_API_KEY');
     $settings = [];
     foreach ($keys as $provider => $key) {
       $settings[$provider . '_api_key'] = $key;

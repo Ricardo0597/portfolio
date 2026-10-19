@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\portfolio_core\Unit\Assistant;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\portfolio_core\Assistant\AssistantContextBuilder;
@@ -25,6 +26,8 @@ final class AssistantContextBuilderTest extends UnitTestCase {
     return $overrides + [
       'name' => 'Ricardo Alonso Contreras García',
       'title' => 'Full Stack Developer',
+      'years' => '7',
+      'today' => '2026-10-19',
       'location' => 'Costa Rica (Remote)',
       'email' => 'ricardo@example.com',
       'bio' => 'Proficient Drupal developer.',
@@ -57,6 +60,7 @@ final class AssistantContextBuilderTest extends UnitTestCase {
       $this->createMock(EntityTypeManagerInterface::class),
       $this->createMock(ProfileDataService::class),
       $this->createMock(CacheBackendInterface::class),
+      $this->createMock(TimeInterface::class),
     );
   }
 
@@ -69,6 +73,15 @@ final class AssistantContextBuilderTest extends UnitTestCase {
     $this->assertStringContainsString('Remote only', $prompt);
     $this->assertStringContainsString('Full-time, Part-time, Contract, Freelance', $prompt);
     $this->assertStringContainsString('Flexible with time zones and project length', $prompt);
+  }
+
+  /**
+   * Total years and today's date are given so the model doesn't guess.
+   */
+  public function testIncludesYearsAndToday(): void {
+    $prompt = $this->builder()->compose($this->facts(), 'chat');
+    $this->assertStringContainsString('Total years of professional experience: 7', $prompt);
+    $this->assertStringContainsString("Today's date: 2026-10-19", $prompt);
   }
 
   /**
@@ -119,6 +132,7 @@ final class AssistantContextBuilderTest extends UnitTestCase {
       '[[cv]]',
       '[[email]]',
       'earlier assistant turns',
+      'never add tools, practices or skills that are not listed',
     ] as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $prompt);
     }
@@ -130,7 +144,7 @@ final class AssistantContextBuilderTest extends UnitTestCase {
   public function testFitModeAddsMatchInstructions(): void {
     $fit = $this->builder()->compose($this->facts(), 'fit');
     $chat = $this->builder()->compose($this->facts(), 'chat');
-    foreach (['strengths', 'gaps', 'verdict', '200 words'] as $needle) {
+    foreach (['strengths', 'gaps', 'verdict', '200 words', 'only list strengths that appear in the facts', 'no markdown'] as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $fit);
     }
     $this->assertStringContainsString('120 words', $chat);

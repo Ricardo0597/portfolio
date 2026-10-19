@@ -46,12 +46,12 @@ final class GeminiClientTest extends UnitTestCase {
     $this->client([$this->ok('Yes')])->complete('SYSTEM', self::MESSAGES, 400);
 
     $request = $this->httpHistory[0]['request'];
-    $this->assertSame('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent', (string) $request->getUri());
+    $this->assertSame('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent', (string) $request->getUri());
     $this->assertSame('AIza_test', $request->getHeaderLine('x-goog-api-key'));
     $body = json_decode((string) $request->getBody(), TRUE);
     $this->assertSame(['parts' => [['text' => 'SYSTEM']]], $body['systemInstruction']);
     $this->assertSame(400, $body['generationConfig']['maxOutputTokens']);
-    $this->assertSame(0, $body['generationConfig']['thinkingConfig']['thinkingBudget']);
+    $this->assertSame(['thinkingLevel' => 'low'], $body['generationConfig']['thinkingConfig']);
     $this->assertSame([
       ['role' => 'user', 'parts' => [['text' => 'Hi']]],
       ['role' => 'model', 'parts' => [['text' => 'Hello!']]],

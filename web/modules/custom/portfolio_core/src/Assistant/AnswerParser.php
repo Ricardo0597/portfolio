@@ -42,6 +42,10 @@ final class AnswerParser {
       $raw,
     );
 
+    // The panel shows plain text: flatten markdown emphasis and headings.
+    $text = preg_replace('/(\*\*|__)(.+?)\1/s', '$2', $text);
+    $text = preg_replace('/^#{1,6}[ \t]+/m', '', $text);
+
     // A tag cut off by the token limit at the very end ("[[scr").
     $text = preg_replace('/\[\[[^\]\s]*$/', '', $text);
 

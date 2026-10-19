@@ -30,11 +30,12 @@ final class GeminiClient extends HttpLlmClientBase {
       [
         'systemInstruction' => ['parts' => [['text' => $system]]],
         'contents' => $contents,
-        // Thinking tokens count against maxOutputTokens; turn thinking off.
+        // Thinking tokens count against maxOutputTokens; keep thinking low.
+        // Gemini 3+ models use thinkingLevel (thinkingBudget is rejected).
         'generationConfig' => [
           'maxOutputTokens' => $max_tokens,
           'temperature' => 0.4,
-          'thinkingConfig' => ['thinkingBudget' => 0],
+          'thinkingConfig' => ['thinkingLevel' => 'low'],
         ],
       ],
     ];
