@@ -2,6 +2,9 @@
 
   {# ── Hero ────────────────────────────────────────────────────── #}
   <header class="hero" id="top" aria-label="{{ 'Introduction'|t }}">
+    {% if profile_availability.available_from %}
+      <p class="hero__badge"><span class="hero__badge-dot" aria-hidden="true"></span>{{ 'Available for work'|t }}</p>
+    {% endif %}
     <p class="hero__greeting">{{ 'Hi, I\'m'|t }}</p>
     <h1 class="hero__name">{{ label }}</h1>
     {% if profile_hero_roles %}
@@ -153,6 +156,18 @@
         <li class="contact__detail">
           <span class="contact__label">{{ 'Phone'|t }}</span>
           <a href="tel:{{ profile_phone|replace({' ': ''}) }}" class="contact__value">{{ profile_phone }}</a>
+        </li>
+      {% endif %}
+      {% set availability = [
+        profile_availability.available_from ? 'Available: @when'|t({'@when': profile_availability.available_from}) : null,
+        profile_availability.work_mode,
+        profile_availability.engagement_types|join(' · '),
+        profile_availability.schedule,
+      ]|filter(v => v) %}
+      {% if availability %}
+        <li class="contact__detail contact__detail--wide">
+          <span class="contact__label">{{ 'Availability'|t }}</span>
+          <span class="contact__value">{{ availability|join(' — ') }}</span>
         </li>
       {% endif %}
       {% if profile_location %}

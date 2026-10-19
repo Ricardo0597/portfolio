@@ -1,0 +1,33 @@
+uuid: b1ce7a9b-2699-495e-9188-fe31b3354a52
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_engagement_types
+field_name: field_engagement_types
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: full_time
+      label: Full-time
+    -
+      value: part_time
+      label: Part-time
+    -
+      value: contract
+      label: Contract
+    -
+      value: freelance
+      label: Freelance
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: -1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

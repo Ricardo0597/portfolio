@@ -280,6 +280,7 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
 
   $variables['profile_skills']          = $profile_data->getSkillsByCategory();
   $variables['profile_work_experience'] = $profile_data->getWorkExperience($node);
+  $variables['profile_availability']    = $profile_data->getAvailability($node);
   $variables['profile_stats']           = $profile_data->getContentStats($node);
 
   // Education.

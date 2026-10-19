@@ -1,0 +1,19 @@
+uuid: c5371c7f-b288-4997-922f-11fe15bb3736
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_schedule_flexibility
+    - node.type.profile
+id: node.profile.field_schedule_flexibility
+field_name: field_schedule_flexibility
+entity_type: node
+bundle: profile
+label: 'Schedule flexibility'
+description: 'e.g. Flexible with time zones and project length'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

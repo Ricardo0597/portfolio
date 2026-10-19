@@ -104,6 +104,48 @@ class ProfileDataService {
   }
 
   /**
+   * Returns the profile's availability facts as display labels.
+   *
+   * @return array{available_from: string, work_mode: string, engagement_types: list<string>, schedule: string}
+   *   Empty strings / array for unset or missing fields.
+   */
+  public function getAvailability(NodeInterface $profile): array {
+    return [
+      'available_from' => $this->stringValue($profile, 'field_available_from'),
+      'work_mode' => $this->listLabels($profile, 'field_work_mode')[0] ?? '',
+      'engagement_types' => $this->listLabels($profile, 'field_engagement_types'),
+      'schedule' => $this->stringValue($profile, 'field_schedule_flexibility'),
+    ];
+  }
+
+  /**
+   * Returns a single string field value, or '' when unset or missing.
+   */
+  private function stringValue(NodeInterface $node, string $field_name): string {
+    if (!$node->hasField($field_name) || $node->get($field_name)->isEmpty()) {
+      return '';
+    }
+    return trim($node->get($field_name)->getString());
+  }
+
+  /**
+   * Returns the allowed-value labels of a list field's selected keys.
+   *
+   * @return list<string>
+   */
+  private function listLabels(NodeInterface $node, string $field_name): array {
+    if (!$node->hasField($field_name) || $node->get($field_name)->isEmpty()) {
+      return [];
+    }
+    $items = $node->get($field_name);
+    $allowed = $items->getFieldDefinition()->getFieldStorageDefinition()->getSetting('allowed_values') ?? [];
+    return array_values(array_map(
+      fn(array $item): string => (string) ($allowed[$item['value']] ?? $item['value']),
+      $items->getValue(),
+    ));
+  }
+
+  /**
    * Returns the absolute URL for a file field, or empty string if unset.
    */
   public function fileUrl(NodeInterface $node, string $field_name): string {

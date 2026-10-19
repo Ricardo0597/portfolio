@@ -1,0 +1,21 @@
+uuid: 2f184eaf-0427-4cea-81d7-92e70e206155
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_engagement_types
+    - node.type.profile
+  module:
+    - options
+id: node.profile.field_engagement_types
+field_name: field_engagement_types
+entity_type: node
+bundle: profile
+label: 'Engagement types'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

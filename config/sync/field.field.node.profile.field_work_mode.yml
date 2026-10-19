@@ -1,0 +1,21 @@
+uuid: 51ad6bc2-d558-4d7c-b8fb-4978d871f1be
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_work_mode
+    - node.type.profile
+  module:
+    - options
+id: node.profile.field_work_mode
+field_name: field_work_mode
+entity_type: node
+bundle: profile
+label: 'Work mode'
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

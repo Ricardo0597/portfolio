@@ -26,6 +26,10 @@
     background-clip: text;
   }
 
+  &__detail--wide {
+    flex-basis: 100%;
+  }
+
   &__label {
     font-size: var(--text-xs);
     font-weight: 600;

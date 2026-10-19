@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.node.profile.body
+    - field.field.node.profile.field_available_from
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
     - field.field.node.profile.field_drupalorg_url
@@ -13,19 +14,24 @@ dependencies:
     - field.field.node.profile.field_edu_location
     - field.field.node.profile.field_edu_start_year
     - field.field.node.profile.field_email
-    - field.field.node.profile.field_phone
+    - field.field.node.profile.field_engagement_types
     - field.field.node.profile.field_github_url
     - field.field.node.profile.field_languages
     - field.field.node.profile.field_linkedin_url
     - field.field.node.profile.field_location
+    - field.field.node.profile.field_phone
     - field.field.node.profile.field_photo
+    - field.field.node.profile.field_schedule_flexibility
     - field.field.node.profile.field_subtitle
     - field.field.node.profile.field_work_experience
+    - field.field.node.profile.field_work_mode
     - field.field.node.profile.field_years_experience
+    - image.style.thumbnail
     - node.type.profile
   module:
-    - datetime
-    - entity_reference_revisions
+    - file
+    - image
+    - link
     - paragraphs
     - path
     - text
@@ -47,6 +53,12 @@ content:
   created:
     type: datetime_timestamp
     weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_available_from:
+    type: string_textfield
+    weight: 50
     region: content
     settings: {  }
     third_party_settings: {  }
@@ -118,6 +130,12 @@ content:
     settings:
       placeholder: ''
     third_party_settings: {  }
+  field_engagement_types:
+    type: options_buttons
+    weight: 52
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_github_url:
     type: link_default
     weight: 12
@@ -166,6 +184,12 @@ content:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
+  field_schedule_flexibility:
+    type: string_textfield
+    weight: 53
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_subtitle:
     type: string_textfield
     weight: 3
@@ -191,6 +215,12 @@ content:
       features:
         collapse_edit_all: collapse_edit_all
         duplicate: '0'
+    third_party_settings: {  }
+  field_work_mode:
+    type: options_select
+    weight: 51
+    region: content
+    settings: {  }
     third_party_settings: {  }
   field_years_experience:
     type: number
