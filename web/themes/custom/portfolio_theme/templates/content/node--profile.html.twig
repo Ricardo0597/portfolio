@@ -1,153 +1,179 @@
 <article class="about">
 
-  <header class="about__header">
-    {% if profile_subtitle %}
-      <p class="about__subtitle">{{ profile_subtitle }}</p>
+  {# ── Hero ────────────────────────────────────────────────────── #}
+  <header class="hero" id="top" aria-label="{{ 'Introduction'|t }}">
+    <p class="hero__greeting">{{ 'Hi, I\'m'|t }}</p>
+    <h1 class="hero__name">{{ label }}</h1>
+    {% if profile_hero_roles %}
+      <p class="hero__roles">
+        <span class="hero__roles-prefix">{{ 'I build '|t }}</span><span
+          class="hero__typing js-typing"
+          data-roles="{{ profile_hero_roles|join('|') }}"
+          aria-label="{{ profile_hero_roles|first }}">{{ profile_hero_roles|first }}</span><span
+          class="hero__cursor" aria-hidden="true">|</span>
+      </p>
     {% endif %}
-    <div class="about__meta">
-      {% if profile_location %}
-        <span class="about__meta-item">{{ profile_location }}</span>
-      {% endif %}
-      {% if profile_phone %}
-        <span class="about__meta-item">{{ profile_phone }}</span>
-      {% endif %}
-      {% if profile_email %}
-        <a href="mailto:{{ profile_email }}" class="about__meta-item about__meta-item--link">{{ profile_email }}</a>
-      {% endif %}
-      {% if profile_github_url %}
-        <a href="{{ profile_github_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">GitHub</a>
-      {% endif %}
-      {% if profile_linkedin_url %}
-        <a href="{{ profile_linkedin_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-      {% endif %}
-      {% if profile_drupalorg_url %}
-        <a href="{{ profile_drupalorg_url }}" class="about__meta-item about__meta-item--link" target="_blank" rel="noopener noreferrer">Drupal.org</a>
-      {% endif %}
+    {% if profile_subtitle %}
+      <p class="hero__subtitle">{{ profile_subtitle }}</p>
+    {% endif %}
+    <div class="hero__actions">
+      <a href="{{ profile_cv_url }}" class="hero__cta" target="_blank">{{ 'Download CV (PDF)'|t }}</a>
+      <a href="#contact" class="hero__cta hero__cta--outline">{{ 'Contact'|t }}</a>
     </div>
+    {{ include('portfolio_theme:social-links', {
+      github: profile_github_url,
+      linkedin: profile_linkedin_url,
+      drupalorg: profile_drupalorg_url,
+      size: 'md',
+    }, with_context = false) }}
   </header>
 
-  {% if profile_stats %}
-    <div class="stats-strip">
-      {% if profile_stats.experience %}
-        <div class="stats-strip__item">
-          <span class="stats-strip__number" data-count="{{ profile_stats.experience }}">0</span>
-          <span class="stats-strip__label">{{ 'Years Experience'|t }}</span>
-        </div>
-      {% endif %}
-      {% if profile_stats.projects %}
-        <div class="stats-strip__item">
-          <span class="stats-strip__number" data-count="{{ profile_stats.projects }}">0</span>
-          <span class="stats-strip__label">{{ 'Projects Shipped'|t }}</span>
-        </div>
-      {% endif %}
-      {% if profile_stats.skills %}
-        <div class="stats-strip__item">
-          <span class="stats-strip__number" data-count="{{ profile_stats.skills }}">0</span>
-          <span class="stats-strip__label">{{ 'Skills'|t }}</span>
-        </div>
-      {% endif %}
-      {% if profile_stats.articles %}
-        <div class="stats-strip__item">
-          <span class="stats-strip__number" data-count="{{ profile_stats.articles }}">0</span>
-          <span class="stats-strip__label">{{ 'Articles Written'|t }}</span>
-        </div>
-      {% endif %}
-    </div>
-  {% endif %}
-
-  <div class="about__actions">
-    <a href="{{ path('entity_print.view', {export_type: 'pdf', entity_type: 'node', entity_id: node.id}) }}"
-       class="about__download-btn"
-       target="_blank">
-      Download CV (PDF)
-    </a>
-  </div>
-
-  {% if profile_bio %}
-    <div class="about__bio">
-      {{ profile_bio }}
-    </div>
-  {% endif %}
+  {# ── About ───────────────────────────────────────────────────── #}
+  <section class="about__section" id="about" aria-labelledby="about-title">
+    <h2 class="about__section-title" id="about-title">{{ 'About'|t }}</h2>
+    {% if profile_stats %}
+      <div class="stats-strip">
+        {% if profile_stats.experience %}
+          <div class="stats-strip__item">
+            <span class="stats-strip__number" data-count="{{ profile_stats.experience }}">0</span>
+            <span class="stats-strip__label">{{ 'Years Experience'|t }}</span>
+          </div>
+        {% endif %}
+        {% if profile_stats.projects %}
+          <div class="stats-strip__item">
+            <span class="stats-strip__number" data-count="{{ profile_stats.projects }}">0</span>
+            <span class="stats-strip__label">{{ 'Projects Shipped'|t }}</span>
+          </div>
+        {% endif %}
+        {% if profile_stats.skills %}
+          <div class="stats-strip__item">
+            <span class="stats-strip__number" data-count="{{ profile_stats.skills }}">0</span>
+            <span class="stats-strip__label">{{ 'Skills'|t }}</span>
+          </div>
+        {% endif %}
+        {% if profile_stats.articles %}
+          <div class="stats-strip__item">
+            <span class="stats-strip__number" data-count="{{ profile_stats.articles }}">0</span>
+            <span class="stats-strip__label">{{ 'Articles Written'|t }}</span>
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% if profile_bio %}
+      <div class="about__bio">
+        {{ profile_bio }}
+      </div>
+    {% endif %}
+  </section>
 
   {# ── Core Skills ─────────────────────────────────────────────── #}
   {% if profile_skills %}
-    <div class="about__section">
-      <h2 class="about__section-title">Core Skills</h2>
+    <section class="about__section" id="skills" aria-labelledby="skills-title">
+      <h2 class="about__section-title" id="skills-title">{{ 'Core Skills'|t }}</h2>
       <div class="about__skills">
         {% for category, labels in profile_skills %}
           <div class="about__skills-group">
             <span class="about__skills-category">{{ category }}</span>
             <div class="about__skills-tags">
-              {% for label in labels %}
-                <span class="about__skill-tag">{{ label }}</span>
+              {% for skill_label in labels %}
+                <span class="about__skill-tag">{{ skill_label }}</span>
               {% endfor %}
             </div>
           </div>
         {% endfor %}
       </div>
-    </div>
+    </section>
   {% endif %}
 
   {# ── Work Experience ─────────────────────────────────────────── #}
   {% if profile_work_experience %}
-    <div class="about__section about__section--timeline">
-      <h2 class="about__section-title">Work Experience</h2>
-      {% for job in profile_work_experience %}
-        <div class="about__work-item">
+    <section class="about__section" id="experience" aria-labelledby="experience-title">
+      <h2 class="about__section-title" id="experience-title">{{ 'Work Experience'|t }}</h2>
+      <div class="about__timeline">
+        {% for job in profile_work_experience %}
+          <div class="about__work-item">
+            <div class="about__work-header">
+              <strong>{{ job.job_title }}</strong>
+              {% if job.company %}<span class="about__work-company"> — {{ job.company }}</span>{% endif %}
+            </div>
+            <div class="about__work-meta">
+              {%- set meta_items = [] -%}
+              {%- if job.location -%}{%- set meta_items = meta_items|merge([job.location]) -%}{%- endif -%}
+              {%- if job.start -%}{%- set meta_items = meta_items|merge([job.start ~ ' – ' ~ job.end]) -%}{%- endif -%}
+              {{ meta_items|join(' · ') }}
+            </div>
+            {% if job.achievements %}
+              <ul class="about__achievements">
+                {% for bullet in job.achievements %}
+                  <li class="about__achievement">{{ bullet }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {# ── Education & Languages ───────────────────────────────────── #}
+  {% if profile_edu_degree or profile_edu_institution or profile_languages %}
+    <section class="about__section" id="education" aria-labelledby="education-title">
+      <h2 class="about__section-title" id="education-title">{{ 'Education'|t }}</h2>
+      {% if profile_edu_degree or profile_edu_institution %}
+        <div class="about__edu-item">
           <div class="about__work-header">
-            <strong>{{ job.job_title }}</strong>
-            {% if job.company %}<span class="about__work-company"> — {{ job.company }}</span>{% endif %}
+            {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
+            {% if profile_edu_institution %}<span class="about__work-company"> — {{ profile_edu_institution }}</span>{% endif %}
           </div>
           <div class="about__work-meta">
-            {%- set meta_items = [] -%}
-            {%- if job.location -%}{%- set meta_items = meta_items|merge([job.location]) -%}{%- endif -%}
-            {%- if job.start -%}{%- set meta_items = meta_items|merge([job.start ~ ' – ' ~ job.end]) -%}{%- endif -%}
-            {{ meta_items|join(' · ') }}
+            {%- set edu_meta = [] -%}
+            {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
+            {%- if profile_edu_start_year -%}
+              {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
+              {%- set edu_meta = edu_meta|merge([year_range]) -%}
+            {%- endif -%}
+            {{ edu_meta|join(' · ') }}
           </div>
-          {% if job.achievements %}
-            <ul class="about__achievements">
-              {% for bullet in job.achievements %}
-                <li class="about__achievement">{{ bullet }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
         </div>
-      {% endfor %}
-    </div>
+      {% endif %}
+      {% if profile_languages %}
+        <h3 class="about__subsection-title">{{ 'Languages'|t }}</h3>
+        <ul class="about__languages">
+          {% for lang in profile_languages %}
+            <li class="about__language">{{ lang }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </section>
   {% endif %}
 
-  {# ── Education ───────────────────────────────────────────────── #}
-  {% if profile_edu_degree or profile_edu_institution %}
-    <div class="about__section">
-      <h2 class="about__section-title">Education</h2>
-      <div class="about__edu-item">
-        <div class="about__work-header">
-          {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
-          {% if profile_edu_institution %}<span class="about__work-company"> — {{ profile_edu_institution }}</span>{% endif %}
-        </div>
-        <div class="about__work-meta">
-          {%- set edu_meta = [] -%}
-          {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
-          {%- if profile_edu_start_year -%}
-            {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
-            {%- set edu_meta = edu_meta|merge([year_range]) -%}
-          {%- endif -%}
-          {{ edu_meta|join(' · ') }}
-        </div>
-      </div>
-    </div>
-  {% endif %}
-
-  {# ── Languages ───────────────────────────────────────────────── #}
-  {% if profile_languages %}
-    <div class="about__section">
-      <h2 class="about__section-title">Languages</h2>
-      <ul class="about__languages">
-        {% for lang in profile_languages %}
-          <li class="about__language">{{ lang }}</li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+  {# ── Contact ─────────────────────────────────────────────────── #}
+  <section class="about__section contact" id="contact" aria-labelledby="contact-title">
+    <h2 class="about__section-title" id="contact-title">{{ 'Contact'|t }}</h2>
+    <p class="contact__lead">{{ 'Open to remote Drupal work.'|t }}</p>
+    {% if profile_email %}
+      <a href="mailto:{{ profile_email }}" class="hero__cta contact__email">{{ profile_email }}</a>
+    {% endif %}
+    <ul class="contact__details">
+      {% if profile_phone %}
+        <li class="contact__detail">
+          <span class="contact__label">{{ 'Phone'|t }}</span>
+          <a href="tel:{{ profile_phone|replace({' ': ''}) }}" class="contact__value">{{ profile_phone }}</a>
+        </li>
+      {% endif %}
+      {% if profile_location %}
+        <li class="contact__detail">
+          <span class="contact__label">{{ 'Location'|t }}</span>
+          <span class="contact__value">{{ profile_location }}</span>
+        </li>
+      {% endif %}
+    </ul>
+    {{ include('portfolio_theme:social-links', {
+      github: profile_github_url,
+      linkedin: profile_linkedin_url,
+      drupalorg: profile_drupalorg_url,
+      size: 'sm',
+    }, with_context = false) }}
+  </section>
 
 </article>

@@ -265,6 +265,19 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
   $drupalorg = $node->get('field_drupalorg_url');
   $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
 
+  // Hero.
+  $variables['profile_hero_roles'] = [
+    (string) t('Drupal Applications'),
+    (string) t('REST APIs'),
+    (string) t('Headless Experiences'),
+    (string) t('Clean, Fast Code'),
+  ];
+  $variables['profile_cv_url'] = Url::fromRoute('entity_print.view', [
+    'export_type' => 'pdf',
+    'entity_type' => 'node',
+    'entity_id' => $node->id(),
+  ])->toString();
+
   $variables['profile_skills']          = $profile_data->getSkillsByCategory();
   $variables['profile_work_experience'] = $profile_data->getWorkExperience($node);
   $variables['profile_stats']           = $profile_data->getContentStats($node);

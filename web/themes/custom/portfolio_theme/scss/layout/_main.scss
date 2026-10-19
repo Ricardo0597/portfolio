@@ -114,21 +114,24 @@
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 .hero {
-  padding: var(--space-16) 0 var(--space-12);
+  padding: var(--space-8) 0 var(--space-8);
   position: relative;
-  overflow: hidden;
+  scroll-margin-top: var(--header-height);
 
+  // Full-bleed glow behind the hero; .site-main clips the horizontal overflow.
   &::before {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: calc(-1 * var(--space-12)) calc(50% - 50vw) 0;
+    mask-image: linear-gradient(to bottom, #000 50%, transparent);
     background:
       radial-gradient(ellipse 80% 60% at 60% 40%, rgba(233, 69, 96, 0.07) 0%, transparent 70%),
       radial-gradient(ellipse 50% 80% at 80% 80%, rgba(74, 158, 255, 0.05) 0%, transparent 70%);
     pointer-events: none;
   }
 
-  &__inner {
+  // Keep content above the absolutely positioned glow.
+  > * {
     position: relative;
   }
 
@@ -186,6 +189,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
+    margin-bottom: var(--space-6);
   }
 
   &__cta {
@@ -227,6 +231,7 @@
 main[role='main'] {
   min-height: 80vh;
   padding: var(--space-12) 0;
+  overflow-x: clip;
 }
 
 // ─── Footer ───────────────────────────────────────────────────────────────────
@@ -723,6 +728,5 @@ footer[role='contentinfo'] {
     }
   }
 
-  // Header needs position:relative for the absolute nav to anchor to it.
-  .site-header { position: relative; }
+  // .site-header stays sticky; sticky elements also anchor the absolute nav.
 }
