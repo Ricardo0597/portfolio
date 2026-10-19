@@ -28,3 +28,22 @@ services:
       - '@settings'
   portfolio_core.answer_parser:
     class: Drupal\portfolio_core\Assistant\AnswerParser
+  logger.channel.portfolio_core:
+    parent: logger.channel_base
+    arguments: ['portfolio_core']
+  portfolio_core.llm.groq:
+    class: Drupal\portfolio_core\Assistant\GroqClient
+    arguments: ['@http_client', '@portfolio_core.assistant_keys', '@config.factory']
+    tags:
+      - { name: portfolio_core.llm_client }
+  portfolio_core.llm.gemini:
+    class: Drupal\portfolio_core\Assistant\GeminiClient
+    arguments: ['@http_client', '@portfolio_core.assistant_keys', '@config.factory']
+    tags:
+      - { name: portfolio_core.llm_client }
+  portfolio_core.llm_chain:
+    class: Drupal\portfolio_core\Assistant\LlmChain
+    arguments:
+      - '@config.factory'
+      - !tagged_iterator portfolio_core.llm_client
+      - '@logger.channel.portfolio_core'
