@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.node.profile.body
+    - field.field.node.profile.field_assistant_notes
     - field.field.node.profile.field_available_from
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
@@ -51,6 +52,7 @@ hidden:
   entity_print_view_epub: true
   entity_print_view_pdf: true
   entity_print_view_word_docx: true
+  field_assistant_notes: true
   field_available_from: true
   field_bio: true
   field_cv_file: true

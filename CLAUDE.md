@@ -497,6 +497,10 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 - Answers are rendered as text only (`textContent`), never HTML.
 - Availability facts live on the profile node (`field_available_from`,
   `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
+- **Extra knowledge:** when Droopy says "I don't have information about…" for
+  something true, add one fact per line to the profile's
+  `field_assistant_notes` ("Extra knowledge for Droopy"). It feeds only the
+  assistant prompt and is never rendered on the page or the PDF CV.
 - Note: in this environment `drush cset` does not persist; change config via
   the UI, `drush php:eval`, or `config/sync` + `drush cim`.
 - The Origin check compares hosts only (proxy-safe) and lets requests without

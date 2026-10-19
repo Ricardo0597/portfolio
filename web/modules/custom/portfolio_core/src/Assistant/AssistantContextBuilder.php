@@ -45,7 +45,7 @@ class AssistantContextBuilder {
    * @param array $facts
    *   Keys: name, title, years, today, location, email, bio, skills,
    *   experience, education, languages, links, availability (see
-   *   ProfileDataService shapes).
+   *   ProfileDataService shapes), notes (list of extra facts).
    * @param string $mode
    *   'chat' or 'fit'.
    */
@@ -87,6 +87,13 @@ class AssistantContextBuilder {
     $add('Languages', implode(', ', $facts['languages'] ?? []));
     foreach ($facts['links'] ?? [] as $label => $url) {
       $add($label, $url);
+    }
+    $notes = array_filter(array_map('trim', $facts['notes'] ?? []));
+    if ($notes) {
+      $lines[] = 'Additional facts:';
+      foreach ($notes as $note) {
+        $lines[] = '  - ' . $note;
+      }
     }
 
     $name = $facts['name'] ?? 'Ricardo';
@@ -149,6 +156,8 @@ class AssistantContextBuilder {
         : [],
       'links' => $links,
       'availability' => $this->profileData->getAvailability($profile),
+      // Owner-written extra knowledge, one fact per line (never shown on the page).
+      'notes' => preg_split('/\R/', $value('field_assistant_notes'), -1, PREG_SPLIT_NO_EMPTY),
     ];
     $this->cache->set(self::CID, $facts, Cache::PERMANENT, Cache::mergeTags(
       $profile->getCacheTags(),

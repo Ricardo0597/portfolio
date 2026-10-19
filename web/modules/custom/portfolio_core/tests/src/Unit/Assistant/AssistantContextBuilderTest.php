@@ -43,6 +43,10 @@ final class AssistantContextBuilderTest extends UnitTestCase {
       'education' => "Bachelor's degree in Systems Engineering — Universidad Nacional (UNA), 2016–2020",
       'languages' => ['Spanish — Native', 'English — Intermediate (B2)'],
       'links' => ['GitHub' => 'https://github.com/example'],
+      'notes' => [
+        'Works in Scrum teams: sprint planning, reviews and retrospectives.',
+        'Handles releases and deployments (including to Acquia Cloud).',
+      ],
       'availability' => [
         'available_from' => 'Immediately',
         'work_mode' => 'Remote only',
@@ -82,6 +86,22 @@ final class AssistantContextBuilderTest extends UnitTestCase {
     $prompt = $this->builder()->compose($this->facts(), 'chat');
     $this->assertStringContainsString('Total years of professional experience: 7', $prompt);
     $this->assertStringContainsString("Today's date: 2026-10-19", $prompt);
+  }
+
+  /**
+   * Owner-written extra knowledge is included line by line.
+   */
+  public function testIncludesExtraKnowledgeNotes(): void {
+    $prompt = $this->builder()->compose($this->facts(), 'chat');
+    $this->assertStringContainsString("Additional facts:\n  - Works in Scrum teams: sprint planning, reviews and retrospectives.\n  - Handles releases and deployments (including to Acquia Cloud).", $prompt);
+  }
+
+  /**
+   * No notes, no "Additional facts" heading.
+   */
+  public function testOmitsEmptyNotes(): void {
+    $prompt = $this->builder()->compose($this->facts(['notes' => []]), 'chat');
+    $this->assertStringNotContainsString('Additional facts:', $prompt);
   }
 
   /**

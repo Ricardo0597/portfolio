@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.node.profile.body
+    - field.field.node.profile.field_assistant_notes
     - field.field.node.profile.field_available_from
     - field.field.node.profile.field_bio
     - field.field.node.profile.field_cv_file
@@ -55,6 +56,14 @@ content:
     weight: 10
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_assistant_notes:
+    type: string_textarea
+    weight: 60
+    region: content
+    settings:
+      rows: 6
+      placeholder: ''
     third_party_settings: {  }
   field_available_from:
     type: string_textfield
