@@ -6,3 +6,7 @@ disabled_bundles:
 disabled_routes:
   - view.portfolio_projects.page_1
   - view.portfolio_skills.page_1
+  - view.frontpage.page_1
+  - view.frontpage.feed_1
+  - entity.taxonomy_term.canonical
+  - view.taxonomy_term.feed_1

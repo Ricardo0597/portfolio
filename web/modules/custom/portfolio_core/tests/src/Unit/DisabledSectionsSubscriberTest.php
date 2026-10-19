@@ -79,6 +79,10 @@ final class DisabledSectionsSubscriberTest extends UnitTestCase {
     $this->assertSame(301, $this->subscriber()->resolveStatus('entity.node.canonical', 'profile', FALSE, 'html', TRUE));
   }
 
+  public function testBypassUserNotRedirectedOnRoute(): void {
+    $this->assertNull($this->subscriber()->resolveStatus('view.portfolio_projects.page_1', NULL, FALSE, 'html', TRUE));
+  }
+
   public function testNonHtmlFormatIsIgnored(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'project', FALSE, 'json', FALSE));
   }

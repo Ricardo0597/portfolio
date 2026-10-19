@@ -662,8 +662,8 @@ footer[role='contentinfo'] {
   }
 }
 
-// Below md: hide nav list by default, show hamburger.
-@media (max-width: 767px) {
+// Below lg: hide nav list by default, show hamburger (six links + switch need ~950px).
+@media (max-width: 1023px) {
   .nav-toggle { display: flex; }
 
   .site-nav {

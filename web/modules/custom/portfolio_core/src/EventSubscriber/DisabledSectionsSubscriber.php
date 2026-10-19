@@ -104,7 +104,7 @@ final class DisabledSectionsSubscriber implements EventSubscriberInterface {
       return NULL;
     }
 
-    return in_array($route_name, $config->get('disabled_routes') ?? [], TRUE) ? 302 : NULL;
+    return !$can_bypass && in_array($route_name, $config->get('disabled_routes') ?? [], TRUE) ? 302 : NULL;
   }
 
 }
