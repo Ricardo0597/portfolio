@@ -1,0 +1,6 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Theme Toggle'
+description: 'Sun/moon switch between light and dark mode. aria-checked="true" means dark.'
+props:
+  type: object
+  properties: {}

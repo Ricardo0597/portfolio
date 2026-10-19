@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html{{ html_attributes }}>
   <head>
-    <script>try{var t=localStorage.getItem('theme');if(!t){var m=document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);if(m)t=m[1];}if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+    <script>try{var t=localStorage.getItem('theme');if(!t){var m=document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);if(m)t=m[1];}if(!t&&window.matchMedia('(prefers-color-scheme: light)').matches)t='light';if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
     <head-placeholder token="{{ placeholder_token }}">
     <title>{{ head_title|safe_join(' | ') }}</title>
     <css-placeholder token="{{ placeholder_token }}">

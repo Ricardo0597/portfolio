@@ -396,48 +396,43 @@
     attach(context) {
       once('theme-toggle', '.theme-toggle', context).forEach((btn) => {
         const html = document.documentElement;
+        const lightQuery = window.matchMedia('(prefers-color-scheme: light)');
 
-        function isLight() {
-          return html.getAttribute('data-theme') === 'light';
+        function storedTheme() {
+          try {
+            const value = localStorage.getItem('theme');
+            if (value) return value;
+          } catch (e) {}
+          const match = document.cookie.match(/(?:^|;)\s*theme=([^;]+)/);
+          return match ? match[1] : null;
         }
 
-        function updateButton() {
-          btn.textContent = isLight() ? '☀️' : '🌙';
-          btn.setAttribute(
-            'aria-label',
-            isLight() ? Drupal.t('Switch to dark mode') : Drupal.t('Switch to light mode')
-          );
+        function apply(theme) {
+          if (theme === 'light') {
+            html.setAttribute('data-theme', 'light');
+          } else {
+            html.removeAttribute('data-theme');
+          }
+          btn.setAttribute('aria-checked', String(theme !== 'light'));
         }
 
-        // Sync button state with current theme on attach.
-        updateButton();
+        // Sync with what the inline <head> script already applied.
+        apply(html.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
 
         btn.addEventListener('click', () => {
-          if (btn.classList.contains('is-spinning')) return;
-          const switchingToLight = !isLight();
+          const theme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+          apply(theme);
+          try { localStorage.setItem('theme', theme); } catch (e) {}
+          try {
+            document.cookie = 'theme=' + theme + ';path=/;max-age=31536000;SameSite=Lax';
+          } catch (e) {}
+        });
 
-          // Start spin animation.
-          btn.classList.add('is-spinning');
-
-          // Swap icon and apply theme at the 180° midpoint (200ms into 400ms).
-          setTimeout(() => {
-            if (switchingToLight) {
-              html.setAttribute('data-theme', 'light');
-            } else {
-              html.removeAttribute('data-theme');
-            }
-            const themeValue = switchingToLight ? 'light' : 'dark';
-            try { localStorage.setItem('theme', themeValue); } catch (e) {}
-            try {
-              document.cookie = 'theme=' + themeValue + ';path=/;max-age=31536000;SameSite=Lax';
-            } catch (e) {}
-            updateButton();
-          }, 200);
-
-          // Remove spin class after animation completes (no reverse snap).
-          btn.addEventListener('animationend', () => {
-            btn.classList.remove('is-spinning');
-          }, { once: true });
+        // Follow the OS setting until the visitor makes a choice.
+        lightQuery.addEventListener('change', (e) => {
+          if (!storedTheme()) {
+            apply(e.matches ? 'light' : 'dark');
+          }
         });
       });
     },

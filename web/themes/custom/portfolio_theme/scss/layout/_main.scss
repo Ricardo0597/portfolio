@@ -620,40 +620,6 @@ footer[role='contentinfo'] {
   }
 }
 
-// ─── Theme mode toggle ────────────────────────────────────────────────────────
-
-@keyframes spin-once {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  color: var(--color-text-muted);
-  font-size: var(--text-lg);
-  cursor: pointer;
-  flex-shrink: 0;
-  line-height: 1;
-  transition: border-color var(--transition-fast), color var(--transition-fast);
-
-  &:hover {
-    border-color: var(--color-highlight);
-    color: var(--color-text);
-  }
-
-  &.is-spinning {
-    animation: spin-once var(--duration-slow) ease forwards;
-  }
-}
-
 // ─── Mobile navigation ────────────────────────────────────────────────────────
 
 // Hamburger button — hidden on desktop, visible below md breakpoint.

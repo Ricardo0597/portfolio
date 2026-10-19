@@ -23,9 +23,6 @@
       <span class="nav-toggle__bar"></span>
       <span class="nav-toggle__bar"></span>
     </button>
-    <button class="theme-toggle"
-            type="button"
-            aria-label="{{ 'Toggle theme'|t }}"
-            aria-live="polite">🌙</button>
+    {{ include('portfolio_theme:theme-toggle', {}, with_context = false) }}
   </div>
 </header>
