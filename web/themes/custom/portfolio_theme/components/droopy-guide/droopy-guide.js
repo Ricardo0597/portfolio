@@ -251,9 +251,12 @@
           if (chips) chips.hidden = true;
         }
 
+        const fitToggle = root.querySelector('.droopy__fit-toggle');
+
         function setMode(next) {
           mode = next;
           root.classList.toggle('is-fit', mode === 'fit');
+          if (fitToggle) fitToggle.setAttribute('aria-pressed', String(mode === 'fit'));
           input.maxLength = mode === 'fit' ? 6000 : 1000;
           input.placeholder = mode === 'fit' ? Drupal.t('Paste the job description…') : defaultPlaceholder;
         }
@@ -268,13 +271,20 @@
           root.classList.remove('is-error');
 
           const display = mode === 'fit' ? Drupal.t('Here is the job description — is Ricardo a fit?') : question;
+          // History keeps the job description itself so follow-ups have context.
+          const remembered = mode === 'fit' ? `${Drupal.t('Job description:')} ${question}` : question;
           addMessage('user', display);
+          const draft = input.value;
           input.value = '';
 
           const typing = document.createElement('div');
           typing.className = 'droopy__typing';
-          typing.setAttribute('aria-label', Drupal.t('Droopy is thinking'));
-          typing.innerHTML = '<span></span><span></span><span></span>';
+          typing.setAttribute('role', 'status');
+          typing.innerHTML = '<span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>';
+          const typingLabel = document.createElement('span');
+          typingLabel.className = 'visually-hidden';
+          typingLabel.textContent = Drupal.t('Droopy is thinking…');
+          typing.appendChild(typingLabel);
           log.appendChild(typing);
           log.scrollTop = log.scrollHeight;
           root.classList.add('is-thinking');
@@ -303,19 +313,25 @@
           typing.remove();
           root.classList.remove('is-thinking');
 
+          const answered = data && typeof data.answer === 'string' && data.answer && data.provider !== 'none';
           if (data && typeof data.answer === 'string' && data.answer) {
             addMessage('bot', data.answer);
             addActions(data.actions);
-            if (data.provider === 'none') root.classList.add('is-error');
-            remember('user', display);
-            remember('assistant', data.answer);
           } else {
-            root.classList.add('is-error');
             addMessage('bot', Drupal.t("I'm napping right now 😴 — email Ricardo instead and he'll get back to you."));
             addActions([{ type: 'email' }]);
           }
 
-          setMode('chat');
+          if (answered) {
+            remember('user', remembered);
+            remember('assistant', data.answer);
+            setMode('chat');
+          } else {
+            // Napping, rate limited or offline: keep the visitor's text (a
+            // pasted job description) and the mode so they can retry.
+            root.classList.add('is-error');
+            input.value = draft;
+          }
           busy = false;
           send.disabled = false;
           input.focus();
@@ -328,11 +344,18 @@
 
         // Enter sends, Shift+Enter adds a new line.
         input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
+          if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
             e.preventDefault();
             ask(input.value);
           }
         });
+
+        if (fitToggle) {
+          fitToggle.addEventListener('click', () => {
+            setMode(mode === 'fit' ? 'chat' : 'fit');
+            input.focus();
+          });
+        }
 
         if (chips) {
           chips.addEventListener('click', (e) => {

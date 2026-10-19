@@ -38,6 +38,9 @@
     {% endif %}
 
     <form class="droopy__form">
+      <div class="droopy__tools">
+        <button type="button" class="droopy__fit-toggle" aria-pressed="false" title="{{ 'Paste a job description to check the fit'|t }}">{{ 'Job fit'|t }}</button>
+      </div>
       <label class="visually-hidden" for="droopy-input">{{ 'Your question'|t }}</label>
       <textarea id="droopy-input" class="droopy__input" rows="2" maxlength="1000" placeholder="{{ 'Ask about Ricardo…'|t }}"></textarea>
       <button type="submit" class="droopy__send" aria-label="{{ 'Send'|t }}">

@@ -118,6 +118,7 @@ final class AssistantContextBuilderTest extends UnitTestCase {
       'about, skills, experience, education, contact',
       '[[cv]]',
       '[[email]]',
+      'earlier assistant turns',
     ] as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $prompt);
     }

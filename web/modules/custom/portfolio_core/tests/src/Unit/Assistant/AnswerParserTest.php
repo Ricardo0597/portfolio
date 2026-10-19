@@ -52,12 +52,21 @@ final class AnswerParserTest extends UnitTestCase {
   }
 
   /**
-   * An unclosed tag is plain text.
+   * A tag cut off at the end of a truncated answer is stripped.
    */
-  public function testLeavesUnclosedTagText(): void {
-    $result = (new AnswerParser())->parse('x [[cv');
+  public function testStripsTrailingUnclosedTag(): void {
+    $result = (new AnswerParser())->parse('He is available now. [[scr');
     $this->assertSame([], $result['actions']);
-    $this->assertSame('x [[cv', $result['text']);
+    $this->assertSame('He is available now.', $result['text']);
+  }
+
+  /**
+   * Tags are recognised regardless of case.
+   */
+  public function testUppercaseTagsRecognised(): void {
+    $result = (new AnswerParser())->parse('See [[Scroll:Experience]] and [[CV]]');
+    $this->assertSame([['type' => 'scroll', 'target' => 'experience'], ['type' => 'cv']], $result['actions']);
+    $this->assertSame('See and', $result['text']);
   }
 
   /**

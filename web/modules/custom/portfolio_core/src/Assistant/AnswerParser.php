@@ -25,11 +25,13 @@ final class AnswerParser {
   public function parse(string $raw): array {
     $actions = [];
     $text = preg_replace_callback(
-      '/\[\[([a-z]+)(?::([^\]]*))?\]\]/',
+      '/\[\[([a-z]+)(?::([^\]]*))?\]\]/i',
       function (array $match) use (&$actions): string {
+        $tag = strtolower($match[1]);
+        $target = isset($match[2]) ? strtolower(trim($match[2])) : NULL;
         $action = match (TRUE) {
-          $match[1] === 'scroll' && in_array($match[2] ?? '', self::SECTIONS, TRUE) => ['type' => 'scroll', 'target' => $match[2]],
-          in_array($match[1], ['cv', 'email'], TRUE) && !isset($match[2]) => ['type' => $match[1]],
+          $tag === 'scroll' && in_array($target, self::SECTIONS, TRUE) => ['type' => 'scroll', 'target' => $target],
+          in_array($tag, ['cv', 'email'], TRUE) && $target === NULL => ['type' => $tag],
           default => NULL,
         };
         if ($action !== NULL && !in_array($action, $actions, TRUE)) {
@@ -39,6 +41,9 @@ final class AnswerParser {
       },
       $raw,
     );
+
+    // A tag cut off by the token limit at the very end ("[[scr").
+    $text = preg_replace('/\[\[[^\]\s]*$/', '', $text);
 
     // Collapse the gaps left by removed tags, keeping paragraph breaks.
     $text = preg_replace('/[ \t]{2,}/', ' ', $text);

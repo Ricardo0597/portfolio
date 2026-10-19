@@ -46,6 +46,8 @@ function portfolio_theme_preprocess_page(array &$variables): void {
   // Droopy AI guide: on every public page while the assistant is enabled.
   $assistant = \Drupal::config('portfolio_core.assistant');
   $variables['#cache']['tags'][] = 'config:portfolio_core.assistant';
+  // Picks up a profile created or published later (CV link, email).
+  $variables['#cache']['tags'][] = 'node_list:profile';
   if ($assistant->get('enabled') && !\Drupal::service('router.admin_context')->isAdminRoute()) {
     $profiles = \Drupal::entityTypeManager()->getStorage('node')
       ->loadByProperties(['type' => 'profile', 'status' => 1]);

@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Tries the configured providers in order until one answers.
  */
-final class LlmChain {
+class LlmChain {
 
   /**
    * Clients keyed by provider id.
