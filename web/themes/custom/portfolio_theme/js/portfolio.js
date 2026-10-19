@@ -300,6 +300,15 @@
           nav.classList.toggle('is-open', !isOpen);
         });
 
+        // Close drawer after choosing a section link.
+        nav.addEventListener('click', (e) => {
+          if (e.target.closest('.site-nav__link')) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', Drupal.t('Open navigation'));
+            nav.classList.remove('is-open');
+          }
+        });
+
         // Close drawer when clicking outside the header.
         document.addEventListener('click', (e) => {
           if (!toggle.closest('.site-header').contains(e.target)) {
@@ -308,6 +317,77 @@
             nav.classList.remove('is-open');
           }
         });
+      });
+    },
+  };
+
+  Drupal.behaviors.sectionNav = {
+    attach(context) {
+      once('section-nav', '.site-nav', context).forEach((nav) => {
+        // Map "/#id" links to the sections present on this page.
+        const pairs = [...nav.querySelectorAll('.site-nav__link')]
+          .map((link) => {
+            const hash = new URL(link.href).hash;
+            const section = hash ? document.getElementById(hash.slice(1)) : null;
+            return section ? { link, section } : null;
+          })
+          .filter(Boolean);
+        if (!pairs.length) return;
+
+        function setActive(activeLink) {
+          pairs.forEach(({ link }) => {
+            const isActive = link === activeLink;
+            link.classList.toggle('site-nav__link--active', isActive);
+            if (isActive) {
+              link.setAttribute('aria-current', 'true');
+            } else {
+              link.removeAttribute('aria-current');
+            }
+          });
+        }
+
+        // Current section: the last one whose top has passed 40% of the
+        // viewport; the last section once the page is scrolled to the end;
+        // none while still in the hero.
+        // A clicked link stays current (the page may not be able to scroll
+        // its section to the top) until the user scrolls by hand.
+        let pinned = null;
+        nav.addEventListener('click', (e) => {
+          const pair = pairs.find(({ link }) => link === e.target.closest('.site-nav__link'));
+          if (pair) {
+            pinned = pair.link;
+            setActive(pinned);
+          }
+        });
+        ['wheel', 'touchmove', 'keydown'].forEach((type) => {
+          window.addEventListener(type, () => { pinned = null; }, { passive: true });
+        });
+
+        function update() {
+          if (pinned) {
+            setActive(pinned);
+            return;
+          }
+          const atEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+          if (atEnd) {
+            setActive(pairs[pairs.length - 1].link);
+            return;
+          }
+          const line = window.innerHeight * 0.4;
+          const current = pairs.filter(({ section }) => section.getBoundingClientRect().top <= line).pop();
+          setActive(current ? current.link : null);
+        }
+
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(() => {
+            update();
+            ticking = false;
+          });
+        }, { passive: true });
+        update();
       });
     },
   };
