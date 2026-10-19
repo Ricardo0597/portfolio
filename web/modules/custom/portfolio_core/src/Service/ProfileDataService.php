@@ -75,11 +75,7 @@ class ProfileDataService {
       $start_raw = $paragraph->get('field_we_start_date')->value;
       $end_raw   = $paragraph->get('field_we_end_date')->value;
 
-      $achievements_raw = $paragraph->get('field_we_achievements')->value ?? '';
-      $achievements = array_values(array_filter(
-        array_map('trim', preg_split('/\r\n|\r|\n/', $achievements_raw)),
-        fn(string $line): bool => $line !== '',
-      ));
+      $achievements = $this->parseAchievements($paragraph->get('field_we_achievements')->value ?? '');
 
       $item = [
         'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
@@ -101,6 +97,25 @@ class ProfileDataService {
       $items[] = $item;
     }
     return $items;
+  }
+
+  /**
+   * Splits an achievements field into plain-text bullets.
+   *
+   * One bullet per line. If the value was saved through a rich-text editor,
+   * paragraphs, list items and line breaks also split, and all markup is
+   * stripped so tags are never printed.
+   *
+   * @return list<string>
+   *   Non-empty, trimmed bullets.
+   */
+  public function parseAchievements(string $raw): array {
+    $text = preg_replace('#<br\s*/?>|</(p|li|div|h[1-6])>#i', "\n", $raw);
+    $text = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return array_values(array_filter(
+      array_map('trim', preg_split('/\R/u', $text)),
+      fn(string $line): bool => $line !== '',
+    ));
   }
 
   /**

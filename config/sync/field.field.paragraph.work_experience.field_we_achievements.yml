@@ -4,6 +4,7 @@ status: true
 dependencies:
   config:
     - field.storage.paragraph.field_we_achievements
+    - filter.format.plain_text
     - paragraphs.paragraphs_type.work_experience
   module:
     - text
@@ -12,11 +13,12 @@ field_name: field_we_achievements
 entity_type: paragraph
 bundle: work_experience
 label: Achievements
-description: 'One achievement per line. These render as bullet points in the CV.'
+description: 'One achievement per line — each line becomes a bullet on the site, in the CV and for Droopy.'
 required: false
 translatable: true
 default_value: {  }
 default_value_callback: ''
 settings:
-  allowed_formats: {  }
+  allowed_formats:
+    - plain_text
 field_type: text_long
