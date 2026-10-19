@@ -15,3 +15,10 @@ services:
     tags:
       - { name: event_subscriber }
 
+  portfolio_core.disabled_sections_subscriber:
+    class: Drupal\portfolio_core\EventSubscriber\DisabledSectionsSubscriber
+    arguments:
+      - '@config.factory'
+      - '@current_user'
+    tags:
+      - { name: event_subscriber }

@@ -1,0 +1,8 @@
+disabled_bundles:
+  - project
+  - article
+  - feature_demo
+  - skill
+disabled_routes:
+  - view.portfolio_projects.page_1
+  - view.portfolio_skills.page_1

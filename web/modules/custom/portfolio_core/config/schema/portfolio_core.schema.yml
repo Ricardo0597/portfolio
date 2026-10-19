@@ -1,0 +1,16 @@
+portfolio_core.settings:
+  type: config_object
+  label: 'Portfolio Core settings'
+  mapping:
+    disabled_bundles:
+      type: sequence
+      label: 'Node bundles whose pages redirect to the front page'
+      sequence:
+        type: string
+        label: 'Bundle'
+    disabled_routes:
+      type: sequence
+      label: 'Routes that redirect to the front page'
+      sequence:
+        type: string
+        label: 'Route name'
