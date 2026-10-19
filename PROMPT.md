@@ -1000,6 +1000,9 @@ Track all implemented features here. Update after each phase.
 | 11 | PDF CV export (Phase A) | Entity Print + dompdf + pdf view mode + preprocess + EventSubscriber CSS | — | ✅ |
 | 12 | Anonymous PDF access | Role permission config for `entity print access bundle profile` | — | ✅ |
 | 13 | ItemList schema on listing pages | `hook_views_post_render` + JSON-LD `ItemList` | — | ✅ |
+| 14 | Single-page profile at `/` (hero + anchored sections + contact, sticky section nav with scroll-spy) | Front page = profile node, `node--profile.html.twig`, shared header partial, `social-links` SDC | — | ✅ |
+| 15 | Disabled sections (projects, articles, features, skills → 302 `/`; `/about` → 301 `/`) | Config-driven Event Subscriber (`portfolio_core.settings`) + unit tests | — | ✅ |
+| 16 | Light/dark switch following OS preference | `theme-toggle` SDC + inline head script + Drupal behavior | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 

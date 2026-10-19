@@ -354,7 +354,9 @@ portfolio_theme/
 │   ├── skill-card/
 │   ├── project-card/
 │   ├── article-teaser/
-│   └── feature-badge/
+│   ├── feature-badge/
+│   ├── social-links/
+│   └── theme-toggle/
 ├── scss/                           ← SCSS source files (compiled to css/)
 │   ├── main.scss                   ← entry point, @use imports only
 │   ├── abstracts/
@@ -456,11 +458,22 @@ contact
 
 | Content Type | Pattern                        |
 |--------------|--------------------------------|
-| profile      | `/about`                       |
+| profile      | `/about` (profile is the front page; `/about` 301s to `/`) |
 | skill        | `/skills/[node:title]`         |
 | project      | `/projects/[node:title]`       |
 | article      | `/articles/[node:title]`       |
 | feature_demo | `/features/[node:title]`       |
+
+---
+
+## Disabled Sections
+
+Projects, articles, feature demos and skills are disabled for now: their node
+pages and listing views redirect (302) to `/`, driven by
+`portfolio_core.settings` (`disabled_bundles`, `disabled_routes`) and
+`DisabledSectionsSubscriber`. Content, JSON:API and REST stay available;
+users with `bypass node access` are not redirected. Re-enable a section by
+removing it from the config and running `ddev drush cim -y`.
 
 ---
 
