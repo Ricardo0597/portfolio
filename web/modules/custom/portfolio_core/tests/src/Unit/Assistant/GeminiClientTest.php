@@ -51,11 +51,20 @@ final class GeminiClientTest extends UnitTestCase {
     $body = json_decode((string) $request->getBody(), TRUE);
     $this->assertSame(['parts' => [['text' => 'SYSTEM']]], $body['systemInstruction']);
     $this->assertSame(400, $body['generationConfig']['maxOutputTokens']);
+    $this->assertSame(0, $body['generationConfig']['thinkingConfig']['thinkingBudget']);
     $this->assertSame([
       ['role' => 'user', 'parts' => [['text' => 'Hi']]],
       ['role' => 'model', 'parts' => [['text' => 'Hello!']]],
       ['role' => 'user', 'parts' => [['text' => 'Is he available?']]],
     ], $body['contents']);
+  }
+
+  /**
+   * Non-string completion content means unavailable, not a crash.
+   */
+  public function testMalformedContentThrowsUnavailable(): void {
+    $this->expectException(LlmUnavailableException::class);
+    $this->client([new Response(200, [], json_encode(['candidates' => [['content' => ['parts' => [['text' => 42]]]]]]))])->complete('S', self::MESSAGES, 400);
   }
 
   /**

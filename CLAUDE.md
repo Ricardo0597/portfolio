@@ -499,6 +499,21 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
   `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
 - Note: in this environment `drush cset` does not persist; change config via
   the UI, `drush php:eval`, or `config/sync` + `drush cim`.
+- The Origin check compares hosts only (proxy-safe) and lets requests without
+  an `Origin` header through; flood control is the real quota protection.
+
+**Production checklist (before enabling on a hosted site):**
+1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.
+2. Configure the reverse proxy in `settings.php` so `getClientIp()` returns
+   the visitor's IP; otherwise every visitor shares one flood bucket
+   (10/min, 60/day for the whole site):
+   ```php
+   $settings['reverse_proxy'] = TRUE;
+   $settings['reverse_proxy_addresses'] = ['<load balancer IPs>'];
+   ```
+3. Verify the model ids in `portfolio_core.assistant` still exist.
+4. Until keys exist, `enabled: true` shows Droopy but every answer is the
+   "napping" message — set `enabled: false` if that is not wanted.
 
 ---
 

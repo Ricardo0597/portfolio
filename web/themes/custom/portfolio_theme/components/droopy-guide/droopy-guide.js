@@ -238,7 +238,9 @@
         }
 
         function remember(role, content) {
-          history.push({ role, content: content.slice(0, 1000) });
+          // Truncate by code points so emoji are never split into lone
+          // surrogates (invalid JSON for the server).
+          history.push({ role, content: [...content].slice(0, 1000).join('') });
           history = history.slice(-MAX_HISTORY);
           store.set(HISTORY_KEY, history);
         }
@@ -278,14 +280,21 @@
           root.classList.add('is-thinking');
 
           const requestMode = mode;
-          const priorHistory = history.slice();
+          const post = (turns) => fetch(root.dataset.endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, mode: requestMode, history: turns }),
+          });
           let data = null;
           try {
-            const response = await fetch(root.dataset.endpoint, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ question, mode: requestMode, history: priorHistory }),
-            });
+            let response = await post(history.slice());
+            // A rejected history (e.g. stored by an older version) must not
+            // break the rest of the session: drop it and ask once more.
+            if (response.status === 400 && history.length) {
+              history = [];
+              store.set(HISTORY_KEY, history);
+              response = await post([]);
+            }
             data = await response.json();
           } catch (e) {
             data = null;

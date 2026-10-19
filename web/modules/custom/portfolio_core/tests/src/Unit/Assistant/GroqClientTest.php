@@ -53,6 +53,16 @@ final class GroqClientTest extends UnitTestCase {
     $this->assertSame(400, $body['max_tokens']);
     $this->assertSame(['role' => 'system', 'content' => 'SYSTEM'], $body['messages'][0]);
     $this->assertSame(self::MESSAGES, array_slice($body['messages'], 1));
+    $this->assertSame('low', $body['reasoning_effort']);
+    $this->assertFalse($body['include_reasoning']);
+  }
+
+  /**
+   * Non-string completion content means unavailable, not a crash.
+   */
+  public function testMalformedContentThrowsUnavailable(): void {
+    $this->expectException(LlmUnavailableException::class);
+    $this->client([new Response(200, [], json_encode(['choices' => [['message' => ['content' => ['x']]]]]))])->complete('S', self::MESSAGES, 400);
   }
 
   /**

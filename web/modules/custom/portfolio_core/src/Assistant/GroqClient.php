@@ -27,6 +27,10 @@ final class GroqClient extends HttpLlmClientBase {
         'messages' => [['role' => 'system', 'content' => $system], ...$messages],
         'max_tokens' => $max_tokens,
         'temperature' => 0.4,
+        // gpt-oss is a reasoning model: reasoning tokens count against
+        // max_tokens, so keep reasoning short and out of the reply.
+        'reasoning_effort' => 'low',
+        'include_reasoning' => FALSE,
       ],
     ];
   }
@@ -34,7 +38,7 @@ final class GroqClient extends HttpLlmClientBase {
   /**
    * {@inheritdoc}
    */
-  protected function extractText(array $data): ?string {
+  protected function extractText(array $data): mixed {
     return $data['choices'][0]['message']['content'] ?? NULL;
   }
 

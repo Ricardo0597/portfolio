@@ -30,7 +30,12 @@ final class GeminiClient extends HttpLlmClientBase {
       [
         'systemInstruction' => ['parts' => [['text' => $system]]],
         'contents' => $contents,
-        'generationConfig' => ['maxOutputTokens' => $max_tokens, 'temperature' => 0.4],
+        // Thinking tokens count against maxOutputTokens; turn thinking off.
+        'generationConfig' => [
+          'maxOutputTokens' => $max_tokens,
+          'temperature' => 0.4,
+          'thinkingConfig' => ['thinkingBudget' => 0],
+        ],
       ],
     ];
   }
@@ -38,7 +43,7 @@ final class GeminiClient extends HttpLlmClientBase {
   /**
    * {@inheritdoc}
    */
-  protected function extractText(array $data): ?string {
+  protected function extractText(array $data): mixed {
     return $data['candidates'][0]['content']['parts'][0]['text'] ?? NULL;
   }
 

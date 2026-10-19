@@ -70,8 +70,11 @@ abstract class HttpLlmClientBase implements LlmClientInterface {
   abstract protected function buildRequest(string $key, string $model, string $system, array $messages, int $max_tokens): array;
 
   /**
-   * Returns the reply text from a decoded response, or NULL.
+   * Returns the raw reply value from a decoded response.
+   *
+   * Untyped on purpose: providers may return non-strings, which complete()
+   * treats as unavailable instead of crashing.
    */
-  abstract protected function extractText(array $data): ?string;
+  abstract protected function extractText(array $data): mixed;
 
 }
