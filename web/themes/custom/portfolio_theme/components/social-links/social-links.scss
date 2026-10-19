@@ -1,0 +1,31 @@
+// Social Links — icon row reused in the hero and the contact section.
+.social-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-highlight);
+      border-color: var(--color-highlight);
+      transform: translateY(-2px);
+    }
+  }
+
+  &--md &__link { width: 44px; height: 44px; }
+  &--md &__icon { width: 20px; height: 20px; }
+  &--sm &__link { width: 36px; height: 36px; }
+  &--sm &__icon { width: 16px; height: 16px; }
+}

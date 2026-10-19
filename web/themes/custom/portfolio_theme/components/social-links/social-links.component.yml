@@ -1,0 +1,19 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/HEAD/core/assets/schemas/v1/metadata.schema.json'
+name: 'Social Links'
+description: 'Icon links to GitHub, LinkedIn and Drupal.org profiles.'
+props:
+  type: object
+  properties:
+    github:
+      type: string
+      title: 'GitHub profile URL'
+    linkedin:
+      type: string
+      title: 'LinkedIn profile URL'
+    drupalorg:
+      type: string
+      title: 'Drupal.org profile URL'
+    size:
+      type: string
+      title: 'Icon size'
+      enum: ['sm', 'md']
