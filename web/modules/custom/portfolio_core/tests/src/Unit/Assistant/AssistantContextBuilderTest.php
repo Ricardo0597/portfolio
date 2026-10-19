@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\Tests\portfolio_core\Unit\Assistant;
@@ -39,7 +40,8 @@ final class AssistantContextBuilderTest extends UnitTestCase {
         'start' => 'Aug 2022',
         'end' => 'Present',
         'achievements' => ['Integrated Acquia DAM with Drupal.'],
-      ]],
+      ],
+      ],
       'education' => "Bachelor's degree in Systems Engineering — Universidad Nacional (UNA), 2016–2020",
       'languages' => ['Spanish — Native', 'English — Intermediate (B2)'],
       'links' => ['GitHub' => 'https://github.com/example'],
@@ -126,14 +128,17 @@ final class AssistantContextBuilderTest extends UnitTestCase {
    * A job without a company keeps its full title.
    */
   public function testJobWithoutCompanyKeepsTitle(): void {
-    $prompt = $this->builder()->compose($this->facts(['experience' => [[
-      'job_title' => 'analyst',
-      'company' => '',
-      'location' => '',
-      'start' => '',
-      'end' => '',
-      'achievements' => [],
-    ]]]), 'chat');
+    $prompt = $this->builder()->compose($this->facts([
+      'experience' => [[
+        'job_title' => 'analyst',
+        'company' => '',
+        'location' => '',
+        'start' => '',
+        'end' => '',
+        'achievements' => [],
+      ],
+      ],
+    ]), 'chat');
     $this->assertStringContainsString("Experience: analyst\n", $prompt);
   }
 
@@ -164,7 +169,15 @@ final class AssistantContextBuilderTest extends UnitTestCase {
   public function testFitModeAddsMatchInstructions(): void {
     $fit = $this->builder()->compose($this->facts(), 'fit');
     $chat = $this->builder()->compose($this->facts(), 'chat');
-    foreach (['strengths', 'gaps', 'verdict', '200 words', 'only list strengths that appear in the facts', 'no markdown'] as $needle) {
+    $needles = [
+      'strengths',
+      'gaps',
+      'verdict',
+      '200 words',
+      'only list strengths that appear in the facts',
+      'no markdown',
+    ];
+    foreach ($needles as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $fit);
     }
     $this->assertStringContainsString('120 words', $chat);

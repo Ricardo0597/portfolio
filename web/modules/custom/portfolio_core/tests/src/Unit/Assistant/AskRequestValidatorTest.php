@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\Tests\portfolio_core\Unit\Assistant;
@@ -100,7 +101,6 @@ final class AskRequestValidatorTest extends UnitTestCase {
     $this->validate('x');
   }
 
-
   /**
    * Requests without an Origin header (non-browser clients) are allowed.
    */
@@ -143,12 +143,12 @@ final class AskRequestValidatorTest extends UnitTestCase {
     $this->assertFalse((new AskRequestValidator())->isAllowedOrigin('null', ['example.com']));
   }
 
-
   /**
    * A tunnel/proxy that rewrites Host still matches its forwarded host.
    */
   public function testForwardedHostAllowed(): void {
-    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://demo.ngrok-free.dev', ['portfolio.ddev.site', 'demo.ngrok-free.dev']));
+    $hosts = ['portfolio.ddev.site', 'demo.ngrok-free.dev'];
+    $this->assertTrue((new AskRequestValidator())->isAllowedOrigin('https://demo.ngrok-free.dev', $hosts));
   }
 
   /**

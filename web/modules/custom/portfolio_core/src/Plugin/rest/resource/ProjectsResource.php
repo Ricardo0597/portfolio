@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\portfolio_core\Plugin\rest\resource;
@@ -86,8 +87,8 @@ final class ProjectsResource extends ResourceBase {
         'summary'  => $node->get('field_summary')->value ?? '',
         'stack'    => $stack_labels,
         'status'   => $status_label,
-        'demo_url' => !$demo_url_field->isEmpty() ? $demo_url_field->first()->getUrl()->toString() : null,
-        'repo_url' => !$repo_url_field->isEmpty() ? $repo_url_field->first()->getUrl()->toString() : null,
+        'demo_url' => !$demo_url_field->isEmpty() ? $demo_url_field->first()->getUrl()->toString() : NULL,
+        'repo_url' => !$repo_url_field->isEmpty() ? $repo_url_field->first()->getUrl()->toString() : NULL,
         'path'     => $node->toUrl()->toString(),
       ];
     }

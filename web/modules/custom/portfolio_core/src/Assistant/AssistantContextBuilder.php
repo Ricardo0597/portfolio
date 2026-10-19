@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\portfolio_core\Assistant;
@@ -31,7 +32,7 @@ class AssistantContextBuilder {
    * Returns the system prompt for the given mode.
    *
    * @param string $mode
-   *   'chat' or 'fit'.
+   *   Either 'chat' or 'fit'.
    */
   public function build(string $mode): string {
     // Today's date is added outside the cached facts so it never goes stale.
@@ -47,7 +48,7 @@ class AssistantContextBuilder {
    *   experience, education, languages, links, availability (see
    *   ProfileDataService shapes), notes (list of extra facts).
    * @param string $mode
-   *   'chat' or 'fit'.
+   *   Either 'chat' or 'fit'.
    */
   public function compose(array $facts, string $mode): string {
     $lines = [];
@@ -156,7 +157,7 @@ class AssistantContextBuilder {
         : [],
       'links' => $links,
       'availability' => $this->profileData->getAvailability($profile),
-      // Owner-written extra knowledge, one fact per line (never shown on the page).
+      // Owner-written extra knowledge, one fact per line (never on the page).
       'notes' => preg_split('/\R/', $value('field_assistant_notes'), -1, PREG_SPLIT_NO_EMPTY),
     ];
     $this->cache->set(self::CID, $facts, Cache::PERMANENT, Cache::mergeTags(

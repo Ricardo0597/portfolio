@@ -4,6 +4,8 @@ portfolio_core.ask:
     _controller: '\Drupal\portfolio_core\Controller\AskController::ask'
   methods: [POST]
   requirements:
+    # Public on purpose: anonymous visitors chat with Droopy. Abuse is limited
+    # by flood control, origin checks and input validation in AskController.
     _access: 'TRUE'
   options:
     no_cache: TRUE

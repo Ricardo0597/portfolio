@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\Tests\portfolio_core\Unit\Assistant;
@@ -85,7 +86,6 @@ final class AnswerParserTest extends UnitTestCase {
     $result = (new AnswerParser())->parse("Hi  [[cv]]  there.\n\nNext [[email]] ");
     $this->assertSame("Hi there.\n\nNext", $result['text']);
   }
-
 
   /**
    * Markdown emphasis and headings are flattened to plain text.

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\portfolio_core\Assistant;
@@ -56,7 +57,6 @@ final class AskRequestValidator {
 
     return ['question' => $question, 'mode' => $mode, 'history' => $clean];
   }
-
 
   /**
    * Whether a browser Origin header belongs to this site.

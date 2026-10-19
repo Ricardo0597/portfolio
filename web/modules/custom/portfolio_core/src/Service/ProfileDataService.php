@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Drupal\portfolio_core\Service;
@@ -6,8 +7,6 @@ namespace Drupal\portfolio_core\Service;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
-use Drupal\Core\Render\MarkupInterface;
-use Drupal\filter\FilterProcessResult;
 use Drupal\node\NodeInterface;
 
 /**
@@ -28,6 +27,7 @@ class ProfileDataService {
    * Returns skill nodes grouped by category, sorted alphabetically.
    *
    * @return array<string, list<string>>
+   *   Skill labels keyed by category name.
    */
   public function getSkillsByCategory(): array {
     $skill_nodes = $this->entityTypeManager
@@ -53,13 +53,14 @@ class ProfileDataService {
    * Returns content-type counts for the stats strip.
    *
    * @return array<string, int>
+   *   Counts keyed by experience, projects, skills and articles.
    */
   public function getContentStats(NodeInterface $profile): array {
     $storage = $this->entityTypeManager->getStorage('node');
     return [
       'experience' => (int) ($profile->get('field_years_experience')->value ?? 0),
       'projects'   => count($storage->loadByProperties(['type' => 'project', 'status' => 1])),
-      'skills'     => count($storage->loadByProperties(['type' => 'skill',   'status' => 1])),
+      'skills'     => count($storage->loadByProperties(['type' => 'skill', 'status' => 1])),
       'articles'   => count($storage->loadByProperties(['type' => 'article', 'status' => 1])),
     ];
   }
@@ -68,6 +69,8 @@ class ProfileDataService {
    * Returns formatted work experience items from the profile paragraph field.
    *
    * @return list<array<string, mixed>>
+   *   One item per job: job_title, company, location, start, end,
+   *   achievements (and employment_type when requested).
    */
   public function getWorkExperience(NodeInterface $profile, bool $includeEmploymentType = FALSE): array {
     $items = [];
@@ -147,6 +150,7 @@ class ProfileDataService {
    * Returns the allowed-value labels of a list field's selected keys.
    *
    * @return list<string>
+   *   Labels in field order; empty when unset or missing.
    */
   private function listLabels(NodeInterface $node, string $field_name): array {
     if (!$node->hasField($field_name) || $node->get($field_name)->isEmpty()) {

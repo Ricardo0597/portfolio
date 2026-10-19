@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @file
+ * Functions to support theming in the portfolio_theme theme.
+ */
+
 declare(strict_types=1);
 
 /**

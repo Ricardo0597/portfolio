@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @file
+ * Hooks for the Portfolio Core module: JSON-LD, preprocess and views.
+ */
+
 declare(strict_types=1);
 
 /**
@@ -28,8 +34,12 @@ function portfolio_core_page_attachments(array &$attachments): void {
     $github   = $node->get('field_github_url');
     $linkedin = $node->get('field_linkedin_url');
     $sameAs   = [];
-    if (!$github->isEmpty())   { $sameAs[] = $github->first()->getUrl()->toString(); }
-    if (!$linkedin->isEmpty()) { $sameAs[] = $linkedin->first()->getUrl()->toString(); }
+    if (!$github->isEmpty()) {
+      $sameAs[] = $github->first()->getUrl()->toString();
+    }
+    if (!$linkedin->isEmpty()) {
+      $sameAs[] = $linkedin->first()->getUrl()->toString();
+    }
 
     $thumbnail_url = $profile_data->fileUrl($node, 'field_thumbnail');
 
@@ -41,7 +51,7 @@ function portfolio_core_page_attachments(array &$attachments): void {
       'email'      => $node->get('field_email')->value ?? '',
       'url'        => Url::fromRoute('<front>')->setAbsolute()->toString(),
       'image'      => $thumbnail_url ?: NULL,
-      'description'=> strip_tags($node->get('field_bio')->value ?? ''),
+      'description' => strip_tags($node->get('field_bio')->value ?? ''),
       'sameAs'     => $sameAs ?: NULL,
     ]);
   }
