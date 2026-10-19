@@ -6,6 +6,7 @@ declare(strict_types=1);
  * Functions to support theming in the portfolio_theme theme.
  */
 
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
 /**
@@ -25,14 +26,20 @@ function portfolio_theme_preprocess_page(array &$variables): void {
     }
   }
 
-  // Header navigation: anchors into the single-page profile at the front
-  // page, plus the separate headless showcase app.
+  // Header navigation: anchors into the single-page profile, plus the
+  // separate headless showcase app. On the front page the links are bare
+  // fragments so "/?utm_source=…" scrolls instead of reloading.
+  $is_front = \Drupal::service('path.matcher')->isFrontPage();
+  $section = static fn(string $id): string => $is_front
+    ? '#' . $id
+    : Url::fromRoute('<front>', [], ['fragment' => $id])->toString();
   $variables['section_nav'] = [
-    ['label' => t('About'), 'url' => '/#about'],
-    ['label' => t('Skills'), 'url' => '/#skills'],
-    ['label' => t('Experience'), 'url' => '/#experience'],
-    ['label' => t('Education'), 'url' => '/#education'],
-    ['label' => t('Contact'), 'url' => '/#contact'],
-    ['label' => t('Headless'), 'url' => '/headless', 'separated' => TRUE],
+    ['label' => t('About'), 'url' => $section('about')],
+    ['label' => t('Skills'), 'url' => $section('skills')],
+    ['label' => t('Experience'), 'url' => $section('experience')],
+    ['label' => t('Education'), 'url' => $section('education')],
+    ['label' => t('Contact'), 'url' => $section('contact')],
+    ['label' => t('Headless'), 'url' => Url::fromUserInput('/headless')->toString(), 'separated' => TRUE],
   ];
+  $variables['#cache']['contexts'][] = 'url.path.is_front';
 }

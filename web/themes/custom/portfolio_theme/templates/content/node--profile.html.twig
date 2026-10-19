@@ -51,12 +51,6 @@
             <span class="stats-strip__label">{{ 'Skills'|t }}</span>
           </div>
         {% endif %}
-        {% if profile_stats.articles %}
-          <div class="stats-strip__item">
-            <span class="stats-strip__number" data-count="{{ profile_stats.articles }}">0</span>
-            <span class="stats-strip__label">{{ 'Articles Written'|t }}</span>
-          </div>
-        {% endif %}
       </div>
     {% endif %}
     {% if profile_bio %}
@@ -152,7 +146,7 @@
     <h2 class="about__section-title" id="contact-title">{{ 'Contact'|t }}</h2>
     <p class="contact__lead">{{ 'Open to remote Drupal work.'|t }}</p>
     {% if profile_email %}
-      <a href="mailto:{{ profile_email }}" class="hero__cta contact__email">{{ profile_email }}</a>
+      <a href="mailto:{{ profile_email }}" class="contact__email">{{ profile_email }}</a>
     {% endif %}
     <ul class="contact__details">
       {% if profile_phone %}

@@ -676,15 +676,22 @@ footer[role='contentinfo'] {
     padding: var(--space-4) var(--space-6);
     transform: translateY(-8px);
     opacity: 0;
+    visibility: hidden; // keeps closed links out of the tab order
     pointer-events: none;
     transition:
-      opacity   var(--transition-base),
-      transform var(--transition-base);
+      opacity    var(--transition-base),
+      transform  var(--transition-base),
+      visibility 0s linear var(--duration-base);
 
     &.is-open {
       transform: translateY(0);
       opacity: 1;
+      visibility: visible;
       pointer-events: auto;
+      transition:
+        opacity    var(--transition-base),
+        transform  var(--transition-base),
+        visibility 0s;
     }
 
     &__list {

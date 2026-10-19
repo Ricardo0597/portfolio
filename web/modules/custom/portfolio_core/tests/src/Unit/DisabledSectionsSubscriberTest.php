@@ -51,51 +51,101 @@ final class DisabledSectionsSubscriberTest extends UnitTestCase {
     return new DisabledSectionsSubscriber($config_factory, $account);
   }
 
+  /**
+   * Disabled bundles redirect temporarily.
+   */
   public function testDisabledBundleRedirects302(): void {
     $this->assertSame(302, $this->subscriber()->resolveStatus('entity.node.canonical', 'project', FALSE, 'html', FALSE));
   }
 
+  /**
+   * Bundles not in the config are left alone.
+   */
   public function testEnabledBundleNotRedirected(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'page', FALSE, 'html', FALSE));
   }
 
+  /**
+   * Disabled routes redirect temporarily.
+   */
   public function testDisabledRouteRedirects302(): void {
     $this->assertSame(302, $this->subscriber()->resolveStatus('view.portfolio_projects.page_1', NULL, FALSE, 'html', FALSE));
   }
 
+  /**
+   * The profile outside the front page redirects permanently.
+   */
   public function testProfileOffFrontRedirects301(): void {
     $this->assertSame(301, $this->subscriber()->resolveStatus('entity.node.canonical', 'profile', FALSE, 'html', FALSE));
   }
 
+  /**
+   * The profile at the front page is served.
+   */
   public function testProfileOnFrontNotRedirected(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'profile', TRUE, 'html', FALSE));
   }
 
+  /**
+   * Users who bypass node access can view disabled nodes.
+   */
   public function testBypassUserNotRedirectedOnNode(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'article', FALSE, 'html', TRUE));
   }
 
+  /**
+   * The profile alias redirects even for users who bypass node access.
+   */
   public function testBypassUserStillRedirectedOnProfileAlias(): void {
     $this->assertSame(301, $this->subscriber()->resolveStatus('entity.node.canonical', 'profile', FALSE, 'html', TRUE));
   }
 
+  /**
+   * Users who bypass node access can view disabled listings.
+   */
   public function testBypassUserNotRedirectedOnRoute(): void {
     $this->assertNull($this->subscriber()->resolveStatus('view.portfolio_projects.page_1', NULL, FALSE, 'html', TRUE));
   }
 
+  /**
+   * The front path never redirects, even to a disabled node (no loop).
+   */
+  public function testFrontPathNeverRedirectsDisabledBundle(): void {
+    $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'project', TRUE, 'html', FALSE));
+  }
+
+  /**
+   * The front path never redirects, even to a disabled route (no loop).
+   */
+  public function testFrontPathNeverRedirectsDisabledRoute(): void {
+    $this->assertNull($this->subscriber()->resolveStatus('view.portfolio_projects.page_1', NULL, TRUE, 'html', FALSE));
+  }
+
+  /**
+   * Non-HTML formats (REST, feeds) are never redirected.
+   */
   public function testNonHtmlFormatIsIgnored(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.canonical', 'project', FALSE, 'json', FALSE));
   }
 
+  /**
+   * Edit forms of disabled bundles stay reachable.
+   */
   public function testEditRouteIgnored(): void {
     $this->assertNull($this->subscriber()->resolveStatus('entity.node.edit_form', 'project', FALSE, 'html', FALSE));
   }
 
+  /**
+   * Empty lists re-enable every section.
+   */
   public function testEmptyConfigDisablesNothing(): void {
     $subscriber = $this->subscriber(['disabled_bundles' => [], 'disabled_routes' => []]);
     $this->assertNull($subscriber->resolveStatus('entity.node.canonical', 'project', FALSE, 'html', FALSE));
   }
 
+  /**
+   * Redirects are invalidated when the settings change.
+   */
   public function testRedirectCarriesConfigCacheTag(): void {
     $url_generator = $this->createMock(UrlGeneratorInterface::class);
     $url_generator->method('generateFromRoute')

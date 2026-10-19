@@ -39,7 +39,6 @@
     height: 24px;
     background: var(--color-highlight);
     border-radius: 50%;
-    transition: transform var(--transition-base);
   }
 
   &[aria-checked='true'] &__thumb {
@@ -51,6 +50,15 @@
     width: 16px;
     height: 16px;
     color: var(--color-text-muted);
+  }
+
+  // Transitions start once JS has synced the initial state, so the thumb
+  // doesn't slide on load for visitors in light mode.
+  &--ready &__thumb {
+    transition: transform var(--transition-base);
+  }
+
+  &--ready &__icon {
     transition: color var(--transition-base);
   }
 

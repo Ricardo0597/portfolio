@@ -300,6 +300,16 @@
           nav.classList.toggle('is-open', !isOpen);
         });
 
+        // Escape closes the drawer and returns focus to the toggle.
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && nav.classList.contains('is-open')) {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', Drupal.t('Open navigation'));
+            nav.classList.remove('is-open');
+            toggle.focus();
+          }
+        });
+
         // Close drawer after choosing a section link.
         nav.addEventListener('click', (e) => {
           if (e.target.closest('.site-nav__link')) {
@@ -418,6 +428,10 @@
 
         // Sync with what the inline <head> script already applied.
         apply(html.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+        // Enable transitions after the synced state has been painted.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => btn.classList.add('theme-toggle--ready'));
+        });
 
         btn.addEventListener('click', () => {
           const theme = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';

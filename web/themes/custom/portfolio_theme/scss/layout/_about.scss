@@ -281,8 +281,22 @@
   }
 
   &__email {
+    display: inline-flex;
+    align-items: center;
     margin-bottom: var(--space-6);
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--border-radius);
+    background: var(--color-highlight);
+    color: #fff; // always white on the highlight background
+    font-size: var(--text-sm);
+    font-weight: 600;
     word-break: break-all;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+
+    &:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
   }
 
   &__details {

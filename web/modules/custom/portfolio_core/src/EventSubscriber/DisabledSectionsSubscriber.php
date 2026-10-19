@@ -79,7 +79,7 @@ final class DisabledSectionsSubscriber implements EventSubscriberInterface {
    * @param string|null $node_bundle
    *   The bundle of the route's node, if any.
    * @param bool $is_front
-   *   Whether the request is for the front page.
+   *   Whether the raw request path is '/'.
    * @param string $format
    *   The request format.
    * @param bool $can_bypass
@@ -89,14 +89,17 @@ final class DisabledSectionsSubscriber implements EventSubscriberInterface {
    *   301 or 302 to redirect, NULL to leave the request alone.
    */
   public function resolveStatus(string $route_name, ?string $node_bundle, bool $is_front, string $format, bool $can_bypass): ?int {
-    if ($format !== 'html') {
+    // Never redirect the front path itself: redirecting '/' to '/' would loop
+    // if the front page were ever pointed at a disabled node or route.
+    if ($is_front || $format !== 'html') {
       return NULL;
     }
     $config = $this->configFactory->get('portfolio_core.settings');
 
     if ($route_name === 'entity.node.canonical' && $node_bundle !== NULL) {
+      // The profile is served at the front page (system.site:page.front).
       if ($node_bundle === 'profile') {
-        return $is_front ? NULL : 301;
+        return 301;
       }
       if (!$can_bypass && in_array($node_bundle, $config->get('disabled_bundles') ?? [], TRUE)) {
         return 302;
