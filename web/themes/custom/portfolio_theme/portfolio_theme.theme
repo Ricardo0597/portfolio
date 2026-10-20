@@ -45,7 +45,7 @@ function portfolio_theme_preprocess_page(array &$variables): void {
     ['label' => t('Experience'), 'url' => $section('experience')],
     ['label' => t('Education'), 'url' => $section('education')],
     ['label' => t('Contact'), 'url' => $section('contact')],
-    ['label' => t('Headless'), 'url' => Url::fromUserInput('/headless')->toString(), 'separated' => TRUE],
+    ['label' => t('Tech Lab'), 'url' => Url::fromUserInput('/headless')->toString(), 'separated' => TRUE],
   ];
   $variables['#cache']['contexts'][] = 'url.path.is_front';
 

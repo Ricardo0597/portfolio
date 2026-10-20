@@ -6,6 +6,11 @@
        height="72"
        loading="eager">
   {% if site_name %}
-    <span class="site-branding__name">{{- site_name -}}</span>
+    <span class="site-branding__text">
+      <span class="site-branding__name">{{- site_name -}}</span>
+      {% if site_slogan %}
+        <span class="site-branding__slogan">{{- site_slogan -}}</span>
+      {% endif %}
+    </span>
   {% endif %}
 </a>

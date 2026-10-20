@@ -2,9 +2,9 @@ _core:
   default_config_hash: ijfbzDTN4CbE7Sr-6ubWzy_t1vH4OtU1doNCLssVz-4
 langcode: en
 uuid: 09244f1c-bc59-4016-9d51-86600e47d7dd
-name: Portfolio
+name: 'Ricardo Contreras'
 mail: admin@example.com
-slogan: ''
+slogan: 'Drupal & Full-Stack Engineer'
 page:
   403: ''
   404: ''
