@@ -4,13 +4,13 @@
 
 @page {
   size: A4;
-  margin: 18mm;
+  margin: 12mm 14mm;
 }
 
 body {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1.25;
+  font-size: 9.5pt;
+  line-height: 1.2;
   color: #1a1a1a;
   margin: 0;
   padding: 0;
@@ -32,14 +32,14 @@ a {
 }
 
 .cv__name {
-  font-size: 22pt;
+  font-size: 19pt;
   font-weight: 700;
   margin: 0 0 4pt;
   color: #1a1a1a;
 }
 
 .cv__subtitle {
-  font-size: 13pt;
+  font-size: 11.5pt;
   color: #1d6a72;
   margin: 0;
 }
@@ -47,9 +47,9 @@ a {
 // ── Contact row ──────────────────────────────────────────────
 
 .cv__contact-row {
-  font-size: 10pt;
+  font-size: 9pt;
   color: #444;
-  margin-bottom: 10pt;
+  margin-bottom: 7pt;
   border-bottom: 0.5pt solid #ccc;
   padding-bottom: 6pt;
 }
@@ -57,12 +57,12 @@ a {
 // ── Sections ─────────────────────────────────────────────────
 
 .cv__section {
-  margin-bottom: 10pt;
+  margin-bottom: 7pt;
   page-break-inside: avoid;
 }
 
 .cv__section-title {
-  font-size: 11pt;
+  font-size: 10pt;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -75,7 +75,7 @@ a {
 // ── Professional Summary ──────────────────────────────────────
 
 .cv__bio {
-  font-size: 10.5pt;
+  font-size: 9.5pt;
   line-height: 1.4;
   color: #1a1a1a;
   margin: 0;
@@ -84,7 +84,7 @@ a {
 // ── Core Skills ───────────────────────────────────────────────
 
 .cv__skills-group {
-  font-size: 10pt;
+  font-size: 9pt;
   margin-bottom: 3pt;
 }
 
@@ -105,19 +105,19 @@ a {
 }
 
 .cv__work-header {
-  font-size: 10.5pt;
+  font-size: 9.5pt;
   font-weight: 400;
   margin-bottom: 1pt;
 }
 
 .cv__work-type {
-  font-size: 9.5pt;
+  font-size: 8.5pt;
   color: #666;
   font-style: italic;
 }
 
 .cv__work-meta {
-  font-size: 9.5pt;
+  font-size: 8.5pt;
   color: #555;
   margin-bottom: 4pt;
 }
@@ -125,7 +125,7 @@ a {
 .cv__achievements {
   margin: 0;
   padding-left: 14pt;
-  font-size: 10pt;
+  font-size: 9pt;
   color: #1a1a1a;
 
   li {
@@ -137,7 +137,7 @@ a {
 // ── Education ─────────────────────────────────────────────────
 
 .cv__edu-item {
-  font-size: 10pt;
+  font-size: 9pt;
 }
 
 .cv__edu-header {
@@ -145,7 +145,7 @@ a {
 }
 
 .cv__edu-meta {
-  font-size: 9.5pt;
+  font-size: 8.5pt;
   color: #555;
 }
 
@@ -155,7 +155,7 @@ a {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 10pt;
+  font-size: 9pt;
 
   li {
     margin-bottom: 2pt;
