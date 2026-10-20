@@ -101,10 +101,33 @@ function portfolio_core_page_attachments(array &$attachments): void {
       [
         '#type'       => 'html_tag',
         '#tag'        => 'script',
-        '#value'      => json_encode($json_ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        '#value'      => json_encode($json_ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG),
         '#attributes' => ['type' => 'application/ld+json'],
       ],
       'portfolio-json-ld',
+    ];
+  }
+
+  // WebSite schema on the front page (the profile), linked to the Person.
+  if ($node->bundle() === 'profile' && \Drupal::service('path.matcher')->isFrontPage()) {
+    $site_url = Url::fromRoute('<front>')->setAbsolute()->toString();
+    $website = array_filter([
+      '@context'    => 'https://schema.org',
+      '@type'       => 'WebSite',
+      'name'        => $node->label(),
+      'url'         => $site_url,
+      'description' => \Drupal::config('system.site')->get('slogan') ?: NULL,
+      'inLanguage'  => \Drupal::languageManager()->getCurrentLanguage()->getId(),
+      'author'      => ['@type' => 'Person', 'name' => $node->label(), 'url' => $site_url],
+    ]);
+    $attachments['#attached']['html_head'][] = [
+      [
+        '#type'       => 'html_tag',
+        '#tag'        => 'script',
+        '#value'      => json_encode($website, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG),
+        '#attributes' => ['type' => 'application/ld+json'],
+      ],
+      'portfolio-json-ld-website',
     ];
   }
 }
@@ -276,12 +299,19 @@ function _portfolio_core_preprocess_profile_full(array &$variables, NodeInterfac
   $variables['profile_drupalorg_url'] = !$drupalorg->isEmpty() ? $drupalorg->first()->getUrl()->toString() : '';
 
   // Hero.
-  $variables['profile_hero_roles'] = [
-    (string) t('Drupal Applications'),
-    (string) t('REST APIs'),
-    (string) t('Headless Experiences'),
-    (string) t('Clean, Fast Code'),
+  $variables['profile_tagline'] = t('Building scalable, accessible Drupal platforms.');
+  $variables['profile_specialties'] = [
+    t('Drupal 8–11'),
+    t('Acquia Cloud & Site Studio'),
+    t('Multisite'),
+    t('PHP'),
+    t('REST APIs'),
   ];
+  $years = (int) ($node->get('field_years_experience')->value ?? 0);
+  $variables['profile_hero_meta'] = array_filter([
+    $years ? t('@count years of experience', ['@count' => $years]) : NULL,
+    $variables['profile_location'] ?: NULL,
+  ]);
   $variables['profile_cv_url'] = Url::fromRoute('entity_print.view', [
     'export_type' => 'pdf',
     'entity_type' => 'node',
@@ -442,7 +472,7 @@ function portfolio_core_views_post_render(ViewExecutable $view, array &$output, 
           'name'            => $list_name,
           'itemListElement' => $items,
         ],
-        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG
       ),
       '#attributes' => ['type' => 'application/ld+json'],
     ],

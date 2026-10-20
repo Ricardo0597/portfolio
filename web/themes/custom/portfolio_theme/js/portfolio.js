@@ -92,7 +92,14 @@
   Drupal.behaviors.statsCounter = {
     attach(context) {
       once('stats-counter', '.stats-strip', context).forEach((strip) => {
+        // The real numbers are already in the HTML (crawlers, screen readers,
+        // no-JS). Counting up is decoration only.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const counters = [...strip.querySelectorAll('[data-count]')];
+        counters.forEach((el) => {
+          el.setAttribute('aria-label', el.dataset.count);
+          el.textContent = '0';
+        });
 
         const run = () => {
           counters.forEach((el) => {

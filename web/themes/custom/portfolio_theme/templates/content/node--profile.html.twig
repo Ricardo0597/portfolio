@@ -7,17 +7,15 @@
     {% endif %}
     <p class="hero__greeting">{{ 'Hi, I\'m'|t }}</p>
     <h1 class="hero__name">{{ label }}</h1>
-    {% if profile_hero_roles %}
-      <p class="hero__roles">
-        <span class="hero__roles-prefix">{{ 'I build '|t }}</span><span
-          class="hero__typing js-typing"
-          data-roles="{{ profile_hero_roles|join('|') }}"
-          aria-label="{{ profile_hero_roles|first }}">{{ profile_hero_roles|first }}</span><span
-          class="hero__cursor" aria-hidden="true">|</span>
-      </p>
-    {% endif %}
     {% if profile_subtitle %}
-      <p class="hero__subtitle">{{ profile_subtitle }}</p>
+      <p class="hero__role">{{ profile_subtitle }}</p>
+    {% endif %}
+    <p class="hero__tagline">{{ profile_tagline }}</p>
+    {% if profile_specialties %}
+      <p class="hero__specialties">{{ profile_specialties|join(' · ') }}</p>
+    {% endif %}
+    {% if profile_hero_meta %}
+      <p class="hero__meta">{{ profile_hero_meta|join(' · ') }}</p>
     {% endif %}
     <div class="hero__actions">
       <a href="{{ profile_cv_url }}" class="hero__cta" target="_blank">{{ 'Download CV (PDF)'|t }}</a>
@@ -38,19 +36,19 @@
       <div class="stats-strip">
         {% if profile_stats.experience %}
           <div class="stats-strip__item">
-            <span class="stats-strip__number" data-count="{{ profile_stats.experience }}">0</span>
+            <span class="stats-strip__number" data-count="{{ profile_stats.experience }}">{{ profile_stats.experience }}</span>
             <span class="stats-strip__label">{{ 'Years Experience'|t }}</span>
           </div>
         {% endif %}
         {% if profile_stats.projects %}
           <div class="stats-strip__item">
-            <span class="stats-strip__number" data-count="{{ profile_stats.projects }}">0</span>
+            <span class="stats-strip__number" data-count="{{ profile_stats.projects }}">{{ profile_stats.projects }}</span>
             <span class="stats-strip__label">{{ 'Projects Shipped'|t }}</span>
           </div>
         {% endif %}
         {% if profile_stats.skills %}
           <div class="stats-strip__item">
-            <span class="stats-strip__number" data-count="{{ profile_stats.skills }}">0</span>
+            <span class="stats-strip__number" data-count="{{ profile_stats.skills }}">{{ profile_stats.skills }}</span>
             <span class="stats-strip__label">{{ 'Skills'|t }}</span>
           </div>
         {% endif %}
