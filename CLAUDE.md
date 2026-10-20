@@ -586,7 +586,10 @@ Keys must be unique per page. Conventions:
 2. **Listing pages:** Add the view ID to the `in_array()` allowlist in
    `portfolio_core_views_post_render()`, then add a branch for the new item type.
 3. Use `array_filter()` to omit null/empty fields — never emit empty properties.
-4. Always pass `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE` to `json_encode()`.
+4. Always pass `JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_AMP | JSON_HEX_TAG`
+   to `json_encode()`. The HEX flags matter: Drupal HTML-escapes `&` in `html_tag`
+   values (inside `<script>` entities are not decoded, so `&` would reach crawlers
+   as `&amp;`), and `<`/`>` escapes stop content from closing the script tag.
 5. URLs must be absolute: `$node->toUrl()->setAbsolute()->toString()`.
 6. Validate with **https://validator.schema.org** — not Google's Rich Results Test,
    which only detects Google-renderable rich result types and will show "No items

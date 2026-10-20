@@ -9,3 +9,10 @@ label: 'Front page'
 tags:
   canonical_url: '[site:url]'
   shortlink: '[site:url]'
+  title: 'Ricardo Alonso Contreras García | Drupal & Full-Stack Engineer'
+  description: 'Drupal & full-stack engineer with 7 years building Drupal 8–11 platforms on Acquia Cloud, multisite and Site Studio. Costa Rica · available for remote work.'
+  og_type: profile
+  og_title: 'Ricardo Alonso Contreras García | Drupal & Full-Stack Engineer'
+  og_description: 'Drupal & full-stack engineer with 7 years building Drupal 8–11 platforms on Acquia Cloud, multisite and Site Studio. Costa Rica · available for remote work.'
+  og_url: '[site:url]'
+  og_site_name: '[site:name]'
