@@ -116,9 +116,9 @@ class AssistantContextBuilder {
   }
 
   /**
-   * Gathers profile facts, cached until the profile or skills change.
+   * Returns profile facts, cached until the profile or skills change.
    */
-  private function facts(): array {
+  public function facts(): array {
     if ($cached = $this->cache->get(self::CID)) {
       return $cached->data;
     }

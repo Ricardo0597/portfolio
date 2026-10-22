@@ -56,3 +56,5 @@ services:
       - '@datetime.time'
   portfolio_core.ask_validator:
     class: Drupal\portfolio_core\Assistant\AskRequestValidator
+  portfolio_core.cv_tailoring_prompt:
+    class: Drupal\portfolio_core\Cv\CvTailoringPrompt
