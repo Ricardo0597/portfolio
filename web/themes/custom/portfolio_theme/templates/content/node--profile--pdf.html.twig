@@ -45,6 +45,18 @@
     </div>
   {% endif %}
 
+  {# ── KEY HIGHLIGHTS (tailored CVs only) ──────────────────── #}
+  {% if profile_highlights %}
+    <div class="cv__section">
+      <h2 class="cv__section-title">Key Highlights</h2>
+      <ul class="cv__achievements cv__highlights">
+        {% for highlight in profile_highlights %}
+          <li>{{ highlight }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
   {# ── CORE SKILLS ─────────────────────────────────────────── #}
   {% if profile_skills %}
     <div class="cv__section">

@@ -67,3 +67,11 @@ services:
       - '@portfolio_core.cv_tailoring_prompt'
       - '@portfolio_core.llm_chain'
       - '@portfolio_core.cv_plan_validator'
+  portfolio_core.tailored_cv_context:
+    class: Drupal\portfolio_core\Cv\TailoredCvContext
+  portfolio_core.cv_pdf_generator:
+    class: Drupal\portfolio_core\Cv\CvPdfGenerator
+    arguments:
+      - '@entity_print.print_builder'
+      - '@plugin.manager.entity_print.print_engine'
+      - '@portfolio_core.tailored_cv_context'

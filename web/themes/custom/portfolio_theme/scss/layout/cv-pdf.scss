@@ -161,3 +161,8 @@ a {
     margin-bottom: 2pt;
   }
 }
+
+// Key highlights (tailored CVs only): same list style, slightly bolder.
+.cv__highlights li {
+  font-weight: 600;
+}

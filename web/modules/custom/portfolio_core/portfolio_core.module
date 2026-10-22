@@ -12,6 +12,7 @@ declare(strict_types=1);
  * Primary module hooks for Portfolio Core.
  */
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Url;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
@@ -129,6 +130,21 @@ function portfolio_core_page_attachments(array &$attachments): void {
       ],
       'portfolio-json-ld-website',
     ];
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_build_defaults_alter() for node entities.
+ *
+ * While a tailored CV is rendered, the profile's PDF build must not come from
+ * (or go into) the render cache, or the public CV and the tailored one would
+ * be served in place of each other.
+ */
+function portfolio_core_node_build_defaults_alter(array &$build, EntityInterface $entity, string $view_mode): void {
+  if ($entity->bundle() === 'profile'
+    && \Drupal::service('portfolio_core.tailored_cv_context')->get() !== NULL) {
+    unset($build['#cache']['keys']);
+    $build['#cache']['max-age'] = 0;
   }
 }
 
@@ -405,6 +421,25 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     fn($item) => $item->value,
     iterator_to_array($node->get('field_languages')),
   );
+
+  // Tailored CV: an approved plan (set only while CvPdfGenerator renders)
+  // replaces the summary, skills order and bullets, and adds highlights.
+  $plan = \Drupal::service('portfolio_core.tailored_cv_context')->get();
+  if ($plan !== NULL) {
+    $variables['profile_bio'] = $plan['summary'];
+    $variables['profile_skills'] = $plan['skills'];
+    $variables['profile_highlights'] = array_column($plan['highlights'], 'text');
+    foreach ($plan['jobs'] as $job) {
+      if (isset($variables['profile_work_experience'][$job['index']])) {
+        $variables['profile_work_experience'][$job['index']]['achievements'] = array_column(
+          array_filter($job['bullets'], fn(array $bullet): bool => $bullet['checked']),
+          'text',
+        );
+      }
+    }
+    // Never cache a tailored render.
+    $variables['#cache']['max-age'] = 0;
+  }
 
   // Entity Print bypasses the standard render cache; explicit cache tags
   // ensure invalidation when the profile node is updated.
