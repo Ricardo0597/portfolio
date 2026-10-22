@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-22
 **Branch:** `feature/tailored-cv`
-**Status:** Draft, awaiting approval
+**Status:** Approved 2026-10-22 (admin page + logged-in Droopy shortcut)
 
 ## Intent
 
@@ -29,6 +29,10 @@ selects, orders and phrases; it does not invent.
 4. One-click download of a PDF using the current CV template, named
    `Ricardo-Contreras-CV-<Company>.pdf` (or `-Tailored.pdf` without a company).
 5. Free to run: the same Groq → Gemini provider chain as Droopy.
+6. A hidden Droopy shortcut: when Ricardo is logged in with the permission,
+   typing `/tailored-cv` in Droopy replies "Opening your tailored-CV tool…"
+   with a button to the page. For everyone else the text is an ordinary
+   question.
 
 ## Non-goals
 
@@ -60,6 +64,19 @@ selects, orders and phrases; it does not invent.
      (read-only), each job's bullets as checkboxes, pre-ticked and in the
      proposed order, a "Gaps for this role" box (read-only, not printed),
      buttons "Download PDF" and "Regenerate".
+
+### Droopy shortcut
+
+- `portfolio_theme_preprocess_page()` adds a `tailor_url` prop to the
+  `droopy-guide` component only when the current user has `use tailored cv`,
+  and adds the `user.permissions` cache context. Anonymous pages never contain
+  the URL, so the internal page cache stays safe.
+- `droopy-guide.js`: when the input is exactly `/tailored-cv` (trimmed,
+  case-insensitive) **and** `data-tailor-url` is present, it doesn't call the
+  API or store history; it shows a local bot message with an
+  "Open tailored-CV tool" link. Without the attribute the text is sent as a
+  normal question.
+- No new endpoint and no secret: Drupal's login is the lock.
 
 ### Facts
 
@@ -124,7 +141,10 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
 
 ## Decisions made by Claude (owner to check)
 
-1. Admin page with a two-step form, not a Droopy chat flow (private first).
+1. Admin page with a two-step form, not a Droopy chat flow (private first);
+   Droopy only links to it, for logged-in users with the permission. An access
+   key (unlock without login) was considered and rejected: a second secret to
+   manage for little gain.
 2. Bullets can be unticked and reordered by the AI, not reworded.
 3. A "Key highlights" section is added to the tailored PDF only.
 4. Gaps appear in the preview only.
