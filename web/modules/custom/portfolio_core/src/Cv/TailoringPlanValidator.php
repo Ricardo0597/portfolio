@@ -28,7 +28,8 @@ final class TailoringPlanValidator {
    *   Facts as returned by AssistantContextBuilder::facts().
    *
    * @return array
-   *   Keys: summary, highlights (text, source, source_text), skills
+   *   Keys: summary, highlights (text, source, source_text, unsupported:
+   *   skill labels named in the text but not in the cited fact), skills
    *   (category => labels), jobs (index, bullets: text + checked), gaps.
    *
    * @throws \InvalidArgumentException
@@ -45,7 +46,7 @@ final class TailoringPlanValidator {
 
     return [
       'summary' => $this->clamp($summary, self::MAX_SUMMARY),
-      'highlights' => $this->highlights($plan['highlights'] ?? [], $sources),
+      'highlights' => $this->highlights($plan['highlights'] ?? [], $sources, $facts['skills'] ?? []),
       'skills' => $this->skills($plan['skills'] ?? [], $facts['skills'] ?? []),
       'jobs' => $this->jobs($plan['jobs'] ?? [], $facts['experience'] ?? []),
       'gaps' => $this->gaps($plan['gaps'] ?? []),
@@ -116,7 +117,8 @@ final class TailoringPlanValidator {
   /**
    * Keeps highlights whose source exists.
    */
-  private function highlights(mixed $items, array $sources): array {
+  private function highlights(mixed $items, array $sources, array $skills): array {
+    $labels = array_merge(...array_values($skills ?: [[]]));
     $kept = [];
     foreach (is_array($items) ? $items : [] as $item) {
       $text = is_string($item['text'] ?? NULL) ? trim($item['text']) : '';
@@ -124,10 +126,15 @@ final class TailoringPlanValidator {
       if ($text === '' || !isset($sources[$source])) {
         continue;
       }
+      // Skills the highlight names but its cited fact doesn't: shown as a
+      // warning in the preview so the owner can correct the wording.
+      $unsupported = array_values(array_filter($labels, fn($label) => mb_stripos($text, $label) !== FALSE
+        && mb_stripos($sources[$source], $label) === FALSE));
       $kept[] = [
         'text' => $this->clamp($text, self::MAX_HIGHLIGHT),
         'source' => $source,
         'source_text' => $sources[$source],
+        'unsupported' => $unsupported,
       ];
       if (count($kept) === self::MAX_HIGHLIGHTS) {
         break;

@@ -167,4 +167,17 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertLessThanOrEqual(200, mb_strlen($result['gaps'][0]));
   }
 
+
+  /**
+   * A highlight naming a skill its source doesn't mention is flagged.
+   */
+  public function testFlagsSkillsMissingFromHighlightSource(): void {
+    $result = $this->validate($this->plan(['highlights' => [
+      ['text' => 'Maintained Drupal 11 sites on Acquia Cloud with Docker', 'source' => 'j1.b1'],
+      ['text' => 'Integrated Acquia DAM with Drupal', 'source' => 'j1.b3'],
+    ]]));
+    $this->assertSame(['Acquia Cloud', 'Docker'], $result['highlights'][0]['unsupported']);
+    $this->assertSame([], $result['highlights'][1]['unsupported']);
+  }
+
 }

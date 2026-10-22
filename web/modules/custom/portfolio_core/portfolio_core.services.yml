@@ -58,3 +58,12 @@ services:
     class: Drupal\portfolio_core\Assistant\AskRequestValidator
   portfolio_core.cv_tailoring_prompt:
     class: Drupal\portfolio_core\Cv\CvTailoringPrompt
+  portfolio_core.cv_plan_validator:
+    class: Drupal\portfolio_core\Cv\TailoringPlanValidator
+  portfolio_core.cv_tailor:
+    class: Drupal\portfolio_core\Cv\CvTailor
+    arguments:
+      - '@portfolio_core.assistant_context'
+      - '@portfolio_core.cv_tailoring_prompt'
+      - '@portfolio_core.llm_chain'
+      - '@portfolio_core.cv_plan_validator'

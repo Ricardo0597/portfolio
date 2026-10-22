@@ -49,7 +49,7 @@ final class CvTailoringPromptTest extends UnitTestCase {
    */
   public function testStatesRulesAndJsonShape(): void {
     $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
-    foreach (['only use facts listed', 'reference bullets by id', 'never invent', '"summary"', '"highlights"', '"skills"', '"jobs"', '"gaps"', 'first person'] as $needle) {
+    foreach (['only use facts listed', 'reference bullets by id', 'never invent', 'nothing that is not in the cited fact', '"summary"', '"highlights"', '"skills"', '"jobs"', '"gaps"', 'first person'] as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $prompt);
     }
   }
