@@ -39,7 +39,8 @@ selects, orders and phrases; it does not invent.
 - Public access (recruiters generating CVs through Droopy). Possible later;
   this design keeps the service reusable for it.
 - Cover letters, DOCX output, languages other than English.
-- Storing job descriptions or generated CVs.
+- Saving job descriptions or generated CVs (beyond Drupal's temporary form
+  cache, which expires after 6 hours).
 - Editing bullet wording in the preview (select and reorder only).
 
 ## Anti-goals
@@ -124,9 +125,10 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
   the summary, the skills order and each job's bullets, and adds a
   `profile_highlights` variable (a new "Key highlights" section in the
   template, rendered only when present).
-- The download handler sets the context, then delivers the profile node
-  through Entity Print's `PrintBuilder::deliverPrintable()` with the Dompdf
-  engine, overriding the file name.
+- The download handler sets the context, then renders the profile node
+  through Entity Print's `PrintBuilder::printHtml()` and the Dompdf engine,
+  and returns the PDF with its own file name. (Built this way instead of
+  `deliverPrintable()`, which picks the file name itself.)
 - The public "Download CV (PDF)" is unchanged (the context is empty there).
 - Must still fit one A4 page; if a long summary pushes it to two, the preview
   warns (word count) rather than shrinking type further.
@@ -148,7 +150,9 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
 2. Bullets can be unticked and reordered by the AI, not reworded.
 3. A "Key highlights" section is added to the tailored PDF only.
 4. Gaps appear in the preview only.
-5. Nothing is stored; regenerate if you leave the page.
+5. Nothing is saved to content or logs; the job description and draft live
+   only in Drupal's temporary form cache (expires after 6 hours). Regenerate if
+   you leave the page.
 6. File name from the optional company field.
 
 ## Left to the builder

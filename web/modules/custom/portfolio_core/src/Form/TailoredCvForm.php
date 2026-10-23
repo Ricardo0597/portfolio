@@ -120,10 +120,12 @@ final class TailoredCvForm extends FormBase {
       '#rows' => 5,
       '#maxlength' => 600,
       '#required' => TRUE,
-      '#description' => $this->t('AI-written — check before downloading. @count words; keep it under about 80 to fit one page.', [
+      '#id' => 'tailored-cv-summary',
+      '#description' => $this->t('AI-written — check before downloading. <span data-word-count-for="tailored-cv-summary">@count</span> words; keep it under about 80 to fit one page.', [
         '@count' => str_word_count($plan['summary']),
       ]),
     ];
+    $form['#attached']['library'][] = 'portfolio_core/tailored_cv';
 
     $preview['highlights'] = [
       '#type' => 'fieldset',

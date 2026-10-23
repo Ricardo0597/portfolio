@@ -1,0 +1,6 @@
+tailored_cv:
+  js:
+    js/tailored-cv.js: {}
+  dependencies:
+    - core/drupal
+    - core/once

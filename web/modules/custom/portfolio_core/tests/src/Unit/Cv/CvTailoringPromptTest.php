@@ -66,4 +66,22 @@ final class CvTailoringPromptTest extends UnitTestCase {
     }
   }
 
+  /**
+   * Droopy's tone rules also apply: no salary, plain text, English.
+   */
+  public function testStatesSalaryPlainTextAndEnglishRules(): void {
+    $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
+    foreach (['salary', 'plain text', 'English'] as $needle) {
+      $this->assertStringContainsStringIgnoringCase($needle, $prompt);
+    }
+  }
+
+  /**
+   * Availability facts are listed so the summary may use them.
+   */
+  public function testListsAvailability(): void {
+    $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
+    $this->assertStringContainsString('Availability: Immediately; Remote only; Full-time, Contract; Flexible with time zones', $prompt);
+  }
+
 }

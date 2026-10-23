@@ -47,6 +47,12 @@ trait CvFactsTrait {
           ],
         ],
       ],
+      'availability' => [
+        'available_from' => 'Immediately',
+        'work_mode' => 'Remote only',
+        'engagement_types' => ['Full-time', 'Contract'],
+        'schedule' => 'Flexible with time zones',
+      ],
       'notes' => [
         'Recently managed a full Drupal 10 to Drupal 11 migration, including the PHP version upgrade.',
         'Runs production maintenance off-hours by preference.',

@@ -82,4 +82,13 @@ final class TailoredPlanEditorTest extends UnitTestCase {
     $this->assertCount(3, $plan['jobs'][0]['bullets']);
   }
 
+  /**
+   * Owner edits get the same glyph clean-up as AI text, or the PDF prints "?".
+   */
+  public function testOwnerEditsAreNormalized(): void {
+    $plan = (new TailoredPlanEditor())->apply($this->plan(), "Drupal 10\u{2011}11  work", ["10\u{00A0}to 11", 'AI two'], [[]]);
+    $this->assertSame('Drupal 10-11 work', $plan['summary']);
+    $this->assertSame('10 to 11', $plan['highlights'][0]['text']);
+  }
+
 }

@@ -519,7 +519,9 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 
 - `/admin/portfolio/tailored-cv` (`TailoredCvForm`, permission `use tailored cv`,
   menu: Content › Tailored CV): paste a job description → AI draft → edit →
-  download `<Site-Name>-CV-<Company>.pdf`. Nothing is stored.
+  download `<Site-Name>-CV-<Company>.pdf`. Nothing is saved to content or
+  logs; the job description and draft sit only in Drupal's temporary form cache
+  (expires after 6 hours).
 - `src/Cv/`: `CvTailoringPrompt` (facts with ids j1.b2 / n1), `CvTailor`
   (uses `LlmChain`, 1,200 tokens), `TailoringPlanValidator` (drops unknown ids
   and skills, clamps, normalises glyphs dompdf lacks, flags highlight skills

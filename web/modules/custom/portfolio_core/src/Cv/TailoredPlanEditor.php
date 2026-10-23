@@ -26,11 +26,11 @@ final class TailoredPlanEditor {
    *   key 0 as the string '0'), an unticked box holds integer 0.
    */
   public function apply(array $plan, string $summary, array $highlights, array $jobs): array {
-    $plan['summary'] = trim($summary);
+    $plan['summary'] = TailoringPlanValidator::normalize($summary);
 
     $edited = [];
     foreach ($plan['highlights'] as $i => $highlight) {
-      $text = trim((string) ($highlights[$i] ?? ''));
+      $text = TailoringPlanValidator::normalize((string) ($highlights[$i] ?? ''));
       if ($text !== '') {
         $edited[] = ['text' => $text] + $highlight;
       }

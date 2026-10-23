@@ -199,4 +199,18 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertSame('Drupal 10 to 11 migration-ready', $result['highlights'][0]['text']);
   }
 
+  /**
+   * A skill label inside a longer word ("PHP" in "PHPUnit") is not a mention.
+   */
+  public function testSkillWarningMatchesWholeWordsOnly(): void {
+    $result = $this->validate($this->plan([
+      'highlights' => [
+        ['text' => 'Kept PHPUnit suites green during off-hours releases', 'source' => 'n2'],
+        ['text' => 'Ran off-hours work on Docker', 'source' => 'n2'],
+      ],
+    ]));
+    $this->assertSame([], $result['highlights'][0]['unsupported']);
+    $this->assertSame(['Docker'], $result['highlights'][1]['unsupported']);
+  }
+
 }

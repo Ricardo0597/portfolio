@@ -128,8 +128,8 @@ final class TailoringPlanValidator {
       }
       // Skills the highlight names but its cited fact doesn't: shown as a
       // warning in the preview so the owner can correct the wording.
-      $unsupported = array_values(array_filter($labels, fn($label) => mb_stripos($text, $label) !== FALSE
-        && mb_stripos($sources[$source], $label) === FALSE));
+      $unsupported = array_values(array_filter($labels, fn($label) => $this->mentions($text, $label)
+        && !$this->mentions($sources[$source], $label)));
       $kept[] = [
         'text' => $this->clamp($text, self::MAX_HIGHLIGHT),
         'source' => $source,
@@ -141,6 +141,13 @@ final class TailoringPlanValidator {
       }
     }
     return $kept;
+  }
+
+  /**
+   * Whether the text names the label as a whole word, ignoring case.
+   */
+  private function mentions(string $text, string $label): bool {
+    return (bool) preg_match('/(?<![\p{L}\p{N}])' . preg_quote($label, '/') . '(?![\p{L}\p{N}])/iu', $text);
   }
 
   /**
@@ -229,20 +236,28 @@ final class TailoringPlanValidator {
   }
 
   /**
-   * Normalises characters the PDF font lacks, then shortens the text.
+   * Replaces characters the PDF font lacks and collapses whitespace.
+   *
+   * The PDF's built-in fonts lack these glyphs (they print as "?"), so both
+   * AI text and the owner's edits go through this before rendering.
    */
-  private function clamp(string $text, int $max): string {
-    // The PDF's built-in fonts lack these glyphs (they print as "?").
+  public static function normalize(string $text): string {
     $text = strtr($text, [
       "\u{2010}" => '-',
       "\u{2011}" => '-',
       "\u{2012}" => '-',
       "\u{2212}" => '-',
       "\u{00A0}" => ' ',
-      ' \u{2192} ' => ' to ',
       "\u{2192}" => ' to ',
     ]);
-    $text = preg_replace('/\s+/u', ' ', $text);
+    return trim(preg_replace('/\s+/u', ' ', $text));
+  }
+
+  /**
+   * Normalises the text, then shortens it to at most $max characters.
+   */
+  private function clamp(string $text, int $max): string {
+    $text = self::normalize($text);
     if (mb_strlen($text) <= $max) {
       return $text;
     }

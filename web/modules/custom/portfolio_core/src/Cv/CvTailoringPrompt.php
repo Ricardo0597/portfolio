@@ -33,6 +33,17 @@ final class CvTailoringPrompt {
       $lines[] = 'Current summary: ' . $facts['bio'];
     }
 
+    $availability = $facts['availability'] ?? [];
+    $available = array_filter([
+      $availability['available_from'] ?? '',
+      $availability['work_mode'] ?? '',
+      implode(', ', $availability['engagement_types'] ?? []),
+      $availability['schedule'] ?? '',
+    ]);
+    if ($available) {
+      $lines[] = 'Availability: ' . implode('; ', $available);
+    }
+
     $skills = array_merge(...array_values($facts['skills'] ?? [[]]));
     if ($skills) {
       $lines[] = 'Skills: ' . implode(', ', $skills);
@@ -61,6 +72,7 @@ final class CvTailoringPrompt {
       'skills: exact skill labels from the Skills line, most relevant to the job first.',
       'jobs: for each job id, the bullet ids that best fit the job, most relevant first; leave out weak matches.',
       'gaps: job requirements the facts do not cover, in short phrases.',
+      'Write in English and in plain text (no Markdown). Never mention salary or rates.',
       'Answer with ONE JSON object and nothing else, exactly this shape: {"summary": "...", "highlights": [{"text": "...", "source": "n1"}], "skills": ["..."], "jobs": [{"id": "j1", "bullets": ["j1.b1"]}], "gaps": ["..."]}',
     ];
 
