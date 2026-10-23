@@ -47,8 +47,9 @@ web/themes/custom/portfolio_theme/components/**/*.map
 .DS_Store
 Thumbs.db
 
-# Next.js headless app (separate repo, cloned locally)
-nextjs/
 
 # Local secrets (LLM API keys)
 .ddev/.env
+
+# Stray lockfile written by the nodejs container
+/.ddev/nextjs/
