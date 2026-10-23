@@ -503,6 +503,8 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 - **Limits:** 10 questions/minute and 60/day per IP (core flood), question
   ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
 - Answers are rendered as text only (`textContent`), never HTML.
+- The header trash button ("Clear conversation", shown once there are messages)
+  empties the log and the stored history and brings the chips back.
 - Certifications live in `field_certifications` (link: title with year + verification URL); they feed the page, both CVs, Droopy and the Person JSON-LD `hasCredential`.
 - Skills are ordered by category term weight, then skill level (highest first), then name.
 - Availability facts live on the profile node (`field_available_from`,

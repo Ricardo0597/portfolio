@@ -215,7 +215,16 @@
     color: var(--color-text);
   }
 
-  &__close {
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  &__clear[hidden] { display: none; }
+
+  &__close,
+  &__clear {
     display: inline-flex;
     padding: var(--space-1);
     background: none;

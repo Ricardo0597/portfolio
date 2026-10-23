@@ -37,6 +37,8 @@
         const bubble = root.querySelector('.droopy__bubble');
         const log = root.querySelector('.droopy__log');
         const chips = root.querySelector('.droopy__chips');
+        const clearButton = root.querySelector('.droopy__clear');
+        const greeting = log.firstElementChild;
         const form = root.querySelector('.droopy__form');
         const input = root.querySelector('.droopy__input');
         const send = root.querySelector('.droopy__send');
@@ -181,6 +183,7 @@
           p.textContent = text;
           log.appendChild(p);
           log.scrollTop = log.scrollHeight;
+          if (clearButton) clearButton.hidden = false;
           return p;
         }
 
@@ -374,6 +377,24 @@
         if (fitToggle) {
           fitToggle.addEventListener('click', () => {
             setMode(mode === 'fit' ? 'chat' : 'fit');
+            input.focus();
+          });
+        }
+
+        // Clear: back to the greeting and chips, and forget the stored turns.
+        if (clearButton) {
+          clearButton.addEventListener('click', () => {
+            if (busy) return;
+            [...log.children].forEach((el) => {
+              if (el !== greeting) el.remove();
+            });
+            history = [];
+            store.set(HISTORY_KEY, history);
+            setMode('chat');
+            input.value = '';
+            root.classList.remove('is-error');
+            if (chips) chips.hidden = false;
+            clearButton.hidden = true;
             input.focus();
           });
         }
