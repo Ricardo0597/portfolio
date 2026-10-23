@@ -263,8 +263,29 @@
 
         // ── Asking ─────────────────────────────────────────────────
 
+        // Private shortcut: only rendered for users allowed to use the tool.
+        function openTailorTool() {
+          addMessage('user', '/tailored-cv');
+          input.value = '';
+          addMessage('bot', Drupal.t('Opening your tailored-CV tool…'));
+          const wrap = document.createElement('div');
+          wrap.className = 'droopy__actions';
+          const link = document.createElement('a');
+          link.className = 'droopy__action';
+          link.href = root.dataset.tailorUrl;
+          link.textContent = Drupal.t('Open tailored-CV tool');
+          wrap.appendChild(link);
+          log.appendChild(wrap);
+          log.scrollTop = log.scrollHeight;
+          if (chips) chips.hidden = true;
+        }
+
         async function ask(question) {
           if (busy || !question.trim()) return;
+          if (root.dataset.tailorUrl && question.trim().toLowerCase() === '/tailored-cv') {
+            openTailorTool();
+            return;
+          }
           busy = true;
           send.disabled = true;
           if (chips) chips.hidden = true;

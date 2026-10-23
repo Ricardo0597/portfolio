@@ -1,4 +1,4 @@
-<div class="droopy" data-endpoint="{{ endpoint }}" data-cv-url="{{ cv_url }}" data-email="{{ email }}">
+<div class="droopy" data-endpoint="{{ endpoint }}" data-cv-url="{{ cv_url }}" data-email="{{ email }}"{% if tailor_url %} data-tailor-url="{{ tailor_url }}"{% endif %}>
   <p class="droopy__bubble" aria-hidden="true"></p>
 
   <button type="button"

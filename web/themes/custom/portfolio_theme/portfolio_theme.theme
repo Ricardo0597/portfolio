@@ -80,5 +80,11 @@ function portfolio_theme_preprocess_page(array &$variables): void {
     if ($profile) {
       $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'], $profile->getCacheTags());
     }
+    // Hidden "/tailored-cv" shortcut, only for users who may use the tool;
+    // anonymous pages never contain the URL.
+    $variables['#cache']['contexts'][] = 'user.permissions';
+    if (\Drupal::currentUser()->hasPermission('use tailored cv')) {
+      $variables['droopy']['#props']['tailor_url'] = Url::fromRoute('portfolio_core.tailored_cv')->toString();
+    }
   }
 }

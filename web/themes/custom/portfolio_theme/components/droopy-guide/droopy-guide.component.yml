@@ -14,6 +14,9 @@ props:
     email:
       type: string
       title: 'Contact email'
+    tailor_url:
+      type: string
+      title: 'Tailored CV tool URL (set only for users with the permission)'
     chips:
       type: array
       title: 'Suggested questions (the last one switches to fit mode)'
