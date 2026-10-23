@@ -490,10 +490,16 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
   / `['gemini_api_key']`, else env vars `GROQ_API_KEY` / `GEMINI_API_KEY`.
   Locally put them in `.ddev/.env` (git-ignored) and run `ddev restart`.
 - **Services** (`src/Assistant/`): `AssistantKeys`, `AssistantContextBuilder`
-  (system prompt from profile facts, cached with profile tags),
+  (system prompt from profile facts — incl. total years, today's date and
+  `field_assistant_notes` — cached with the profile's tags plus
+  `node_list:skill` and `taxonomy_term_list:skill_category`),
   `GroqClient` / `GeminiClient` (`LlmClientInterface`), `LlmChain`
   (fallback; NULL → "napping" answer), `AnswerParser` (whitelisted
-  `[[scroll:…]]`, `[[cv]]`, `[[email]]` action tags), `AskRequestValidator`.
+  `[[scroll:…]]`, `[[cv]]`, `[[email]]` action tags, case-insensitive; strips
+  unknown/truncated tags and Markdown emphasis), `AskRequestValidator`.
+- **Models:** Groq `openai/gpt-oss-120b` with `reasoning_effort: low`; Gemini
+  `gemini-flash-lite-latest` with `thinkingConfig.thinkingLevel: low` (Gemini 3+
+  rejects `thinkingBudget`; `gemini-2.5-flash` is closed to new accounts).
 - **Limits:** 10 questions/minute and 60/day per IP (core flood), question
   ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
 - Answers are rendered as text only (`textContent`), never HTML.
@@ -505,8 +511,25 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
   assistant prompt and is never rendered on the page or the PDF CV.
 - Note: in this environment `drush cset` does not persist; change config via
   the UI, `drush php:eval`, or `config/sync` + `drush cim`.
-- The Origin check compares hosts only (proxy-safe) and lets requests without
-  an `Origin` header through; flood control is the real quota protection.
+- The Origin check compares hosts only (proxy-safe), also accepting the first
+  `X-Forwarded-Host` (tunnels such as ngrok rewrite `Host`), and lets requests
+  without an `Origin` header through; flood control is the real quota protection.
+
+### Tailored CV (private)
+
+- `/admin/portfolio/tailored-cv` (`TailoredCvForm`, permission `use tailored cv`,
+  menu: Content › Tailored CV): paste a job description → AI draft → edit →
+  download `<Site-Name>-CV-<Company>.pdf`. Nothing is stored.
+- `src/Cv/`: `CvTailoringPrompt` (facts with ids j1.b2 / n1), `CvTailor`
+  (uses `LlmChain`, 1,200 tokens), `TailoringPlanValidator` (drops unknown ids
+  and skills, clamps, normalises glyphs dompdf lacks, flags highlight skills
+  missing from their source), `TailoredCvContext` + `CvPdfGenerator` (renders the
+  profile through Entity Print's `printHtml()` under the default front-end theme).
+- `_portfolio_core_preprocess_profile_pdf()` swaps summary, skills, bullets and adds
+  highlights only while a plan is set; `portfolio_core_node_build_defaults_alter()`
+  disables the render cache for that render so public and tailored CVs never mix.
+- Droopy shortcut: logged in with the permission, typing `/tailored-cv` shows a
+  link to the tool (`tailor_url` prop + `user.permissions` cache context).
 
 **Production checklist (before enabling on a hosted site):**
 1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.

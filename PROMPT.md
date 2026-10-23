@@ -1005,6 +1005,7 @@ Track all implemented features here. Update after each phase.
 | 16 | Light/dark switch following OS preference | `theme-toggle` SDC + inline head script + Drupal behavior | — | ✅ |
 | 17 | Availability fields (start date, work mode, engagement types, schedule) shown in hero badge + Contact | List/string fields + `ProfileDataService::getAvailability()` + unit tests | — | ✅ |
 | 18 | Droopy AI guide — floating mascot answering questions about Ricardo (`POST /api/portfolio/ask`) | SDC with JS + custom JSON endpoint + provider-agnostic LLM chain (Groq → Gemini, free tiers) + flood control + unit tests | — | ✅ |
+| 19 | Tailored CV (private admin tool + logged-in `/tailored-cv` Droopy shortcut) | Multi-step Form API + LLM plan with fact-id references + validator + Entity Print render with request-scoped override + unit tests | — | ✅ |
 
 Update status to ✅ after each phase completes and passes checkpoint.
 
