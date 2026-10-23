@@ -12,6 +12,7 @@ use Drupal\node\NodeInterface;
 use Drupal\portfolio_core\Assistant\AssistantContextBuilder;
 use Drupal\portfolio_core\Cv\CvPdfGenerator;
 use Drupal\portfolio_core\Cv\CvTailor;
+use Drupal\portfolio_core\Cv\TailoredPlanEditor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -36,6 +37,7 @@ final class TailoredCvForm extends FormBase {
     protected CvPdfGenerator $pdfGenerator,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected AssistantContextBuilder $contextBuilder,
+    protected TailoredPlanEditor $planEditor,
     ConfigFactoryInterface $config_factory,
   ) {
     $this->configFactory = $config_factory;
@@ -50,6 +52,7 @@ final class TailoredCvForm extends FormBase {
       $container->get('portfolio_core.cv_pdf_generator'),
       $container->get('entity_type.manager'),
       $container->get('portfolio_core.assistant_context'),
+      $container->get('portfolio_core.tailored_plan_editor'),
       $container->get('config.factory'),
     );
   }
@@ -88,6 +91,7 @@ final class TailoredCvForm extends FormBase {
       '#type' => 'submit',
       '#value' => $plan ? $this->t('Regenerate') : $this->t('Generate draft'),
       '#submit' => ['::generateSubmit'],
+      '#limit_validation_errors' => [['job_description'], ['company']],
       '#button_type' => $plan ? 'secondary' : 'primary',
     ];
 
@@ -178,6 +182,7 @@ final class TailoredCvForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Download PDF'),
       '#submit' => ['::downloadSubmit'],
+      '#limit_validation_errors' => [['summary'], ['highlights'], ['jobs'], ['company']],
       '#button_type' => 'primary',
     ];
   }
@@ -221,30 +226,32 @@ final class TailoredCvForm extends FormBase {
       return;
     }
 
-    $plan['summary'] = trim((string) $form_state->getValue('summary'));
-    $edited = [];
-    foreach ($plan['highlights'] as $i => $highlight) {
-      $text = trim((string) $form_state->getValue(['highlights', $i]));
-      if ($text !== '') {
-        $edited[] = ['text' => $text] + $highlight;
-      }
-    }
-    $plan['highlights'] = $edited;
-    foreach ($plan['jobs'] as $j => $job) {
-      $ticked = array_filter((array) $form_state->getValue(['jobs', $j]), fn($v) => $v !== 0 && $v !== '0');
-      foreach ($job['bullets'] as $b => $bullet) {
-        $plan['jobs'][$j]['bullets'][$b]['checked'] = isset($ticked[$b]);
-      }
-    }
+    $plan = $this->planEditor->apply(
+      $plan,
+      (string) $form_state->getValue('summary'),
+      (array) $form_state->getValue('highlights'),
+      (array) $form_state->getValue('jobs'),
+    );
 
-    $input = $form_state->get('input');
-    $filename = CvPdfGenerator::filename((string) $this->config('system.site')->get('name'), (string) ($input['company'] ?? ''));
-    $response = new Response($this->pdfGenerator->generate($profile, $plan), 200, [
+    // The company field stays editable in the preview: read it now.
+    $filename = CvPdfGenerator::filename(
+      (string) $this->config('system.site')->get('name'),
+      trim((string) $form_state->getValue('company')),
+    );
+    try {
+      $pdf = $this->pdfGenerator->generate($profile, $plan);
+    }
+    catch (\Throwable $e) {
+      $this->getLogger('portfolio_core')->error('Tailored CV PDF failed: @message', ['@message' => $e->getMessage()]);
+      $this->messenger()->addError($this->t("Couldn't build the PDF, try again."));
+      $form_state->setRebuild();
+      return;
+    }
+    $form_state->setResponse(new Response($pdf, 200, [
       'Content-Type' => 'application/pdf',
       'Content-Disposition' => 'attachment; filename="' . $filename . '"',
       'Cache-Control' => 'no-store, private',
-    ]);
-    $form_state->setResponse($response);
+    ]));
   }
 
   /**

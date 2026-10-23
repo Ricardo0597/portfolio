@@ -78,3 +78,5 @@ services:
       - '@theme.manager'
       - '@theme.initialization'
       - '@config.factory'
+  portfolio_core.tailored_plan_editor:
+    class: Drupal\portfolio_core\Cv\TailoredPlanEditor
