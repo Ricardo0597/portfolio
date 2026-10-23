@@ -503,6 +503,8 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 - **Limits:** 10 questions/minute and 60/day per IP (core flood), question
   ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
 - Answers are rendered as text only (`textContent`), never HTML.
+- Certifications live in `field_certifications` (link: title with year + verification URL); they feed the page, both CVs, Droopy and the Person JSON-LD `hasCredential`.
+- Skills are ordered by category term weight, then skill level (highest first), then name.
 - Availability facts live on the profile node (`field_available_from`,
   `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
 - **Extra knowledge:** when Droopy says "I don't have information about…" for
@@ -522,7 +524,7 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
   download `<Site-Name>-CV-<Company>.pdf`. Nothing is saved to content or
   logs; the job description and draft sit only in Drupal's temporary form cache
   (expires after 6 hours).
-- `src/Cv/`: `CvTailoringPrompt` (facts with ids j1.b2 / n1), `CvTailor`
+- `src/Cv/`: `CvTailoringPrompt` (facts with ids j1.b2 / n1 / c1), `CvTailor`
   (uses `LlmChain`, 1,200 tokens), `TailoringPlanValidator` (drops unknown ids
   and skills, clamps, normalises glyphs dompdf lacks, flags highlight skills
   missing from their source), `TailoredCvContext` + `CvPdfGenerator` (renders the

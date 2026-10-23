@@ -24,7 +24,11 @@ class ProfileDataService {
   ) {}
 
   /**
-   * Returns skill nodes grouped by category, sorted alphabetically.
+   * Returns skill nodes grouped by category, strongest first.
+   *
+   * Categories follow their taxonomy weight (then name; uncategorised skills
+   * go last under "Other"); skills within a category follow their level,
+   * highest first, then name. This is the order recruiters read.
    *
    * @return array<string, list<string>>
    *   Skill labels keyed by category name.
@@ -35,15 +39,18 @@ class ProfileDataService {
       ->loadByProperties(['type' => 'skill', 'status' => 1]);
 
     $by_category = [];
+    $category_rank = [];
     foreach ($skill_nodes as $skill) {
       $terms = $skill->get('field_category')->referencedEntities();
-      $category = !empty($terms) ? $terms[0]->label() : 'Other';
-      $by_category[$category][] = $skill->label();
+      $category = !empty($terms) ? (string) $terms[0]->label() : 'Other';
+      $category_rank[$category] = !empty($terms) ? [0, (int) $terms[0]->getWeight(), $category] : [1, 0, $category];
+      $by_category[$category][] = [(int) $skill->get('field_skill_level')->value, (string) $skill->label()];
     }
 
-    ksort($by_category);
-    foreach ($by_category as &$labels) {
-      sort($labels);
+    uksort($by_category, fn($a, $b) => $category_rank[$a] <=> $category_rank[$b]);
+    foreach ($by_category as &$skills) {
+      usort($skills, fn($a, $b) => [$b[0], $a[1]] <=> [$a[0], $b[1]]);
+      $skills = array_column($skills, 1);
     }
 
     return $by_category;
