@@ -1,6 +1,8 @@
 # Portfolio
 
-Personal portfolio site built on Drupal 11. The site serves two purposes: professional presentation (bio, projects, skills, articles) and a living technical showcase where each major feature is implemented using a different Drupal pattern — the codebase itself is the portfolio.
+Personal portfolio site built on Drupal 11. The site serves two purposes: professional presentation and a living technical showcase where each major feature is implemented using a different Drupal pattern — the codebase itself is the portfolio.
+
+The public site is a single-page profile at `/` (hero, about, skills, experience, education, contact) with a downloadable PDF CV and **Droopy**, an AI guide that answers visitors' questions about Ricardo. Projects, articles, feature demos and skill pages are built but currently disabled (see [Disabled sections](#disabled-sections)).
 
 ## Tech Stack
 
@@ -11,6 +13,9 @@ Personal portfolio site built on Drupal 11. The site serves two purposes: profes
 - **Theme:** Custom (`portfolio_theme`) — no base theme, SDC components, Dart Sass, BEM
 - **Admin theme:** Gin
 - **Search:** Search API + Database backend + Facets
+- **PDF:** Entity Print + dompdf
+- **AI:** Groq (`openai/gpt-oss-120b`) with Gemini (`gemini-flash-lite-latest`) fallback — free tiers, plain HTTP via Guzzle
+- **CI:** GitHub Actions — `composer audit`, PHPUnit, phpcs (Drupal + DrupalPractice)
 - **CSS:** Custom properties (design tokens), no frameworks
 
 ## Local Setup
@@ -27,13 +32,28 @@ git clone git@github.com:Ricardo0597/portfolio.git
 cd portfolio
 ddev start
 ddev composer install
-ddev drush site:install --existing-config -y
+ddev drush site:install --existing-config --account-name=admin --account-pass=admin -y
 ddev drush cr
 ```
 
 Site will be available at **https://portfolio.ddev.site**.
 
-Default admin credentials: `admin` / `admin`
+Default admin credentials: `admin` / `admin` (local only).
+
+### AI keys (optional)
+
+Droopy and the tailored CV need at least one provider key. Keys never go in config or git — put them in `.ddev/.env` (git-ignored) and restart:
+
+```bash
+GROQ_API_KEY=...
+GEMINI_API_KEY=...
+```
+
+```bash
+ddev restart
+```
+
+Without keys Droopy still renders, but every answer is a friendly "napping" message. Set `enabled: false` in `portfolio_core.assistant` to hide it entirely.
 
 ## Common Commands
 
@@ -51,30 +71,47 @@ ddev theme-watch        # watch mode for SCSS
 
 # Expose site publicly (ngrok)
 ddev share              # expose site via ngrok tunnel, prints a public URL
+
+# Tests and coding standards (also run in CI)
+ddev exec ./vendor/bin/phpunit -c web/core web/modules/custom/portfolio_core/
+ddev exec ./vendor/bin/phpcs --standard=Drupal,DrupalPractice \
+  --extensions=php,module,inc,install,theme,yml --ignore=node_modules,*.css,*.js \
+  web/modules/custom web/themes/custom/portfolio_theme
 ```
 
 ## Project Structure
 
 ```
 portfolio/
+├── .github/workflows/ci.yml        # audit, unit tests, phpcs
 ├── config/sync/                    # Drupal config (source of truth)
+├── docs/superpowers/               # design specs and implementation plans
 ├── web/
 │   ├── modules/custom/
 │   │   └── portfolio_core/         # single custom module
+│   │       ├── src/Assistant/      # Droopy: LLM clients, fallback chain, prompt, parser, validator
+│   │       ├── src/Controller/     # AskController (POST /api/portfolio/ask)
+│   │       ├── src/Cv/             # tailored CV: prompt, plan validator, PDF generator
+│   │       ├── src/EventSubscriber/# disabled sections redirect, Entity Print CSS
+│   │       ├── src/Form/           # TailoredCvForm
 │   │       ├── src/Plugin/Block/   # CurrentSkillsBlock
 │   │       ├── src/Plugin/rest/    # Projects REST endpoint
-│   │       ├── src/EventSubscriber/# Profile redirect
-│   │       └── src/TwigExtension/  # skill_level_label, reading_time
+│   │       ├── src/Service/        # ProfileDataService
+│   │       ├── src/TwigExtension/  # skill_level_label, reading_time
+│   │       └── tests/src/Unit/     # PHPUnit unit tests
 │   └── themes/custom/
 │       └── portfolio_theme/
 │           ├── components/         # SDC components
+│           │   ├── droopy-guide/
+│           │   ├── theme-toggle/
+│           │   ├── social-links/
 │           │   ├── project-card/
 │           │   ├── skill-card/
 │           │   ├── article-teaser/
 │           │   └── feature-badge/
 │           └── scss/               # Dart Sass source
 └── .ddev/
-    └── commands/                   # custom DDEV commands
+    └── commands/web/               # theme-build, theme-watch
 ```
 
 ## Drupal Patterns Demonstrated
@@ -90,21 +127,49 @@ Each feature is an intentional showcase of a different Drupal pattern:
 | Project/Article listings | Preprocess hooks + SDC view mode templates |
 | SEO metadata | Metatag + Simple Sitemap config |
 | Headless pattern | JSON:API with filters, sparse fieldsets, includes |
-| PDF CV export | Entity Print + dompdf + `pdf` view mode + preprocess hook |
-| Structured data (node pages) | `hook_page_attachments` + JSON-LD (`SoftwareSourceCode`, `Article`) |
+| Single-page profile at `/` | Front page = profile node, anchored sections, sticky nav with scroll-spy, `social-links` SDC |
+| Disabled sections | Config-driven Event Subscriber (`portfolio_core.settings`) |
+| Availability (start date, work mode, engagement, schedule) | List/string fields + `ProfileDataService` |
+| PDF CV export (one A4 page) | Entity Print + dompdf + `pdf` view mode + preprocess hook |
+| Droopy AI guide (`POST /api/portfolio/ask`) | SDC with JS + JSON endpoint + provider-agnostic LLM chain (tagged services) + flood control + action-tag whitelist |
+| Tailored CV (private) | Multi-step Form API + LLM plan with fact-id references + validator + Entity Print render with request-scoped override |
+| Structured data (node pages) | `hook_page_attachments` + JSON-LD (`Person` with `hasCredential`, `WebSite`, `SoftwareSourceCode`, `TechArticle`) |
 | Structured data (listing pages) | `hook_views_post_render` + JSON-LD `ItemList` |
-| Light/dark mode toggle | CSS custom property token swap + `localStorage` persistence |
+| Light/dark switch | `theme-toggle` SDC + CSS custom property token swap, follows OS preference, `localStorage` persistence |
 | Mobile navigation | Animated hamburger drawer + `aria-expanded` + Drupal behavior |
 
 ## Content Types
 
 | Type | Path pattern |
 |---|---|
-| Profile | `/about` |
+| Profile | `/` (front page; `/about` 301s to `/`) |
 | Project | `/projects/[title]` |
 | Skill | `/skills/[title]` |
 | Article | `/articles/[title]` |
 | Feature Demo | `/features/[title]` |
+
+## Droopy (AI guide)
+
+A floating mascot that answers questions about Ricardo from the profile's facts (experience, skills, certifications, availability and the private "Extra knowledge for Droopy" field).
+
+- **Endpoint:** `POST /api/portfolio/ask` — question ≤ 1000 chars (6000 in job-fit mode), history ≤ 6 turns.
+- **Fallback:** providers are tried in the order set in `portfolio_core.assistant`; if all fail the visitor gets a "napping" answer with an email link.
+- **Limits:** 10 questions/minute and 60/day per IP (core flood); foreign `Origin` → 403.
+- **Safety:** answers are rendered as text only; the model can trigger UI actions only through whitelisted tags (`[[scroll:…]]`, `[[cv]]`, `[[email]]`).
+
+## Tailored CV (private)
+
+`/admin/portfolio/tailored-cv` (permission `use tailored cv`, menu: Content › Tailored CV): paste a job description → AI draft → edit summary, bullets, highlights and skills → download `<Site-Name>-CV-<Company>.pdf`. The AI may only reference existing profile facts by id; a validator drops anything unknown. Nothing is saved to content or logs. Logged-in users with the permission can also type `/tailored-cv` in Droopy for a shortcut.
+
+## Disabled sections
+
+Projects, articles, feature demos and skills redirect (302) to `/`, driven by `portfolio_core.settings` (`disabled_bundles`, `disabled_routes`). JSON:API and REST stay available, and users with `bypass node access` are not redirected. Re-enable a section by removing it from the config and running `ddev drush cim -y`.
+
+## Production checklist
+
+1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.
+2. Configure `reverse_proxy` in `settings.php` so flood control sees the visitor's IP (otherwise all visitors share one quota).
+3. Check the model ids in `portfolio_core.assistant` still exist.
 
 ## Development Notes
 
