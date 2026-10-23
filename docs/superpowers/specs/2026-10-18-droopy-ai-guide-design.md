@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-18
 **Phase:** 2 (builds on `2026-10-18-single-page-rebrand-design.md`)
-**Status:** Draft, awaiting approval
+**Status:** Implemented (merged to `main` 2026-10-19); see the drift notes at the end
 
 ## Intent
 
@@ -98,7 +98,9 @@ The hero gets a small "● Available for work" badge when
 - **Panel:** `role="dialog"` (non-modal), labelled "Ask about Ricardo";
   focus moves to the input on open, `Esc` closes and returns focus to
   Droopy; answers announced via `aria-live="polite"`. Desktop: 380px panel
-  anchored right; ≤767px: full-width bottom sheet, max 75vh.
+  anchored right; ≤767px: full-width bottom sheet, max 75dvh (75vh fallback).
+- **Job fit toggle:** a permanent "Job fit" button above the input switches
+  fit mode on and off (the fit chip below does the same).
 - **Chips** (shown before the first question): "Is he available?",
   "What's his Drupal experience?", "What has he built?", "Is he a fit for
   my role?" (switches to fit mode with a larger textarea).
@@ -119,15 +121,21 @@ Response JSON (`JsonResponse`, `Cache-Control: no-store`):
 `{ "answer": string, "actions": [{ "type": "scroll", "target": "experience" } | { "type": "cv" } | { "type": "email" }], "provider": "groq"|"gemini"|"none" }`.
 
 Limits: `question` ≤ 1,000 chars (chat) / 6,000 chars (fit); history ≤ 6
-items, each ≤ 1,000 chars; reject with 400 otherwise. Same-origin check on
-the `Origin` header (403 if foreign). Anonymous access allowed.
+items, each ≤ 1,000 chars; reject with 400 otherwise. Origin check: a present
+`Origin` header must match the request host or the first `X-Forwarded-Host`
+(host comparison only, so TLS proxies and tunnels work), else 403. Anonymous
+access allowed.
 
 **Services (DI, unit-tested):**
 
 - `AssistantContextBuilder` — builds the system prompt from
   `ProfileDataService` + profile node fields (bio, skills by category, work
   experience, education, languages, links) + availability facts. Cached
-  with the profile node's cache tags so edits apply instantly.
+  with the profile node's cache tags plus `node_list:skill` and
+  `taxonomy_term_list:skill_category` so edits apply instantly. Facts also
+  include total years of experience, the profile's `field_assistant_notes`
+  ("Extra knowledge for Droopy", one fact per line) and, added after the cache
+  read, today's date.
 - `LlmClientInterface::complete(string $system, array $messages, int $max_tokens): string`
   with `GroqClient` and `GeminiClient` (Guzzle `http_client`), each throwing
   `LlmUnavailableException` on 429/5xx/timeout (8 s).
@@ -153,7 +161,7 @@ off-topic requests politely; append action tags when relevant.
 enabled: true
 providers: [groq, gemini]
 groq_model: 'openai/gpt-oss-120b'
-gemini_model: 'gemini-2.5-flash'
+gemini_model: 'gemini-flash-lite-latest'
 max_tokens_chat: 400
 max_tokens_fit: 700
 ```
@@ -211,3 +219,37 @@ public CV data and visitor questions are sent, and the disclaimer covers it.
   message; both keys removed → napping message.
 - Both themes, 1280px and 375px, keyboard-only, reduced motion.
 - No API key in page source or network responses.
+
+## Code/doc drift found 2026-10-22
+
+Reconciled against the code while writing the external technical study.
+
+**Corrected in this spec:** status (implemented); Gemini model
+(`gemini-2.5-flash` → `gemini-flash-lite-latest`); origin check (host comparison
+plus `X-Forwarded-Host`, not an exact `scheme://host` match); facts cache tags
+and new facts (years, today's date, `field_assistant_notes`); phone sheet height
+(`75dvh`); the permanent "Job fit" toggle.
+
+**Not in the original spec, now in the code:** Groq `reasoning_effort: low` and
+`include_reasoning: false`; Gemini `thinkingConfig.thinkingLevel: low`;
+`AnswerParser` matches tags case-insensitively, strips a truncated trailing tag
+and flattens Markdown emphasis/headings; the widget renders after the footer in
+`page.html.twig`; failed (napping/429) exchanges are not stored in history and a
+400 clears stored history and retries once.
+
+**Corrected elsewhere:** `CLAUDE.md` AI Assistant section (facts and cache tags,
+model settings, `X-Forwarded-Host`).
+
+**Code issues found, not fixed:**
+- The allowed section ids are duplicated: `AnswerParser::SECTIONS` (PHP) and
+  `SECTIONS` in `droopy-guide.js`. Adding a section needs both.
+- `AssistantContextBuilder::facts()` (entity loading and caching) has no test;
+  only the pure `compose()` is unit-tested.
+- The fit chip and the "Job fit" toggle are two entry points to the same mode.
+- Prompt rules do not fully stop the model from listing job requirements that
+  are not in the facts (seen with Groq in fit mode).
+
+**Could not verify:** production hosting, reverse-proxy settings and provider
+free-tier limits (taken from provider pages and third-party summaries at design
+time, not measured).
+
