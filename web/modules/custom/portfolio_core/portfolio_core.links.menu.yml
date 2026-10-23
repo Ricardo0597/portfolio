@@ -1,0 +1,6 @@
+portfolio_core.tailored_cv:
+  title: 'Tailored CV'
+  description: 'Tailor the CV to a job description and download it as PDF.'
+  route_name: portfolio_core.tailored_cv
+  parent: system.admin_content
+  weight: 20

@@ -229,9 +229,19 @@ final class TailoringPlanValidator {
   }
 
   /**
-   * Shortens text to a maximum number of characters, at a word boundary.
+   * Normalises characters the PDF font lacks, then shortens the text.
    */
   private function clamp(string $text, int $max): string {
+    // The PDF's built-in fonts lack these glyphs (they print as "?").
+    $text = strtr($text, [
+      "\u{2010}" => '-',
+      "\u{2011}" => '-',
+      "\u{2012}" => '-',
+      "\u{2212}" => '-',
+      "\u{00A0}" => ' ',
+      ' \u{2192} ' => ' to ',
+      "\u{2192}" => ' to ',
+    ]);
     $text = preg_replace('/\s+/u', ' ', $text);
     if (mb_strlen($text) <= $max) {
       return $text;

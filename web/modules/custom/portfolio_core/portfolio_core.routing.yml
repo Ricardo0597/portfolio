@@ -9,3 +9,13 @@ portfolio_core.ask:
     _access: 'TRUE'
   options:
     no_cache: TRUE
+
+portfolio_core.tailored_cv:
+  path: '/admin/portfolio/tailored-cv'
+  defaults:
+    _form: '\Drupal\portfolio_core\Form\TailoredCvForm'
+    _title: 'Tailored CV'
+  requirements:
+    _permission: 'use tailored cv'
+  options:
+    _admin_route: TRUE

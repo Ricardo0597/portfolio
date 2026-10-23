@@ -164,5 +164,5 @@ a {
 
 // Key highlights (tailored CVs only): same list style, slightly bolder.
 .cv__highlights li {
-  font-weight: 600;
+  font-weight: bold; // dompdf's Helvetica has no 600 and would fall back to a serif
 }

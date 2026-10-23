@@ -1,0 +1,4 @@
+use tailored cv:
+  title: 'Use the tailored CV tool'
+  description: 'Generate and download CVs tailored to a job description.'
+  restrict access: true

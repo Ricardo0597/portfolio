@@ -75,10 +75,12 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
    * Unknown job and bullet ids are dropped.
    */
   public function testDropsUnknownBulletAndJobIds(): void {
-    $result = $this->validate($this->plan(['jobs' => [
+    $result = $this->validate($this->plan([
+      'jobs' => [
       ['id' => 'j1', 'bullets' => ['j1.b99', 'j1.b3', 'j2.b1']],
       ['id' => 'j9', 'bullets' => ['j9.b1']],
-    ]]));
+      ],
+    ]));
     $this->assertCount(2, $result['jobs']);
     $this->assertSame(['text' => 'Integrated Acquia DAM with Drupal.', 'checked' => TRUE], $result['jobs'][0]['bullets'][0]);
     $this->assertSame(1, array_sum(array_column($result['jobs'][0]['bullets'], 'checked')));
@@ -98,10 +100,12 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
    * Highlights citing unknown sources are dropped.
    */
   public function testDropsHighlightWithUnknownSource(): void {
-    $result = $this->validate($this->plan(['highlights' => [
+    $result = $this->validate($this->plan([
+      'highlights' => [
       ['text' => 'Ran a team of 40', 'source' => 'n9'],
       ['text' => 'No source at all'],
-    ]]));
+      ],
+    ]));
     $this->assertSame([], $result['highlights']);
   }
 
@@ -109,10 +113,12 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
    * A kept highlight carries the text of the fact it cites.
    */
   public function testHighlightGetsSourceText(): void {
-    $result = $this->validate($this->plan(['highlights' => [
+    $result = $this->validate($this->plan([
+      'highlights' => [
       ['text' => 'Led a Drupal 10 to 11 migration with a PHP upgrade', 'source' => 'n1'],
       ['text' => 'Acquia DAM integration', 'source' => 'J1.B3'],
-    ]]));
+      ],
+    ]));
     $this->assertSame('Recently managed a full Drupal 10 to Drupal 11 migration, including the PHP version upgrade.', $result['highlights'][0]['source_text']);
     $this->assertSame('j1.b3', $result['highlights'][1]['source']);
   }
@@ -167,17 +173,31 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertLessThanOrEqual(200, mb_strlen($result['gaps'][0]));
   }
 
-
   /**
    * A highlight naming a skill its source doesn't mention is flagged.
    */
   public function testFlagsSkillsMissingFromHighlightSource(): void {
-    $result = $this->validate($this->plan(['highlights' => [
+    $result = $this->validate($this->plan([
+      'highlights' => [
       ['text' => 'Maintained Drupal 11 sites on Acquia Cloud with Docker', 'source' => 'j1.b1'],
       ['text' => 'Integrated Acquia DAM with Drupal', 'source' => 'j1.b3'],
-    ]]));
+      ],
+    ]));
     $this->assertSame(['Acquia Cloud', 'Docker'], $result['highlights'][0]['unsupported']);
     $this->assertSame([], $result['highlights'][1]['unsupported']);
+  }
+
+
+  /**
+   * Typographic hyphens and arrows the PDF font lacks become plain text.
+   */
+  public function testNormalisesCharactersThePdfFontLacks(): void {
+    $result = $this->validate($this->plan([
+      'summary' => "Drupal 8\u{2011}11 sites, off\u{2010}hours work, 10 \u{2192} 11 migration.",
+      'highlights' => [['text' => "Drupal 10 \u{2192} 11 migration\u{2011}ready", 'source' => 'n1']],
+    ]));
+    $this->assertSame('Drupal 8-11 sites, off-hours work, 10 to 11 migration.', $result['summary']);
+    $this->assertSame('Drupal 10 to 11 migration-ready', $result['highlights'][0]['text']);
   }
 
 }

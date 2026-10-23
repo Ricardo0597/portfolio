@@ -75,3 +75,6 @@ services:
       - '@entity_print.print_builder'
       - '@plugin.manager.entity_print.print_engine'
       - '@portfolio_core.tailored_cv_context'
+      - '@theme.manager'
+      - '@theme.initialization'
+      - '@config.factory'
