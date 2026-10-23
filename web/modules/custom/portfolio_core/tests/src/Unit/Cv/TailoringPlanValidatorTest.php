@@ -187,7 +187,6 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertSame([], $result['highlights'][1]['unsupported']);
   }
 
-
   /**
    * Typographic hyphens and arrows the PDF font lacks become plain text.
    */
