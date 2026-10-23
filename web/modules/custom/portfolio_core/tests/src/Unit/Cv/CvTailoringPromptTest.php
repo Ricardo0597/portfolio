@@ -84,4 +84,12 @@ final class CvTailoringPromptTest extends UnitTestCase {
     $this->assertStringContainsString('Availability: Immediately; Remote only; Full-time, Contract; Flexible with time zones', $prompt);
   }
 
+  /**
+   * Certifications get citable ids.
+   */
+  public function testListsCertificationIds(): void {
+    $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
+    $this->assertStringContainsString('[c1] Certification: Acquia Certified Site Builder – Drupal 10 (2023)', $prompt);
+  }
+
 }

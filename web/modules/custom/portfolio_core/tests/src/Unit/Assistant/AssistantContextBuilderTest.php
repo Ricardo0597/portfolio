@@ -45,6 +45,12 @@ final class AssistantContextBuilderTest extends UnitTestCase {
       'education' => "Bachelor's degree in Systems Engineering — Universidad Nacional (UNA), 2016–2020",
       'languages' => ['Spanish — Native', 'English — Intermediate (B2)'],
       'links' => ['GitHub' => 'https://github.com/example'],
+      'certifications' => [
+        [
+          'title' => 'Acquia Certified Site Builder – Drupal 10 (2023)',
+          'url' => 'https://certification.acquia.com/person/certified/example',
+        ],
+      ],
       'notes' => [
         'Works in Scrum teams: sprint planning, reviews and retrospectives.',
         'Handles releases and deployments (including to Acquia Cloud).',
@@ -182,6 +188,14 @@ final class AssistantContextBuilderTest extends UnitTestCase {
     }
     $this->assertStringContainsString('120 words', $chat);
     $this->assertStringNotContainsStringIgnoringCase('verdict', $chat);
+  }
+
+  /**
+   * Certifications are listed with their verification URL.
+   */
+  public function testIncludesCertifications(): void {
+    $prompt = $this->builder()->compose($this->facts(), 'chat');
+    $this->assertStringContainsString('Certifications: Acquia Certified Site Builder – Drupal 10 (2023), verifiable at https://certification.acquia.com/person/certified/example', $prompt);
   }
 
 }

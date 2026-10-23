@@ -137,6 +137,26 @@ class ProfileDataService {
   }
 
   /**
+   * Returns the profile's certifications with their verification URLs.
+   *
+   * @return list<array{title: string, url: string}>
+   *   One entry per titled link, in field order; empty when unset or missing.
+   */
+  public function getCertifications(NodeInterface $profile): array {
+    if (!$profile->hasField('field_certifications') || $profile->get('field_certifications')->isEmpty()) {
+      return [];
+    }
+    $certifications = [];
+    foreach ($profile->get('field_certifications')->getValue() as $item) {
+      $title = trim((string) ($item['title'] ?? ''));
+      if ($title !== '') {
+        $certifications[] = ['title' => $title, 'url' => (string) ($item['uri'] ?? '')];
+      }
+    }
+    return $certifications;
+  }
+
+  /**
    * Returns a single string field value, or '' when unset or missing.
    */
   private function stringValue(NodeInterface $node, string $field_name): string {

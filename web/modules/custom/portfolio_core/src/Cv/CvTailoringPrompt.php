@@ -8,8 +8,9 @@ namespace Drupal\portfolio_core\Cv;
  * Builds the system prompt that asks an LLM for a CV tailoring plan.
  *
  * Every fact the plan may use gets a stable id (jobs j1…, bullets j1.b1…,
- * extra-knowledge lines n1…) so the answer can reference facts instead of
- * restating them; TailoringPlanValidator drops anything that doesn't exist.
+ * extra-knowledge lines n1…, certifications c1…) so the answer can reference
+ * facts instead of restating them; TailoringPlanValidator drops anything that
+ * doesn't exist.
  */
 final class CvTailoringPrompt {
 
@@ -63,11 +64,15 @@ final class CvTailoringPrompt {
       $lines[] = '[n' . ($k + 1) . '] ' . $note;
     }
 
+    foreach (array_values($facts['certifications'] ?? []) as $k => $cert) {
+      $lines[] = '[c' . ($k + 1) . '] Certification: ' . $cert['title'];
+    }
+
     $rules = [
       "You tailor {$name}'s CV to a job description the user sends. You do not write a new CV: you choose and order existing facts.",
       'Only use facts listed below; never invent employers, dates, numbers, tools or skills. Reference bullets by id (j1.b2), never retype them.',
       'summary: at most 80 words, in the same first person voice as the current summary, leading with what the job asks for that the facts support.',
-      'highlights: up to 3 short lines (at most 20 words each), each restating one listed fact, with its id in "source" (a bullet id like j1.b2 or a note id like n1). A highlight says nothing that is not in the cited fact: do not add tools, places or tasks from the job description, even if the job asks for them.',
+      'highlights: up to 3 short lines (at most 20 words each), each restating one listed fact, with its id in "source" (a bullet id like j1.b2, a note id like n1 or a certification id like c1). A highlight says nothing that is not in the cited fact: do not add tools, places or tasks from the job description, even if the job asks for them.',
       'The summary follows the same rule: every claim must be in the facts; a requirement the facts do not cover goes in gaps, not in the summary.',
       'skills: exact skill labels from the Skills line, most relevant to the job first.',
       'jobs: for each job id, the bullet ids that best fit the job, most relevant first; leave out weak matches.',

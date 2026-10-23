@@ -110,8 +110,8 @@
     </section>
   {% endif %}
 
-  {# ── Education & Languages ───────────────────────────────────── #}
-  {% if profile_edu_degree or profile_edu_institution or profile_languages %}
+  {# ── Education, Certifications & Languages ───────────────────── #}
+  {% if profile_edu_degree or profile_edu_institution or profile_certifications or profile_languages %}
     <section class="about__section" id="education" aria-labelledby="education-title">
       <h2 class="about__section-title" id="education-title">{{ 'Education'|t }}</h2>
       {% if profile_edu_degree or profile_edu_institution %}
@@ -130,6 +130,19 @@
             {{ edu_meta|join(' · ') }}
           </div>
         </div>
+      {% endif %}
+      {% if profile_certifications %}
+        <h3 class="about__subsection-title">{{ 'Certifications'|t }}</h3>
+        <ul class="about__certifications">
+          {% for cert in profile_certifications %}
+            <li class="about__certification">
+              <strong>{{ cert.title }}</strong>
+              {% if cert.url %}
+                <a class="about__certification-link" href="{{ cert.url }}" target="_blank" rel="noopener">{{ 'Verify credential'|t }}<span class="visually-hidden"> {{ cert.title }} {{ '(opens in a new tab)'|t }}</span></a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
       {% endif %}
       {% if profile_languages %}
         <h3 class="about__subsection-title">{{ 'Languages'|t }}</h3>

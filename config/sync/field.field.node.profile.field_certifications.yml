@@ -1,0 +1,23 @@
+uuid: f5cb7e73-bcb0-4cef-8db3-0b01bd13c464
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_certifications
+    - node.type.profile
+  module:
+    - link
+id: node.profile.field_certifications
+field_name: field_certifications
+entity_type: node
+bundle: profile
+label: Certifications
+description: 'One per certification: the title with its year, e.g. "Acquia Certified Site Builder – Drupal 10 (2023)", and its public verification URL.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 2
+  link_type: 16
+field_type: link

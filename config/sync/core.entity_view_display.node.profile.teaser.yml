@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.profile.field_assistant_notes
     - field.field.node.profile.field_available_from
     - field.field.node.profile.field_bio
+    - field.field.node.profile.field_certifications
     - field.field.node.profile.field_cv_file
     - field.field.node.profile.field_drupalorg_url
     - field.field.node.profile.field_edu_degree
@@ -57,6 +58,7 @@ hidden:
   field_assistant_notes: true
   field_available_from: true
   field_bio: true
+  field_certifications: true
   field_cv_file: true
   field_drupalorg_url: true
   field_edu_degree: true

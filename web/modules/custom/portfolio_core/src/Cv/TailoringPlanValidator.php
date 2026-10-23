@@ -96,7 +96,7 @@ final class TailoringPlanValidator {
   }
 
   /**
-   * Maps every citable id (j1.b1, n1) to its fact text.
+   * Maps every citable id (j1.b1, n1, c1) to its fact text.
    *
    * @return array<string, string>
    *   Fact text keyed by lowercase id.
@@ -110,6 +110,9 @@ final class TailoringPlanValidator {
     }
     foreach (array_values($facts['notes'] ?? []) as $k => $note) {
       $sources['n' . ($k + 1)] = $note;
+    }
+    foreach (array_values($facts['certifications'] ?? []) as $k => $cert) {
+      $sources['c' . ($k + 1)] = $cert['title'];
     }
     return $sources;
   }

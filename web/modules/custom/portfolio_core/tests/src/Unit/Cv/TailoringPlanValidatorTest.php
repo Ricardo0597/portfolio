@@ -213,4 +213,14 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertSame(['Docker'], $result['highlights'][1]['unsupported']);
   }
 
+  /**
+   * A highlight may cite a certification.
+   */
+  public function testHighlightMayCiteCertification(): void {
+    $result = $this->validate($this->plan([
+      'highlights' => [['text' => 'Acquia Certified Site Builder for Drupal 10', 'source' => 'c1']],
+    ]));
+    $this->assertSame('Acquia Certified Site Builder – Drupal 10 (2023)', $result['highlights'][0]['source_text']);
+  }
+
 }

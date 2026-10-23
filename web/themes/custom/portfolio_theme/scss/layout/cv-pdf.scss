@@ -149,6 +149,28 @@ a {
   color: #555;
 }
 
+// ── Education · Certifications · Languages row ──────────────
+
+.cv__extras {
+  width: 100%;
+  border-collapse: collapse;
+  page-break-inside: avoid;
+}
+
+.cv__extras-col {
+  vertical-align: top;
+  width: 26%;
+  padding: 0 10pt 0 0;
+
+  &--wide {
+    width: 37%;
+  }
+
+  &:last-child {
+    padding-right: 0;
+  }
+}
+
 // ── Languages ─────────────────────────────────────────────────
 
 .cv__languages {

@@ -47,6 +47,12 @@ trait CvFactsTrait {
           ],
         ],
       ],
+      'certifications' => [
+        [
+          'title' => 'Acquia Certified Site Builder – Drupal 10 (2023)',
+          'url' => 'https://certification.acquia.com/person/certified/example',
+        ],
+      ],
       'availability' => [
         'available_from' => 'Immediately',
         'work_mode' => 'Remote only',

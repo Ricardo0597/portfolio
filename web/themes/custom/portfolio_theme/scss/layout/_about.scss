@@ -253,6 +253,33 @@
     }
   }
 
+  // ── Certifications ─────────────────────────────────────────────
+
+  &__certifications {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__certification {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+  }
+
+  &__certification-link {
+    font-size: var(--text-sm);
+    color: var(--color-highlight);
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
   // ── Languages ──────────────────────────────────────────────────
 
   &__languages {

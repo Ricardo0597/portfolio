@@ -45,8 +45,8 @@ class AssistantContextBuilder {
    *
    * @param array $facts
    *   Keys: name, title, years, today, location, email, bio, skills,
-   *   experience, education, languages, links, availability (see
-   *   ProfileDataService shapes), notes (list of extra facts).
+   *   experience, education, languages, links, certifications, availability
+   *   (see ProfileDataService shapes), notes (list of extra facts).
    * @param string $mode
    *   Either 'chat' or 'fit'.
    */
@@ -86,6 +86,10 @@ class AssistantContextBuilder {
     }
     $add('Education', $facts['education'] ?? '');
     $add('Languages', implode(', ', $facts['languages'] ?? []));
+    $add('Certifications', implode('; ', array_map(
+      fn(array $cert): string => $cert['title'] . ($cert['url'] !== '' ? ', verifiable at ' . $cert['url'] : ''),
+      $facts['certifications'] ?? [],
+    )));
     foreach ($facts['links'] ?? [] as $label => $url) {
       $add($label, $url);
     }
@@ -156,6 +160,7 @@ class AssistantContextBuilder {
         ? array_map(fn($item) => (string) $item->value, iterator_to_array($profile->get('field_languages')))
         : [],
       'links' => $links,
+      'certifications' => $this->profileData->getCertifications($profile),
       'availability' => $this->profileData->getAvailability($profile),
       // Owner-written extra knowledge, one fact per line (never on the page).
       'notes' => preg_split('/\R/', $value('field_assistant_notes'), -1, PREG_SPLIT_NO_EMPTY),

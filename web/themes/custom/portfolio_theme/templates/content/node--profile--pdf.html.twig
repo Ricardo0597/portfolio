@@ -100,38 +100,53 @@
     </div>
   {% endif %}
 
-  {# ── EDUCATION ───────────────────────────────────────────── #}
-  {% if profile_edu_degree or profile_edu_institution %}
-    <div class="cv__section">
-      <h2 class="cv__section-title">Education</h2>
-      <div class="cv__edu-item">
-        <div class="cv__edu-header">
-          {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
-          {% if profile_edu_institution %} — {{ profile_edu_institution }}{% endif %}
-        </div>
-        <div class="cv__edu-meta">
-          {%- set edu_meta = [] -%}
-          {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
-          {%- if profile_edu_start_year -%}
-            {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
-            {%- set edu_meta = edu_meta|merge([year_range]) -%}
-          {%- endif -%}
-          {{ edu_meta|join(' | ') }}
-        </div>
-      </div>
-    </div>
-  {% endif %}
-
-  {# ── LANGUAGES ───────────────────────────────────────────── #}
-  {% if profile_languages %}
-    <div class="cv__section">
-      <h2 class="cv__section-title">Languages</h2>
-      <ul class="cv__languages">
-        {% for lang in profile_languages %}
-          <li>{{ lang }}</li>
-        {% endfor %}
-      </ul>
-    </div>
+  {# ── EDUCATION · CERTIFICATIONS · LANGUAGES (one row) ───── #}
+  {# A table: dompdf lays out table cells reliably, unlike floats or flex. #}
+  {% if profile_edu_degree or profile_edu_institution or profile_certifications or profile_languages %}
+    <table class="cv__extras">
+      <tr>
+        {% if profile_edu_degree or profile_edu_institution %}
+          <td class="cv__extras-col cv__extras-col--wide">
+            <h2 class="cv__section-title">Education</h2>
+            <div class="cv__edu-item">
+              <div class="cv__edu-header">
+                {% if profile_edu_degree %}<strong>{{ profile_edu_degree }}</strong>{% endif %}
+                {% if profile_edu_institution %} — {{ profile_edu_institution }}{% endif %}
+              </div>
+              <div class="cv__edu-meta">
+                {%- set edu_meta = [] -%}
+                {%- if profile_edu_location -%}{%- set edu_meta = edu_meta|merge([profile_edu_location]) -%}{%- endif -%}
+                {%- if profile_edu_start_year -%}
+                  {%- set year_range = profile_edu_start_year ~ (profile_edu_end_year ? ' – ' ~ profile_edu_end_year : '') -%}
+                  {%- set edu_meta = edu_meta|merge([year_range]) -%}
+                {%- endif -%}
+                {{ edu_meta|join(' | ') }}
+              </div>
+            </div>
+          </td>
+        {% endif %}
+        {% if profile_certifications %}
+          <td class="cv__extras-col cv__extras-col--wide">
+            <h2 class="cv__section-title">Certifications</h2>
+            <ul class="cv__languages">
+              {% for cert in profile_certifications %}
+                <li>{% if cert.url %}<a href="{{ cert.url }}">{{ cert.title }}</a>{% else %}{{ cert.title }}{% endif %}</li>
+              {% endfor %}
+            </ul>
+          </td>
+        {% endif %}
+        {% if profile_languages %}
+          <td class="cv__extras-col">
+            <h2 class="cv__section-title">Languages</h2>
+            <ul class="cv__languages">
+              {% for lang in profile_languages %}
+                <li>{{ lang }}</li>
+              {% endfor %}
+            </ul>
+          </td>
+        {% endif %}
+      </tr>
+    </table>
   {% endif %}
 
 </div>

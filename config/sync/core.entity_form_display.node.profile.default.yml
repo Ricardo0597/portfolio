@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.profile.field_assistant_notes
     - field.field.node.profile.field_available_from
     - field.field.node.profile.field_bio
+    - field.field.node.profile.field_certifications
     - field.field.node.profile.field_cv_file
     - field.field.node.profile.field_drupalorg_url
     - field.field.node.profile.field_edu_degree
@@ -78,6 +79,14 @@ content:
     settings:
       rows: 12
       placeholder: ''
+    third_party_settings: {  }
+  field_certifications:
+    type: link_default
+    weight: 41
+    region: content
+    settings:
+      placeholder_url: 'https://certification.acquia.com/…'
+      placeholder_title: 'Acquia Certified Site Builder – Drupal 10 (2023)'
     third_party_settings: {  }
   field_cv_file:
     type: file_generic
