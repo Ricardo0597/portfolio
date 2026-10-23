@@ -28,9 +28,12 @@ final class TailoringPlanValidator {
    *   Facts as returned by AssistantContextBuilder::facts().
    *
    * @return array
-   *   Keys: summary, highlights (text, source, source_text, unsupported:
-   *   skill labels named in the text but not in the cited fact), skills
-   *   (category => labels), jobs (index, bullets: text + checked), gaps.
+   *   Keys: summary, warnings (codes for the preview: 'pronouns' when the
+   *   summary uses personal pronouns, 'years' when it omits the years figure),
+   *   highlights (text, source, source_text, unsupported: skill labels named
+   *   in the text but not in the cited fact; never a bullet that prints),
+   *   skills (category => list of label + checked), jobs (index, bullets:
+   *   text + checked), gaps.
    *
    * @throws \InvalidArgumentException
    *   When no JSON object can be read or the summary is empty.
@@ -43,12 +46,26 @@ final class TailoringPlanValidator {
     }
 
     $sources = $this->sources($facts);
+    $jobs = $this->jobs($plan['jobs'] ?? [], $facts['experience'] ?? []);
+    // Bullets that already print: a highlight restating one would repeat it.
+    $printed = [];
+    foreach ($jobs as $job) {
+      foreach ($job['bullets'] as $bullet) {
+        if ($bullet['checked']) {
+          $printed[$bullet['text']] = TRUE;
+        }
+      }
+    }
+    $summary = $this->clamp($summary, self::MAX_SUMMARY);
 
     return [
-      'summary' => $this->clamp($summary, self::MAX_SUMMARY),
-      'highlights' => $this->highlights($plan['highlights'] ?? [], $sources, $facts['skills'] ?? []),
+      'summary' => $summary,
+      'warnings' => $this->warnings($summary, (string) ($facts['years'] ?? '')),
+      'highlights' => $this->highlights($plan['highlights'] ?? [], array_diff_key($sources, array_filter(
+        $sources, fn(string $text) => isset($printed[$text]),
+      )), $facts['skills'] ?? []),
       'skills' => $this->skills($plan['skills'] ?? [], $facts['skills'] ?? []),
-      'jobs' => $this->jobs($plan['jobs'] ?? [], $facts['experience'] ?? []),
+      'jobs' => $jobs,
       'gaps' => $this->gaps($plan['gaps'] ?? []),
     ];
   }
@@ -155,11 +172,15 @@ final class TailoringPlanValidator {
 
   /**
    * Reorders skill categories and labels by the plan's priority list.
+   *
+   * Chosen skills are ticked and lead; the rest follow unticked. When the plan
+   * picks no known skill, every skill stays ticked.
    */
   private function skills(mixed $chosen, array $by_category): array {
+    $known = array_flip(array_merge(...array_values($by_category ?: [[]])));
     $rank = [];
     foreach (is_array($chosen) ? $chosen : [] as $label) {
-      if (is_string($label) && !isset($rank[$label])) {
+      if (is_string($label) && isset($known[$label]) && !isset($rank[$label])) {
         $rank[$label] = count($rank);
       }
     }
@@ -170,14 +191,34 @@ final class TailoringPlanValidator {
       usort($picked, fn($a, $b) => $rank[$a] <=> $rank[$b]);
       $rest = array_values(array_filter($labels, fn($l) => !isset($rank[$l])));
       $ordered[$category] = [
-        'labels' => array_merge($picked, $rest),
+        'skills' => array_merge(
+          array_map(fn($l) => ['label' => $l, 'checked' => TRUE], $picked),
+          array_map(fn($l) => ['label' => $l, 'checked' => !$rank], $rest),
+        ),
         'first' => $picked ? $rank[$picked[0]] : PHP_INT_MAX,
       ];
     }
     // Stable sort: categories without chosen skills keep their order.
     uasort($ordered, fn($a, $b) => $a['first'] <=> $b['first']);
 
-    return array_map(fn($c) => $c['labels'], $ordered);
+    return array_map(fn($c) => $c['skills'], $ordered);
+  }
+
+  /**
+   * Flags what the owner should fix in the summary before downloading.
+   *
+   * @return list<string>
+   *   'pronouns' and/or 'years'.
+   */
+  private function warnings(string $summary, string $years): array {
+    $warnings = [];
+    if (preg_match('/\b(?:I|I\'m|I\'ve|me|my|myself|he|his|him)\b/i', $summary)) {
+      $warnings[] = 'pronouns';
+    }
+    if ($years !== '' && !preg_match('/\b' . preg_quote($years, '/') . '\+?\s*(?:years?|yrs)\b/i', $summary)) {
+      $warnings[] = 'years';
+    }
+    return $warnings;
   }
 
   /**

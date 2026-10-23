@@ -113,6 +113,11 @@ final class TailoredCvForm extends FormBase {
     ];
     $preview = &$form['preview'];
 
+    $messages = [
+      'pronouns' => $this->t('Warning: the summary uses personal pronouns (I, my, he…); CVs usually leave them out.'),
+      'years' => $this->t('Warning: the summary does not state your years of experience.'),
+    ];
+    $warnings = array_intersect_key($messages, array_flip($plan['warnings'] ?? []));
     $preview['summary'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Professional summary'),
@@ -121,8 +126,9 @@ final class TailoredCvForm extends FormBase {
       '#maxlength' => 600,
       '#required' => TRUE,
       '#id' => 'tailored-cv-summary',
-      '#description' => $this->t('AI-written — check before downloading. <span data-word-count-for="tailored-cv-summary">@count</span> words; keep it under about 80 to fit one page.', [
+      '#description' => $this->t('AI-written — check before downloading. <span data-word-count-for="tailored-cv-summary">@count</span> words; keep it under about 80 to fit one page. @warnings', [
         '@count' => str_word_count($plan['summary']),
+        '@warnings' => implode(' ', array_map('strval', $warnings)),
       ]),
     ];
     $form['#attached']['library'][] = 'portfolio_core/tailored_cv';
@@ -151,14 +157,19 @@ final class TailoredCvForm extends FormBase {
     }
 
     $preview['skills'] = [
-      '#theme' => 'item_list',
-      '#title' => $this->t('Skills, most relevant first'),
-      '#items' => array_map(
-        fn(string $category, array $labels): string => $category . ': ' . implode(', ', $labels),
-        array_keys($plan['skills']),
-        $plan['skills'],
-      ),
+      '#type' => 'fieldset',
+      '#title' => $this->t('Skills'),
+      '#description' => $this->t('Ticked skills print, in this order. The AI ticks the ones that matter for this job.'),
+      '#tree' => TRUE,
     ];
+    foreach (array_values($plan['skills']) as $c => $skills) {
+      $preview['skills'][$c] = [
+        '#type' => 'checkboxes',
+        '#title' => array_keys($plan['skills'])[$c],
+        '#options' => array_column($skills, 'label'),
+        '#default_value' => array_keys(array_filter(array_column($skills, 'checked'))),
+      ];
+    }
 
     $experience = $this->contextBuilder->facts()['experience'] ?? [];
     $preview['jobs'] = ['#tree' => TRUE];
@@ -184,7 +195,7 @@ final class TailoredCvForm extends FormBase {
       '#type' => 'submit',
       '#value' => $this->t('Download PDF'),
       '#submit' => ['::downloadSubmit'],
-      '#limit_validation_errors' => [['summary'], ['highlights'], ['jobs'], ['company']],
+      '#limit_validation_errors' => [['summary'], ['highlights'], ['skills'], ['jobs'], ['company']],
       '#button_type' => 'primary',
     ];
   }
@@ -233,6 +244,7 @@ final class TailoredCvForm extends FormBase {
       (string) $form_state->getValue('summary'),
       (array) $form_state->getValue('highlights'),
       (array) $form_state->getValue('jobs'),
+      (array) $form_state->getValue('skills'),
     );
 
     // The company field stays editable in the preview: read it now.
