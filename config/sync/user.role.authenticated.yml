@@ -4,10 +4,12 @@ status: true
 dependencies:
   config:
     - filter.format.basic_html
+    - rest.resource.portfolio_projects
   module:
     - comment
     - file
     - filter
+    - rest
     - search
     - shortcut
     - system
@@ -23,6 +25,7 @@ permissions:
   - 'access shortcuts'
   - 'delete own files'
   - 'post comments'
+  - 'restful get portfolio_projects'
   - 'search content'
   - 'skip comment approval'
   - 'use text format basic_html'
