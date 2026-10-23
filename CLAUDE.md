@@ -440,7 +440,6 @@ facets
 restui
 serialization
 hal
-basic_auth
 decoupled_router
 ```
 
@@ -449,10 +448,15 @@ decoupled_router
 ```
 rest
 serialization
-basic_auth
 jsonapi
 contact
 ```
+
+`basic_auth` is deliberately **not** installed: nothing uses it, and every
+request carrying credentials is a login attempt. The core node REST resource
+(`rest.resource.entity.node`) is GET-only with cookie auth and `method`
+granularity — with `resource` granularity core exposes POST/PATCH/DELETE
+routes regardless of the `methods` list.
 
 ---
 
@@ -541,12 +545,18 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 
 **Production checklist (before enabling on a hosted site):**
 1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.
-2. Configure the reverse proxy in `settings.php` so `getClientIp()` returns
-   the visitor's IP; otherwise every visitor shares one flood bucket
-   (10/min, 60/day for the whole site):
+2. Set `REVERSE_PROXY_ADDRESSES` (comma-separated proxy IPs/CIDRs) on the host
+   so `getClientIp()` returns the visitor's IP; otherwise every visitor shares
+   one flood bucket (10/min, 60/day for the whole site). The local
+   `settings.php` reads it and sets `reverse_proxy` /
+   `reverse_proxy_addresses`; `settings.php` is git-ignored, so the host's
+   copy needs the same block (Acquia's settings include configures this itself):
    ```php
-   $settings['reverse_proxy'] = TRUE;
-   $settings['reverse_proxy_addresses'] = ['<load balancer IPs>'];
+   $reverse_proxy_addresses = array_filter(array_map('trim', explode(',', (string) getenv('REVERSE_PROXY_ADDRESSES'))));
+   if ($reverse_proxy_addresses) {
+     $settings['reverse_proxy'] = TRUE;
+     $settings['reverse_proxy_addresses'] = $reverse_proxy_addresses;
+   }
    ```
 3. Verify the model ids in `portfolio_core.assistant` still exist.
 4. Until keys exist, `enabled: true` shows Droopy but every answer is the

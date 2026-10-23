@@ -168,7 +168,7 @@ Projects, articles, feature demos and skills redirect (302) to `/`, driven by `p
 ## Production checklist
 
 1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.
-2. Configure `reverse_proxy` in `settings.php` so flood control sees the visitor's IP (otherwise all visitors share one quota).
+2. Set `REVERSE_PROXY_ADDRESSES` (comma-separated proxy IPs/CIDRs) so flood control sees the visitor's IP (otherwise all visitors share one quota). `settings.php` is git-ignored: the host's copy needs the env-driven `reverse_proxy` block shown in CLAUDE.md.
 3. Check the model ids in `portfolio_core.assistant` still exist.
 
 ## Development Notes
