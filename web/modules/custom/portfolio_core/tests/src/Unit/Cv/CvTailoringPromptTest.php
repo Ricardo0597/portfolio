@@ -59,7 +59,7 @@ final class CvTailoringPromptTest extends UnitTestCase {
       '"skills"',
       '"jobs"',
       '"gaps"',
-      'first person',
+      'no personal pronouns',
     ];
     foreach ($needles as $needle) {
       $this->assertStringContainsStringIgnoringCase($needle, $prompt);
@@ -90,6 +90,17 @@ final class CvTailoringPromptTest extends UnitTestCase {
   public function testListsCertificationIds(): void {
     $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
     $this->assertStringContainsString('[c1] Certification: Acquia Certified Site Builder – Drupal 10 (2023)', $prompt);
+  }
+
+  /**
+   * Rules for years in the summary, non-repeating highlights and skills.
+   */
+  public function testStatesYearsHighlightAndSkillRules(): void {
+    $prompt = (new CvTailoringPrompt())->compose($this->cvFacts());
+    foreach (['total years', 'never cite a bullet id you also list in jobs', 'leave out skills unrelated'] as $needle) {
+      $this->assertStringContainsStringIgnoringCase($needle, $prompt);
+    }
+    $this->assertStringNotContainsStringIgnoringCase('first person', $prompt);
   }
 
 }

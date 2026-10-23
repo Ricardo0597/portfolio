@@ -527,7 +527,9 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 - `src/Cv/`: `CvTailoringPrompt` (facts with ids j1.b2 / n1 / c1), `CvTailor`
   (uses `LlmChain`, 1,200 tokens), `TailoringPlanValidator` (drops unknown ids
   and skills, clamps, normalises glyphs dompdf lacks, flags highlight skills
-  missing from their source), `TailoredCvContext` + `CvPdfGenerator` (renders the
+  missing from their source, drops highlights that repeat a printed bullet, flags
+  summaries with pronouns or no years figure; skills come back ticked/unticked
+  for the preview checkboxes), `TailoredCvContext` + `CvPdfGenerator` (renders the
   profile through Entity Print's `printHtml()` under the default front-end theme).
 - `_portfolio_core_preprocess_profile_pdf()` swaps summary, skills, bullets and adds
   highlights only while a plan is set; `portfolio_core_node_build_defaults_alter()`

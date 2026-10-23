@@ -91,7 +91,7 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
    */
   public function testDropsUnknownSkills(): void {
     $result = $this->validate($this->plan(['skills' => ['Kubernetes', 'PHP']]));
-    $all = array_merge(...array_values($result['skills']));
+    $all = array_column(array_merge(...array_values($result['skills'])), 'label');
     $this->assertNotContains('Kubernetes', $all);
     $this->assertSame('PHP', $all[0]);
   }
@@ -118,6 +118,7 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
       ['text' => 'Led a Drupal 10 to 11 migration with a PHP upgrade', 'source' => 'n1'],
       ['text' => 'Acquia DAM integration', 'source' => 'J1.B3'],
       ],
+      'jobs' => [['id' => 'j1', 'bullets' => ['j1.b1']]],
     ]));
     $this->assertSame('Recently managed a full Drupal 10 to Drupal 11 migration, including the PHP version upgrade.', $result['highlights'][0]['source_text']);
     $this->assertSame('j1.b3', $result['highlights'][1]['source']);
@@ -150,9 +151,9 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
   public function testSkillsReorderedAcrossAndWithinCategories(): void {
     $result = $this->validate($this->plan(['skills' => ['Acquia Cloud', 'Twig', 'PHP']]));
     $this->assertSame([
-      'DevOps' => ['Acquia Cloud', 'Docker'],
-      'CMS' => ['Twig', 'Drupal'],
-      'Backend' => ['PHP', 'MySQL'],
+      'DevOps' => [['label' => 'Acquia Cloud', 'checked' => TRUE], ['label' => 'Docker', 'checked' => FALSE]],
+      'CMS' => [['label' => 'Twig', 'checked' => TRUE], ['label' => 'Drupal', 'checked' => FALSE]],
+      'Backend' => [['label' => 'PHP', 'checked' => TRUE], ['label' => 'MySQL', 'checked' => FALSE]],
     ], $result['skills']);
   }
 
@@ -182,6 +183,7 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
       ['text' => 'Maintained Drupal 11 sites on Acquia Cloud with Docker', 'source' => 'j1.b1'],
       ['text' => 'Integrated Acquia DAM with Drupal', 'source' => 'j1.b3'],
       ],
+      'jobs' => [['id' => 'j1', 'bullets' => ['j1.b2']]],
     ]));
     $this->assertSame(['Acquia Cloud', 'Docker'], $result['highlights'][0]['unsupported']);
     $this->assertSame([], $result['highlights'][1]['unsupported']);
@@ -221,6 +223,46 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
       'highlights' => [['text' => 'Acquia Certified Site Builder for Drupal 10', 'source' => 'c1']],
     ]));
     $this->assertSame('Acquia Certified Site Builder – Drupal 10 (2023)', $result['highlights'][0]['source_text']);
+  }
+
+  /**
+   * Without any valid skill picks, every skill stays ticked.
+   */
+  public function testNoSkillPicksKeepsAllSkillsChecked(): void {
+    $result = $this->validate($this->plan(['skills' => ['Cobol']]));
+    $this->assertSame([TRUE, TRUE], array_column($result['skills']['CMS'], 'checked'));
+    $this->assertSame([TRUE, TRUE], array_column($result['skills']['Backend'], 'checked'));
+  }
+
+  /**
+   * A highlight citing a bullet that already prints would repeat it.
+   */
+  public function testHighlightCitingTickedBulletIsDropped(): void {
+    $result = $this->validate($this->plan([
+      'jobs' => [['id' => 'j1', 'bullets' => ['j1.b2']]],
+      'highlights' => [
+        ['text' => 'Ran DDEV environments', 'source' => 'j1.b2'],
+        ['text' => 'Integrated Acquia DAM', 'source' => 'j1.b3'],
+        ['text' => 'Drupal 8 sites', 'source' => 'j2.b1'],
+      ],
+    ]));
+    $this->assertSame(['j1.b3'], array_column($result['highlights'], 'source'));
+  }
+
+  /**
+   * Pronouns and a missing years figure are flagged for the preview.
+   */
+  public function testWarnsAboutPronounsAndMissingYears(): void {
+    $result = $this->validate($this->plan(['summary' => 'I build Drupal sites and my focus is Acquia Cloud.']));
+    $this->assertSame(['pronouns', 'years'], $result['warnings']);
+  }
+
+  /**
+   * A CV-style summary with the years figure has no warnings.
+   */
+  public function testCvStyleSummaryHasNoWarnings(): void {
+    $result = $this->validate($this->plan(['summary' => 'Drupal engineer with 7+ years of experience on Acquia Cloud.']));
+    $this->assertSame([], $result['warnings']);
   }
 
 }

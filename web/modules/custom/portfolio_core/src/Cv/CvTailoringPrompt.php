@@ -71,10 +71,10 @@ final class CvTailoringPrompt {
     $rules = [
       "You tailor {$name}'s CV to a job description the user sends. You do not write a new CV: you choose and order existing facts.",
       'Only use facts listed below; never invent employers, dates, numbers, tools or skills. Reference bullets by id (j1.b2), never retype them.',
-      'summary: at most 80 words, in the same first person voice as the current summary, leading with what the job asks for that the facts support.',
-      'highlights: up to 3 short lines (at most 20 words each), each restating one listed fact, with its id in "source" (a bullet id like j1.b2, a note id like n1 or a certification id like c1). A highlight says nothing that is not in the cited fact: do not add tools, places or tasks from the job description, even if the job asks for them.',
+      'summary: at most 80 words in CV style with no personal pronouns (never I, me, my, he or his): start with the role, state the total years of experience (for example "Drupal engineer with 7+ years of experience"), then lead with what the job asks for that the facts support.',
+      'highlights: up to 3 short lines (at most 20 words each), each restating one listed fact, with its id in "source" (a bullet id like j1.b2, a note id like n1 or a certification id like c1). Highlights must add something the printed bullets do not already say: never cite a bullet id you also list in jobs, and prefer notes and certifications relevant to the job. A highlight says nothing that is not in the cited fact: do not add tools, places or tasks from the job description, even if the job asks for them.',
       'The summary follows the same rule: every claim must be in the facts; a requirement the facts do not cover goes in gaps, not in the summary.',
-      'skills: exact skill labels from the Skills line, most relevant to the job first.',
+      'skills: exact skill labels from the Skills line that matter for the job, most relevant first; leave out skills unrelated to the job.',
       'jobs: for each job id, the bullet ids that best fit the job, most relevant first; leave out weak matches.',
       'gaps: job requirements the facts do not cover, in short phrases.',
       'Write in English and in plain text (no Markdown). Never mention salary or rates.',

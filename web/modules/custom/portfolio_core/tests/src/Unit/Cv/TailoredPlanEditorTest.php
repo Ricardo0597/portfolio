@@ -26,7 +26,10 @@ final class TailoredPlanEditorTest extends UnitTestCase {
         ['text' => 'AI one', 'source' => 'n1', 'source_text' => 'Fact one', 'unsupported' => []],
         ['text' => 'AI two', 'source' => 'n2', 'source_text' => 'Fact two', 'unsupported' => []],
       ],
-      'skills' => ['CMS' => ['Drupal']],
+      'skills' => [
+        'CMS' => [['label' => 'Drupal', 'checked' => TRUE], ['label' => 'Twig', 'checked' => TRUE]],
+        'DevOps' => [['label' => 'Docker', 'checked' => FALSE]],
+      ],
       'jobs' => [[
         'index' => 0,
         'bullets' => [
@@ -89,6 +92,16 @@ final class TailoredPlanEditorTest extends UnitTestCase {
     $plan = (new TailoredPlanEditor())->apply($this->plan(), "Drupal 10\u{2011}11  work", ["10\u{00A0}to 11", 'AI two'], [[]]);
     $this->assertSame('Drupal 10-11 work', $plan['summary']);
     $this->assertSame('10 to 11', $plan['highlights'][0]['text']);
+  }
+
+  /**
+   * Ticked skills print in order; categories left empty are dropped.
+   */
+  public function testSkillTicksBecomeLabelLists(): void {
+    // Checkboxes per category, by index: ticked = key as string.
+    $skills = [0 => [0 => '0', 1 => 0], 1 => [0 => 0]];
+    $plan = (new TailoredPlanEditor())->apply($this->plan(), 'Mine', ['AI one', 'AI two'], [[]], $skills);
+    $this->assertSame(['CMS' => ['Drupal']], $plan['skills']);
   }
 
 }
