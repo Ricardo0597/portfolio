@@ -21,7 +21,9 @@ module.exports = defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'phone', use: { ...devices['Pixel 7'] } },
+    // Logs in once as the owner for the tests that need a session.
+    { name: 'setup', testMatch: /owner\.setup\.js/ },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] }, dependencies: ['setup'] },
+    { name: 'phone', use: { ...devices['Pixel 7'] }, dependencies: ['setup'] },
   ],
 });

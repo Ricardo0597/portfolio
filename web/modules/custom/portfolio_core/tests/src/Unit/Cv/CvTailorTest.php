@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\portfolio_core\Unit\Cv;
 
+use Drupal\Core\Flood\FloodInterface;
 use Drupal\portfolio_core\Assistant\AssistantContextBuilder;
 use Drupal\portfolio_core\Assistant\LlmChain;
 use Drupal\portfolio_core\Assistant\LlmResult;
 use Drupal\portfolio_core\Cv\CvTailor;
 use Drupal\portfolio_core\Cv\CvTailoringPrompt;
+use Drupal\portfolio_core\Cv\TailoringLimitException;
 use Drupal\portfolio_core\Cv\TailoringPlanValidator;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -26,7 +28,7 @@ final class CvTailorTest extends UnitTestCase {
   /**
    * Builds the service with a chain that returns the given answer.
    */
-  private function tailor(?string $answer, ?array &$sent = NULL): CvTailor {
+  private function tailor(?string $answer, ?array &$sent = NULL, ?FloodInterface $flood = NULL): CvTailor {
     $context = $this->createMock(AssistantContextBuilder::class);
     $context->method('facts')->willReturn($this->cvFacts());
     $chain = $this->createMock(LlmChain::class);
@@ -34,7 +36,11 @@ final class CvTailorTest extends UnitTestCase {
       $sent = ['system' => $system, 'messages' => $messages, 'max' => $max];
       return $answer === NULL ? NULL : new LlmResult($answer, 'groq');
     });
-    return new CvTailor($context, new CvTailoringPrompt(), $chain, new TailoringPlanValidator());
+    if ($flood === NULL) {
+      $flood = $this->createMock(FloodInterface::class);
+      $flood->method('isAllowed')->willReturn(TRUE);
+    }
+    return new CvTailor($context, new CvTailoringPrompt(), $chain, new TailoringPlanValidator(), $flood);
   }
 
   /**
@@ -71,6 +77,50 @@ final class CvTailorTest extends UnitTestCase {
     $this->assertSame([['role' => 'user', 'content' => 'Senior Drupal role']], $sent['messages']);
     $this->assertStringContainsString('[j1.b1]', $sent['system']);
     $this->assertSame(1200, $sent['max']);
+  }
+
+  /**
+   * A job description over the limit is refused before any provider call.
+   */
+  public function testRejectsTooLongJobDescription(): void {
+    $sent = NULL;
+    try {
+      $this->tailor('{"summary": "x"}', $sent)->tailor(str_repeat('a', CvTailor::MAX_JOB_DESCRIPTION + 1));
+      $this->fail('Expected a limit exception.');
+    }
+    catch (TailoringLimitException $e) {
+      $this->assertSame(TailoringLimitException::TOO_LONG, $e->getCode());
+    }
+    $this->assertNull($sent);
+  }
+
+  /**
+   * Over the hourly limit, nothing is sent and nothing more is counted.
+   */
+  public function testHourlyLimitStopsDrafts(): void {
+    $flood = $this->createMock(FloodInterface::class);
+    $flood->method('isAllowed')->willReturn(FALSE);
+    $flood->expects($this->never())->method('register');
+    $sent = NULL;
+    try {
+      $this->tailor('{"summary": "x"}', $sent, $flood)->tailor('Drupal job');
+      $this->fail('Expected a limit exception.');
+    }
+    catch (TailoringLimitException $e) {
+      $this->assertSame(TailoringLimitException::TOO_MANY, $e->getCode());
+    }
+    $this->assertNull($sent);
+  }
+
+  /**
+   * Every allowed draft is counted, even when the provider then fails.
+   */
+  public function testDraftIsCountedBeforeTheCall(): void {
+    $flood = $this->createMock(FloodInterface::class);
+    $flood->method('isAllowed')->willReturn(TRUE);
+    $flood->expects($this->once())->method('register')->with('portfolio_core.cv_tailor', 3600);
+    $this->expectException(\RuntimeException::class);
+    $this->tailor(NULL, $sent, $flood)->tailor('Drupal job');
   }
 
 }

@@ -25,6 +25,7 @@ trait CvFactsTrait {
       ],
       'experience' => [
         [
+          'id' => 11,
           'job_title' => 'Fullstack Developer',
           'company' => 'TanRen Tech',
           'location' => 'Remote',
@@ -37,6 +38,7 @@ trait CvFactsTrait {
           ],
         ],
         [
+          'id' => 12,
           'job_title' => 'Web Developer',
           'company' => 'Decimo Inc.',
           'location' => 'Costa Rica',

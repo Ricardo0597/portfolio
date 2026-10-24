@@ -30,14 +30,14 @@ final class CvPdfGenerator {
   ) {}
 
   /**
-   * Returns the PDF bytes for the profile rendered with the plan.
+   * Returns the PDF for the profile rendered with the plan.
    *
    * @param \Drupal\node\NodeInterface $profile
    *   The profile node.
    * @param array $plan
    *   The approved plan (TailoringPlanValidator shape, edited by the owner).
    */
-  public function generate(NodeInterface $profile, array $plan): string {
+  public function generate(NodeInterface $profile, array $plan): CvPdf {
     // The CV template lives in the front-end theme; the admin page runs in
     // the admin theme, so render under the default theme and switch back.
     $previous = $this->themeManager->getActiveTheme();
@@ -48,12 +48,34 @@ final class CvPdfGenerator {
       $html = $this->printBuilder->printHtml($profile);
       $engine = $this->printEngines->createSelectedInstance('pdf');
       $engine->addPage($html);
-      return $engine->getBlob();
+      $bytes = $engine->getBlob();
+      return new CvPdf($bytes, self::pageCount($engine->getPrintObject(), $bytes));
     }
     finally {
       $this->context->clear();
       $this->themeManager->setActiveTheme($previous);
     }
+  }
+
+  /**
+   * Counts the pages of a rendered PDF.
+   *
+   * Asks Dompdf's canvas when the engine exposes it; otherwise counts page
+   * objects in the bytes (Dompdf writes no compressed object streams).
+   *
+   * @param mixed $print_object
+   *   The engine's underlying library object (Dompdf for the pdf engine).
+   * @param string $bytes
+   *   The PDF.
+   */
+  public static function pageCount(mixed $print_object, string $bytes): int {
+    if (is_object($print_object) && method_exists($print_object, 'getCanvas')) {
+      $canvas = $print_object->getCanvas();
+      if (is_object($canvas) && method_exists($canvas, 'get_page_count')) {
+        return (int) $canvas->get_page_count();
+      }
+    }
+    return max(1, preg_match_all('#/Type\s*/Page\b#', $bytes));
   }
 
   /**

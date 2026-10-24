@@ -265,4 +265,43 @@ final class TailoringPlanValidatorTest extends UnitTestCase {
     $this->assertSame([], $result['warnings']);
   }
 
+  /**
+   * Plan jobs carry the work experience paragraph id.
+   */
+  public function testJobsCarryParagraphIds(): void {
+    $result = $this->validate($this->plan(['jobs' => [['id' => 'j2', 'bullets' => ['j2.b1']]]]));
+    $this->assertSame([11, 12], array_column($result['jobs'], 'id'));
+  }
+
+  /**
+   * A plan job is found by paragraph id after the experience is reordered.
+   */
+  public function testLocateJobFollowsParagraphIdAfterReorder(): void {
+    $experience = array_reverse($this->cvFacts()['experience']);
+    $this->assertSame(1, TailoringPlanValidator::locateJob(['index' => 0, 'id' => 11], $experience));
+    $this->assertSame(0, TailoringPlanValidator::locateJob(['index' => 1, 'id' => 12], $experience));
+  }
+
+  /**
+   * A deleted job is not found; a plan without ids falls back to position.
+   */
+  public function testLocateJobMissingOrWithoutId(): void {
+    $experience = $this->cvFacts()['experience'];
+    $this->assertNull(TailoringPlanValidator::locateJob(['index' => 0, 'id' => 99], $experience));
+    $this->assertSame(1, TailoringPlanValidator::locateJob(['index' => 1, 'id' => NULL], $experience));
+    $this->assertNull(TailoringPlanValidator::locateJob(['index' => 5, 'id' => NULL], $experience));
+  }
+
+  /**
+   * Numbers a highlight adds beyond its cited fact are flagged.
+   */
+  public function testHighlightNumbersMissingFromSourceAreFlagged(): void {
+    $result = $this->validate($this->plan([
+      'highlights' => [
+        ['text' => 'Migrated 40 Drupal 10 sites to Drupal 11', 'source' => 'n1'],
+      ],
+    ]));
+    $this->assertSame(['40'], $result['highlights'][0]['unsupported']);
+  }
+
 }

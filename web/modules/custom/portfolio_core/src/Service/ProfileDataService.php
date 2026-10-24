@@ -88,6 +88,9 @@ class ProfileDataService {
       $achievements = $this->parseAchievements($paragraph->get('field_we_achievements')->value ?? '');
 
       $item = [
+        // Stable reference for plans built from these facts (positions
+        // change when the owner reorders experience).
+        'id'        => $paragraph->id(),
         'job_title' => $paragraph->get('field_we_job_title')->value ?? '',
         'company'   => $paragraph->get('field_we_company')->value ?? '',
         'location'  => $paragraph->get('field_we_location')->value ?? '',

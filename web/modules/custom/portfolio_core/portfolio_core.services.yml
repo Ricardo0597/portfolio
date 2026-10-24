@@ -67,6 +67,7 @@ services:
       - '@portfolio_core.cv_tailoring_prompt'
       - '@portfolio_core.llm_chain'
       - '@portfolio_core.cv_plan_validator'
+      - '@flood'
   portfolio_core.tailored_cv_context:
     class: Drupal\portfolio_core\Cv\TailoredCvContext
   portfolio_core.cv_pdf_generator:

@@ -30,10 +30,12 @@ final class TailoringPlanValidator {
    * @return array
    *   Keys: summary, warnings (codes for the preview: 'pronouns' when the
    *   summary uses personal pronouns, 'years' when it omits the years figure),
-   *   highlights (text, source, source_text, unsupported: skill labels named
-   *   in the text but not in the cited fact; never a bullet that prints),
-   *   skills (category => list of label + checked), jobs (index, bullets:
-   *   text + checked), gaps.
+   *   highlights (text, source, source_text, unsupported: skill labels and
+   *   numbers in the text but not in the cited fact; never a bullet that
+   *   prints),
+   *   skills (category => list of label + checked), jobs (index, id: the
+   *   work experience paragraph id when known, bullets: text + checked),
+   *   gaps.
    *
    * @throws \InvalidArgumentException
    *   When no JSON object can be read or the summary is empty.
@@ -146,10 +148,14 @@ final class TailoringPlanValidator {
       if ($text === '' || !isset($sources[$source])) {
         continue;
       }
-      // Skills the highlight names but its cited fact doesn't: shown as a
-      // warning in the preview so the owner can correct the wording.
+      // Skills and numbers the highlight names but its cited fact doesn't:
+      // shown as a warning in the preview so the owner can fix the wording.
       $unsupported = array_values(array_filter($labels, fn($label) => $this->mentions($text, $label)
         && !$this->mentions($sources[$source], $label)));
+      $unsupported = array_merge($unsupported, array_values(array_diff(
+        $this->numbers($text),
+        $this->numbers($sources[$source]),
+      )));
       $kept[] = [
         'text' => $this->clamp($text, self::MAX_HIGHLIGHT),
         'source' => $source,
@@ -161,6 +167,17 @@ final class TailoringPlanValidator {
       }
     }
     return $kept;
+  }
+
+  /**
+   * Returns the distinct numbers in a text ("10", "3.5", "1,200").
+   *
+   * @return list<string>
+   *   The numbers as written.
+   */
+  private function numbers(string $text): array {
+    preg_match_all('/(?<![\p{L}\p{N}])\d+(?:[.,]\d+)*/u', $text, $matches);
+    return array_values(array_unique($matches[0]));
   }
 
   /**
@@ -239,6 +256,7 @@ final class TailoringPlanValidator {
       if (!isset($chosen[$i])) {
         $jobs[] = [
           'index' => $i,
+          'id' => $job['id'] ?? NULL,
           'bullets' => array_map(fn($t) => ['text' => $t, 'checked' => TRUE], $bullets),
         ];
         continue;
@@ -258,9 +276,36 @@ final class TailoringPlanValidator {
           $items[] = ['text' => $text, 'checked' => FALSE];
         }
       }
-      $jobs[] = ['index' => $i, 'bullets' => $items];
+      $jobs[] = ['index' => $i, 'id' => $job['id'] ?? NULL, 'bullets' => $items];
     }
     return $jobs;
+  }
+
+  /**
+   * Finds a plan job in the current work experience.
+   *
+   * Matches by paragraph id, so reordering experience after the draft was
+   * built never moves bullets to another job; falls back to the position for
+   * plans without ids.
+   *
+   * @param array $plan_job
+   *   One entry of the plan's 'jobs'.
+   * @param array $experience
+   *   Work experience as returned by ProfileDataService::getWorkExperience().
+   *
+   * @return int|null
+   *   The key in $experience, or NULL when the job no longer exists.
+   */
+  public static function locateJob(array $plan_job, array $experience): ?int {
+    if (($plan_job['id'] ?? NULL) !== NULL) {
+      foreach ($experience as $key => $job) {
+        if ((string) ($job['id'] ?? '') === (string) $plan_job['id']) {
+          return $key;
+        }
+      }
+      return NULL;
+    }
+    return isset($experience[$plan_job['index'] ?? -1]) ? $plan_job['index'] : NULL;
   }
 
   /**

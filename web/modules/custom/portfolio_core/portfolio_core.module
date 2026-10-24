@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\node\NodeInterface;
+use Drupal\portfolio_core\Cv\TailoringPlanValidator;
 use Drupal\Core\Url;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\ViewExecutable;
@@ -440,8 +441,9 @@ function _portfolio_core_preprocess_profile_pdf(array &$variables, NodeInterface
     $variables['profile_skills'] = $plan['skills'];
     $variables['profile_highlights'] = array_column($plan['highlights'], 'text');
     foreach ($plan['jobs'] as $job) {
-      if (isset($variables['profile_work_experience'][$job['index']])) {
-        $variables['profile_work_experience'][$job['index']]['achievements'] = array_column(
+      $key = TailoringPlanValidator::locateJob($job, $variables['profile_work_experience']);
+      if ($key !== NULL) {
+        $variables['profile_work_experience'][$key]['achievements'] = array_column(
           array_filter($job['bullets'], fn(array $bullet): bool => $bullet['checked']),
           'text',
         );

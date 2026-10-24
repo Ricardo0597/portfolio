@@ -13,6 +13,8 @@ use Drupal\portfolio_core\Assistant\AssistantContextBuilder;
 use Drupal\portfolio_core\Cv\CvPdfGenerator;
 use Drupal\portfolio_core\Cv\CvTailor;
 use Drupal\portfolio_core\Cv\TailoredPlanEditor;
+use Drupal\portfolio_core\Cv\TailoringLimitException;
+use Drupal\portfolio_core\Cv\TailoringPlanValidator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -76,7 +78,7 @@ final class TailoredCvForm extends FormBase {
       '#title' => $this->t('Job description'),
       '#default_value' => $input['job_description'],
       '#rows' => $plan ? 4 : 14,
-      '#maxlength' => 6000,
+      '#maxlength' => CvTailor::MAX_JOB_DESCRIPTION,
       '#required' => TRUE,
       '#description' => $this->t('Paste the posting. It is sent to the AI provider and not stored.'),
     ];
@@ -96,7 +98,7 @@ final class TailoredCvForm extends FormBase {
     ];
 
     if ($plan) {
-      $this->buildPreview($form, $plan);
+      $this->buildPreview($form, $plan, (bool) $form_state->get('allow_multi_page'));
     }
     return $form;
   }
@@ -104,7 +106,7 @@ final class TailoredCvForm extends FormBase {
   /**
    * Adds the preview of a plan to the form.
    */
-  private function buildPreview(array &$form, array $plan): void {
+  private function buildPreview(array &$form, array $plan, bool $allow_multi_page): void {
     $form['preview'] = [
       '#type' => 'details',
       '#title' => $this->t('Draft'),
@@ -174,7 +176,8 @@ final class TailoredCvForm extends FormBase {
     $experience = $this->contextBuilder->facts()['experience'] ?? [];
     $preview['jobs'] = ['#tree' => TRUE];
     foreach ($plan['jobs'] as $j => $job) {
-      $meta = $experience[$job['index']] ?? [];
+      $key = TailoringPlanValidator::locateJob($job, $experience);
+      $meta = $key !== NULL ? $experience[$key] : [];
       $options = array_column($job['bullets'], 'text');
       $preview['jobs'][$j] = [
         '#type' => 'checkboxes',
@@ -193,7 +196,7 @@ final class TailoredCvForm extends FormBase {
 
     $preview['download'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Download PDF'),
+      '#value' => $allow_multi_page ? $this->t('Download anyway') : $this->t('Download PDF'),
       '#submit' => ['::downloadSubmit'],
       '#limit_validation_errors' => [['summary'], ['highlights'], ['skills'], ['jobs'], ['company']],
       '#button_type' => 'primary',
@@ -216,10 +219,16 @@ final class TailoredCvForm extends FormBase {
       'company' => trim((string) $form_state->getValue('company')),
     ];
     $form_state->set('input', $input);
+    $form_state->set('allow_multi_page', FALSE);
     try {
       $form_state->set('plan', $this->tailor->tailor($input['job_description']));
       // New defaults for the preview fields.
       $form_state->setUserInput(array_intersect_key($form_state->getUserInput(), $input));
+    }
+    catch (TailoringLimitException $e) {
+      $this->messenger()->addError($e->getCode() === TailoringLimitException::TOO_MANY
+        ? $this->t("You've generated many drafts in the last hour; try again later.")
+        : $this->t('The job description is too long.'));
     }
     catch (\RuntimeException $e) {
       $this->messenger()->addError($this->t("Couldn't build a draft, try again."));
@@ -261,7 +270,15 @@ final class TailoredCvForm extends FormBase {
       $form_state->setRebuild();
       return;
     }
-    $form_state->setResponse(new Response($pdf, 200, [
+    // The CV should fit one A4 page: warn once, and let a second click
+    // download it anyway.
+    if ($pdf->pages > 1 && !$form_state->get('allow_multi_page')) {
+      $form_state->set('allow_multi_page', TRUE);
+      $this->messenger()->addWarning($this->t('The PDF runs to @count pages. Shorten the summary or untick bullets, or download it anyway.', ['@count' => $pdf->pages]));
+      $form_state->setRebuild();
+      return;
+    }
+    $form_state->setResponse(new Response($pdf->bytes, 200, [
       'Content-Type' => 'application/pdf',
       'Content-Disposition' => 'attachment; filename="' . $filename . '"',
       'Cache-Control' => 'no-store, private',
