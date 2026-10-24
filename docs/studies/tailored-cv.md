@@ -16,11 +16,11 @@ result, and Entity Print renders it with the same template as the public CV.
 | Source of truth | The published `profile` node: summary, work experience paragraphs with achievement bullets, skills by category, certifications, availability, and the owner-only "Extra knowledge" lines |
 | Trigger | The owner pastes a job description at `/admin/portfolio/tailored-cv` and presses "Generate draft" |
 | AI | The same Groq → Gemini fallback chain as the site's chat assistant ([Droopy study](droopy-ai-guide.md)), 1,200-token budget, one JSON object per answer |
-| Honesty check | `TailoringPlanValidator`: unknown ids and skills are dropped; repeats, pronouns, a missing years figure and unsupported skill names are flagged or removed |
+| Honesty check | `TailoringPlanValidator`: unknown ids and skills are dropped; repeats, pronouns, a missing years figure, and skill names or numbers a highlight adds beyond its source are flagged or removed |
 | Storage | None in content or logs. The draft lives in Drupal's form cache, which expires after 6 hours |
 | Output | `<Site-Name>-CV-<Company>.pdf`, rendered from `node--profile--pdf.html.twig` |
 | Access | Permission `use tailored cv` (restricted); anonymous users get 403 |
-| Custom code | 934 lines of PHP (6 classes in `src/Cv/` plus `TailoredCvForm`), about 40 lines of hooks in `portfolio_core.module`, a 22-line JS word counter, plus 698 lines of PHPUnit tests (42 tests) |
+| Custom code | 1,086 lines of PHP (8 classes in `src/Cv/` plus `TailoredCvForm`), about 40 lines of hooks in `portfolio_core.module`, a 22-line JS word counter, plus 811 lines of PHPUnit tests (51 tests) and 3 Playwright scenarios |
 
 ## 2. Does your use case match ours?
 
@@ -32,7 +32,7 @@ result, and Entity Print renders it with the same template as the public CV.
 | How strict must honesty be? | Strict: no skill, employer, date or number that is not in the profile | If loose is fine, a plain "rewrite my CV" prompt is far simpler, and this design is overkill |
 | What format do you need? | One A4 PDF from an existing Entity Print template | For DOCX or several templates, replace `CvPdfGenerator`; the plan and validator do not care about the format |
 | Is it public? | No. Admin page only; the job description goes to a free-tier provider | A public version needs flood control, a length check in the service and a privacy notice about the provider |
-| Volume | A few drafts per application, no rate limit | High volume needs a paid provider tier; there is no queue or retry |
+| Volume | A few drafts per application; at most 20 drafts per hour per client | High volume needs a paid provider tier and higher limits; there is no queue or retry |
 
 **Rule of thumb:** if your facts are structured and you need the AI to choose rather than write,
 this design matches. The rows on where the facts live and what the AI may write decide it.
@@ -118,6 +118,12 @@ The rules ask for:
 
 - `tailor()` sends the prompt as the system message and the trimmed job description as the only
   user message, through `LlmChain::complete()` with 1,200 tokens.
+- Before the call it enforces its own limits, so any future caller gets them too: at most 6,000
+  characters (`CvTailor::MAX_JOB_DESCRIPTION`, also the form's `#maxlength`), and at most 20
+  drafts per hour per client (core flood event `portfolio_core.cv_tailor`). The draft is counted
+  before the call, because failed drafts use provider quota too. Both throw
+  `TailoringLimitException` with a code (`TOO_LONG`, `TOO_MANY`), and the form shows a specific
+  message.
 - A `NULL` from the chain (no provider answered) and any validator rejection both become a
   `RuntimeException`.
 - The form shows "Couldn't build a draft, try again". The log line carries only the reason, never
@@ -130,12 +136,15 @@ The rules ask for:
    empty summary, throws.
 2. **Jobs.** Jobs the model omitted keep all their bullets, ticked. In a chosen job, valid
    `jN.bM` ids come first (ticked) and the remaining bullets follow unticked. Ids pointing at
-   another job, unknown ids and duplicates are ignored.
+   another job, unknown ids and duplicates are ignored. Each plan job also stores the work
+   experience **paragraph id**. `TailoringPlanValidator::locateJob()` uses it at render time, so
+   reordering experience while a draft is open never moves bullets to another job.
 3. **Highlights.**
    - Sources are looked up in an id → text map (`jN.bM`, `nK`, `cK`). Unknown sources are dropped.
    - A highlight citing a bullet that will print is dropped as a repeat.
    - At most 3 are kept, each clamped to 160 characters.
-   - Each keeps `source_text` so the preview can show where it came from, and `unsupported`: skill
+   - Each keeps `source_text` so the preview can show where it came from, and `unsupported`: numbers
+     the text contains but the fact doesn't (a made-up "40 sites"), plus skill
      labels the text names as whole words but the cited fact doesn't.
 4. **Skills.**
    - Only exact known labels count.
@@ -154,12 +163,15 @@ The rules ask for:
 - **One form, two steps.**
   - "Generate draft" stores `input` and `plan` in form state and rebuilds.
   - "Regenerate" replaces the plan.
-  - "Download PDF" applies the edits.
+  - "Download PDF" applies the edits and renders the PDF. If it runs past one page, the form
+    warns with the page count and turns the button into "Download anyway"; a new draft resets
+    that.
   - `#limit_validation_errors` keeps each button's validation to its own fields.
 - **Preview fields.**
   - The summary is an editable textarea (600 characters max) with a live word count from
     `js/tailored-cv.js` and the warnings.
-  - Each highlight is a text field showing "From: <fact>", plus a warning for unsupported skills.
+  - Each highlight is a text field showing "From: <fact>", plus a warning naming any unsupported
+    skills or numbers.
   - Skills (per category) and bullets (per job) are checkboxes.
   - Gaps are a plain list marked "not printed".
 - **`TailoredPlanEditor::apply()`** walks only the plan it was given. Form input can change
@@ -177,6 +189,7 @@ The rules ask for:
 | Switch to the default front-end theme, then back in `finally` | `CvPdfGenerator::generate()` | The CV template and its CSS live in `portfolio_theme`; the form runs in the admin theme |
 | `TailoredCvContext::set($plan)` / `clear()` in `finally` | `CvPdfGenerator` | Request-scoped, in-memory hand-off to the preprocess hook; nothing is persisted |
 | `PrintBuilder::printHtml()`, then the `pdf` engine's `addPage()` and `getBlob()` | `CvPdfGenerator` | `deliverPrintable()` chooses its own file name and response |
+| Count pages: Dompdf's `getCanvas()->get_page_count()`, else `/Type /Page` objects in the bytes | `CvPdfGenerator::pageCount()`, returned in a `CvPdf` value object | The one-page check needs the real rendered result, not a word count |
 | Remove `#cache['keys']`, set `max-age` 0 for the profile build | `portfolio_core_node_build_defaults_alter()` | Otherwise the render cache would serve the tailored CV as the public one, or the reverse |
 | Swap the summary, skills and bullets; add `profile_highlights`; `max-age` 0 | `_portfolio_core_preprocess_profile_pdf()` | Only while a plan is set; the public CV path is untouched |
 | "Key Highlights" section | `node--profile--pdf.html.twig` | Printed only when `profile_highlights` is not empty |
@@ -203,8 +216,9 @@ The rules ask for:
   fieldsets. The word counter is the only JavaScript, and without it the server-rendered count
   still shows.
 - **Cost per draft:** one provider call (two if the first provider fails) with the full fact list
-  plus the job description, and a 1,200-token reply. There's no flood control, because only the
-  permission holder can reach the form.
+  plus the job description, and a 1,200-token reply. A draft that runs past one page costs one
+  extra render, not another provider call. The hourly limit of 20 drafts is a backstop in case a
+  session is stolen; only the permission holder can reach the form.
 - **Caching:** facts come from the shared cache (tagged by the profile and skills). The tailored
   render bypasses the render cache entirely. The public CV keeps its normal caching.
 - **Theme switching:** rendering under the front-end theme from an admin route is scoped with
@@ -227,8 +241,8 @@ The rules ask for:
 
 Operators should know:
 - Without provider keys every draft fails with "Couldn't build a draft".
-- Editing the order of work experience while a draft is open can misplace bullets (see section 9).
-- The one-page fit depends on the summary length; watch the word count.
+- After 20 drafts in an hour, generating is refused until the window passes.
+- A CV longer than one page is never downloaded silently: the form warns first.
 
 ## 8. Replication guide
 
@@ -273,9 +287,8 @@ describes the client chain we reuse.
 
 | Area | Limitation | Possible next step |
 |---|---|---|
-| Fact ids | Ids are positional (`j1` is the first job in field order). Reordering experience between "Generate" and "Download" would put bullets under the wrong job | Use paragraph ids instead of positions |
-| Page fit | Nothing measures the rendered PDF; the preview only shows a word count | Render once and count pages, warning when there are more than one |
-| Tests | 42 unit tests cover the prompt, validator, editor, generator and context; no functional or browser test covers the form or the downloaded PDF | Add a functional test with a mocked chain, and a Playwright test logged in as the owner |
-| Public use | `CvTailor` has no length check or flood control of its own (the form's `#maxlength` enforces 6,000 characters) | Add both before exposing it through the chat assistant |
-| AI quality | The model can still phrase a highlight beyond its source; only skill names are checked | Compare the highlight text against the cited fact more strictly, or offer the fact text as the default |
+| Tests | 51 unit tests cover the prompt, validator, editor, limits, generator and page count. Playwright covers access, the owner page and the chat shortcut. The generate → preview → download path needs a live provider, so it is checked by hand, not automated | Add a fake provider to a test-only module and drive the whole form in Playwright |
+| Public use | Limits exist (6,000 characters, 20 drafts per hour per client), but the tool assumes one trusted owner and shows no privacy notice for third parties | Add per-user profiles, access checks and a provider privacy notice before opening it up |
+| AI quality | Unsupported skill names and numbers are flagged, but other wording beyond the cited fact (places, tasks) is not | Offer the fact text as the default highlight, or compare wording more strictly |
+| Page fit | Overflow is detected after rendering, not prevented | Suggest which bullets to untick when the page count is above one |
 | Formats | PDF only, English only | Add a DOCX engine; the plan is format-independent |

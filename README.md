@@ -1,5 +1,7 @@
 # Portfolio
 
+[![CI](https://github.com/Ricardo0597/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Ricardo0597/portfolio/actions/workflows/ci.yml)
+
 Personal portfolio site built on Drupal 11. The site serves two purposes: professional presentation and a living technical showcase where each major feature is implemented using a different Drupal pattern — the codebase itself is the portfolio.
 
 The public site is a single-page profile at `/` (hero, about, skills, experience, education, contact) with a downloadable PDF CV and **Droopy**, an AI guide that answers visitors' questions about Ricardo. Projects, articles, feature demos and skill pages are built but currently disabled (see [Disabled sections](#disabled-sections)). A separate Next.js app, the **Tech Lab** at `/headless`, consumes Drupal's JSON:API.
@@ -187,13 +189,13 @@ A floating mascot that answers questions about Ricardo from the profile's facts 
 
 - **Endpoint:** `POST /api/portfolio/ask` — question ≤ 1000 chars (6000 in job-fit mode), history ≤ 6 turns.
 - **Fallback:** providers are tried in the order set in `portfolio_core.assistant`; if all fail the visitor gets a "napping" answer with an email link.
-- **Limits:** 10 questions/minute and 60/day per IP (core flood); foreign `Origin` → 403.
+- **Limits:** 10 questions/minute and 60/day per IP, plus 500/day for the whole site (core flood); foreign `Origin` → 403.
 - **Safety:** answers are rendered as text only; the model can trigger UI actions only through whitelisted tags (`[[scroll:…]]`, `[[cv]]`, `[[email]]`).
 - **How it works and how to replicate it:** [technical study](docs/studies/droopy-ai-guide.md).
 
 ## Tailored CV (private)
 
-`/admin/portfolio/tailored-cv` (permission `use tailored cv`, menu: Content › Tailored CV): paste a job description → AI draft → edit summary, bullets, highlights and skills → download `<Site-Name>-CV-<Company>.pdf`. The AI may only reference existing profile facts by id; a validator drops anything unknown. Nothing is saved to content or logs. Logged-in users with the permission can also type `/tailored-cv` in Droopy for a shortcut.
+`/admin/portfolio/tailored-cv` (permission `use tailored cv`, menu: Content › Tailored CV): paste a job description → AI draft → edit summary, bullets, highlights and skills → download `<Site-Name>-CV-<Company>.pdf`. The AI may only reference existing profile facts by id; a validator drops anything unknown and flags skills or numbers a highlight adds. A CV longer than one page is held back once with a warning. Limits: 6,000 characters and 20 drafts per hour. Nothing is saved to content or logs. Logged-in users with the permission can also type `/tailored-cv` in Droopy for a shortcut. How it works: [technical study](docs/studies/tailored-cv.md).
 
 ## Disabled sections
 
@@ -213,3 +215,11 @@ Projects, articles, feature demos and skills redirect (302) to `/`, driven by `p
 - One custom module only: `portfolio_core`
 - Commit format: [Conventional Commits](https://www.conventionalcommits.org/)
 - All component colours must use `var(--color-*)` tokens — the light/dark toggle swaps nine CSS custom properties at runtime; hardcoded colours break light mode. See CLAUDE.md for full SCSS patterns.
+
+## License
+
+The code is licensed under the [GNU General Public License v2.0 or later](LICENSE.txt), like Drupal itself. The content and branding (the CV text, profile data, the Droopy mascot and the site name) are not covered by that license and may not be reused.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for how to report a vulnerability.

@@ -150,7 +150,8 @@ access allowed.
   (sections: about, skills, experience, education, contact), strips them
   from the text.
 - Flood control (`flood` service): 10 requests / minute and 60 / day per
-  IP; over the limit → 429 with a friendly message Droopy shows.
+  IP, plus 500 / day for the whole site; over a limit → 429 with a friendly
+  message Droopy shows.
 
 **System prompt rules** (exact wording is the builder's): speak as Droopy,
 Ricardo's mascot, in third person about Ricardo; answer only from the
@@ -270,6 +271,9 @@ cover open/close, text-only rendering with an injected `<img>`, the action
 whitelist, the napping fallback and the foreign-`Origin` 403, with the endpoint
 mocked so no provider quota is used.
 
-**Still open (code, not fixed):** the duplicated section whitelist
-(`AnswerParser::SECTIONS` and `SECTIONS` in `droopy-guide.js`); no unit test for
-`AssistantContextBuilder::facts()`; two entry points to fit mode.
+**Fixed the same day:** the section whitelist is now passed to the component
+as the `sections` prop (`AnswerParser::SECTIONS` is the only copy);
+`AssistantContextBuilder::facts()` has unit tests (`AssistantContextFactsTest`);
+a site-wide cap of 500 questions a day (`portfolio_core.ask_site_day`, shared
+identifier `site`) sits on top of the per-IP limits. The two entry points to fit
+mode are kept on purpose (chip for discovery, toggle for later turns).

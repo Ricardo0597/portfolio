@@ -581,16 +581,17 @@ gotchas for working on it:
   Locally put them in `.ddev/.env` (git-ignored) and run `ddev restart`.
 - **Answers are text only** (`textContent`), never HTML. Page actions come only
   from whitelisted `[[scroll:…]]`, `[[cv]]`, `[[email]]` tags. The section list
-  exists twice (`AnswerParser::SECTIONS` and `SECTIONS` in `droopy-guide.js`):
-  change both.
+  is defined once, in `AnswerParser::SECTIONS`, and reaches the JS as the
+  component's `sections` prop.
 - **Facts** come from the profile node and skills (`AssistantContextBuilder`),
   cached with the profile's tags plus `node_list:skill` and
   `taxonomy_term_list:skill_category`. A new fact source needs its cache tag.
 - **Models:** Groq `openai/gpt-oss-120b` with `reasoning_effort: low`; Gemini
   `gemini-flash-lite-latest` with `thinkingConfig.thinkingLevel: low` (Gemini 3+
   rejects `thinkingBudget`; `gemini-2.5-flash` is closed to new accounts).
-- **Limits:** 10 questions/minute and 60/day per IP (core flood), question
-  ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
+- **Limits:** 10 questions/minute and 60/day per IP plus 500/day site-wide
+  (core flood; the site cap uses the identifier `site`), question ≤ 1000 chars
+  (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
   The Origin check compares hosts only and also accepts the first
   `X-Forwarded-Host` (ngrok rewrites `Host`).
 - **Extra knowledge:** when Droopy says "I don't have information about…" for
@@ -625,6 +626,13 @@ How it works end to end, and why: **`docs/studies/tailored-cv.md`**.
   summaries with pronouns or no years figure; skills come back ticked/unticked
   for the preview checkboxes), `TailoredCvContext` + `CvPdfGenerator` (renders the
   profile through Entity Print's `printHtml()` under the default front-end theme).
+- Limits live in `CvTailor`: job description ≤ 6,000 chars and 20 drafts/hour
+  per client (flood `portfolio_core.cv_tailor`), thrown as
+  `TailoringLimitException` (`TOO_LONG` / `TOO_MANY`).
+- Plan jobs carry the work-experience paragraph id; always find a job with
+  `TailoringPlanValidator::locateJob()`, never by position.
+- `CvPdfGenerator::generate()` returns a `CvPdf` (bytes + pages); more than one
+  page holds the download back once with a warning ("Download anyway").
 - `_portfolio_core_preprocess_profile_pdf()` swaps summary, skills, bullets and adds
   highlights only while a plan is set; `portfolio_core_node_build_defaults_alter()`
   disables the render cache for that render so public and tailored CVs never mix.
@@ -741,9 +749,10 @@ Keys must be unique per page. Conventions:
 - At minimum, write unit tests for any custom service or plugin logic.
 - **End-to-end (Playwright):** `tests/e2e/` holds smoke tests for what a
   visitor sees: the profile page and its JSON-LD, the theme switch, the PDF CV,
-  disabled-section redirects, the public APIs and Droopy (open/close, text-only
-  answers, action whitelist, napping fallback, foreign-Origin 403). Every test
-  runs on a desktop and a phone viewport.
+  disabled-section redirects, the public APIs, Droopy (open/close, text-only
+  answers, action whitelist, napping fallback, foreign-Origin 403) and the
+  tailored CV (anonymous 403, the owner's page, the `/tailored-cv` shortcut).
+  Every test runs on a desktop and a phone viewport.
   ```bash
   ddev start                 # the suite runs against https://portfolio.ddev.site
   npm install                # once, at the project root
@@ -754,6 +763,11 @@ Keys must be unique per page. Conventions:
     from tests.
   - Droopy floats forever, so its tests set
     `contextOptions: { reducedMotion: 'reduce' }` to keep it clickable.
+  - Tests that need the owner use the session saved by `owner.setup.js` (the
+    `setup` project logs in once with `ddev drush user:login`, or
+    `E2E_LOGIN_URL`). Never fetch a login link per test: Drupal one-time links
+    stop working once the user logs in again, so parallel workers break each
+    other's links.
   - `@playwright/test` is pinned to match the locally installed Chromium; on a
     new machine run `npx playwright install chromium`.
   - The suite is not in CI yet: CI has no Drupal site to test against.

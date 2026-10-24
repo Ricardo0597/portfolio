@@ -17,10 +17,10 @@ a friendly "napping" message when both fail.
 | Retrieval | None. The whole profile fits in the system prompt, so there is no RAG or vector store |
 | LLM providers | Groq (`openai/gpt-oss-120b`) first, Google Gemini (`gemini-flash-lite-latest`) second, both on free tiers, called over HTTPS with core's Guzzle client |
 | Endpoint | `POST /api/portfolio/ask`, anonymous, JSON in and out, never cached |
-| Abuse controls | Origin check, input limits, core flood control (10 per minute and 60 per day per IP) |
+| Abuse controls | Origin check, input limits, core flood control (10 per minute and 60 per day per IP, plus 500 per day for the whole site) |
 | Front end | A Single Directory Component (`droopy-guide`) with vanilla JS (a Drupal behavior with `once()`), no build step for JS and no third-party scripts |
 | Page actions | The model may append whitelisted tags that become buttons: scroll to a section, download the CV, email the owner |
-| Custom code | 810 lines of PHP (11 classes in `src/Assistant/` plus `AskController`), 963 lines of JS, SCSS and Twig, plus 1,045 lines of PHPUnit tests (66 tests) and 4 Playwright scenarios |
+| Custom code | 830 lines of PHP (11 classes in `src/Assistant/` plus `AskController`), 970 lines of JS, SCSS and Twig, plus 1,212 lines of PHPUnit tests (71 tests) and 4 Playwright scenarios |
 | Running cost | $0: free tiers without a card; the worst case is the napping answer, never a bill |
 
 ## 2. Does your use case match ours?
@@ -31,7 +31,7 @@ a friendly "napping" message when both fail.
 | How much knowledge is there? | One person's CV: a few thousand tokens, small enough for every prompt | Past roughly a few pages of facts, prompt size and cost grow per request; look at retrieval instead of a full-context prompt (general guidance, not measured here) |
 | Who owns the content? | A single owner edits the profile in the Drupal UI; edits reach Droopy at once through cache tags | With many editors, add review: anything in the facts can be said to visitors |
 | How fresh must answers be? | As fresh as the profile; there is no external sync | Live data (stock, prices) needs a tool-calling or fetch step this design does not have |
-| Who asks, and how much? | Anonymous visitors to a personal site; low volume | High traffic outgrows free tiers and per-IP flood limits; budget for a paid tier and a shared rate limiter |
+| Who asks, and how much? | Anonymous visitors to a personal site; low volume, capped at 500 questions a day site-wide | High traffic outgrows free tiers and these caps; budget for a paid tier and raise the limits |
 | What can go wrong if the model is wrong? | Low stakes: it describes one person, and the prompt forbids salary, rates or commitments | Legal, medical or financial answers need stronger grounding, human review and logging, none of which exist here |
 | Interaction model | Short chat (6 turns kept in the browser), plus a "job fit" mode for a pasted job description | Long sessions or server-side memory need storage and a privacy review; we store nothing on the server |
 | Hosting and auth | Any PHP host; keys come from `settings.php` or environment variables; no user accounts | Behind a load balancer you must configure Drupal's reverse proxy settings, or every visitor shares one flood bucket |
@@ -50,7 +50,7 @@ flowchart LR
   subgraph Drupal["Drupal 11 (portfolio_core)"]
     C["AskController<br/>POST /api/portfolio/ask"]
     V[AskRequestValidator]
-    F[("core flood<br/>10/min · 60/day per IP")]
+    F[("core flood<br/>10/min · 60/day per IP<br/>500/day site-wide")]
     B["AssistantContextBuilder<br/>system prompt"]
     P[("profile + skill nodes")]
     K[("cache: facts<br/>tagged by profile/skills")]
@@ -84,8 +84,9 @@ profile facts, tries each provider in order and returns plain text plus whitelis
 - `portfolio_theme_preprocess_page()` in `portfolio_theme.theme` adds a `component` render element
   (`portfolio_theme:droopy-guide`) on every non-admin page while `portfolio_core.assistant:enabled`
   is true.
-- Props: `endpoint`, `cv_url` (the Entity Print PDF route for the profile), `email`, four `chips`
-  (suggested questions, the last one switches to fit mode) and `tailor_url`. `tailor_url` is set
+- Props: `endpoint`, `sections` (the scroll targets, straight from `AnswerParser::SECTIONS`),
+  `cv_url` (the Entity Print PDF route for the profile), `email`, four `chips` (suggested
+  questions, the last one switches to fit mode) and `tailor_url`. `tailor_url` is set
   only for users with the `use tailored cv` permission, so anonymous pages never contain it.
 - Cache metadata: `config:portfolio_core.assistant`, `node_list:profile`, the profile's own tags
   and the `user.permissions` context.
@@ -119,7 +120,8 @@ The steps run in this order, and each one can end the request:
    `X-Forwarded-Host` (hosts only, ports stripped) → otherwise 403. A missing `Origin` is allowed;
    flood control is the real quota protection.
 3. **Flood check.** `portfolio_core.ask_minute` (10 per 60 s) and `portfolio_core.ask_day`
-   (60 per 86,400 s), keyed by `getClientIp()` → 429 with a friendly answer and an email action.
+   (60 per 86,400 s), keyed by `getClientIp()`, plus `portfolio_core.ask_site_day` (500 per
+   86,400 s) under the shared identifier `site` → 429 with a friendly answer and an email action.
 4. **Validation** (`AskRequestValidator`). Mode `chat` or `fit`; question 1–1,000 characters
    (6,000 in fit mode); history at most 6 turns, roles `user` or `assistant`, each at most 1,000
    characters → 400 with a short reason.
@@ -171,8 +173,8 @@ and one entry in the `providers` list.
   `contact`), `cv` and `email` become actions, with duplicates dropped.
 - It also strips a tag cut off by the token limit at the very end (`[[scr`), flattens Markdown
   bold and headings, and collapses the gaps the tags leave.
-- The browser filters the actions again against its own copy of the section list before building
-  buttons.
+- The browser filters the actions again before building buttons, against the same list received
+  as the `sections` prop (`data-sections`), so the whitelist is defined once in PHP.
 
 ### 4.7 Configuration
 
@@ -196,7 +198,8 @@ max_tokens_fit: 700
 | Plain HTTP clients behind an interface | A provider SDK or a contrib AI module | Two small JSON APIs did not justify a dependency; the interface keeps providers swappable and testable with mocked Guzzle |
 | History kept in the browser | Server-side sessions | Nothing personal is stored on the server; the prompt tells the model to trust facts over browser-supplied turns |
 | Action tags parsed on the server and whitelisted on both sides | Letting the model return HTML or JSON | Text-only output and a closed list of actions mean a prompt injection cannot add links or markup |
-| Core flood service per IP | A contrib rate limiter or an external gateway | Built into core, no new dependency; enough for one personal site |
+| Core flood service per IP, plus a site-wide daily cap | A contrib rate limiter or an external gateway | Built into core, no new dependency; the shared cap stops many IPs together from draining the free tier |
+| Fit mode reachable from a chip and a toggle | One entry point | The chip makes the mode discoverable before the first question; the toggle stays for later turns. Both call the same `setMode()` |
 | Origin check by host, also accepting `X-Forwarded-Host` | Exact `scheme://host` match (the first version) | The exact match rejected real visitors behind TLS proxies and ngrok tunnels |
 | Low reasoning effort on both models | Default reasoning | Reasoning tokens count against the output budget, so long reasoning leaves little room for the reply itself |
 | `gemini-flash-lite-latest` | `gemini-2.5-flash` (the first choice) | `gemini-2.5-flash` is closed to new accounts |
@@ -285,9 +288,7 @@ an API key from at least one OpenAI-compatible or Gemini provider. No contrib mo
 | Area | Limitation | Possible next step |
 |---|---|---|
 | Grounding | In fit mode the model sometimes lists job requirements that are not in the facts (seen with Groq) | Ask for structured output (strengths and gaps as ids from the facts) and validate it, as the tailored CV tool does |
-| Duplication | The section whitelist exists twice: `AnswerParser::SECTIONS` and `SECTIONS` in `droopy-guide.js` | Pass the list to the component as a prop |
-| Tests | `AssistantContextBuilder::facts()` (entity loading and caching) has no unit test; only `compose()` does | Add a kernel test with a profile fixture |
-| UX | Fit mode has two entry points (the last chip and the "Job fit" toggle) | Keep one |
-| Rate limiting | Per-IP flood limits are shared by everyone behind one NAT, and do not stop distributed abuse | Add a site-wide daily cap or put a gateway in front of the endpoint |
+| Tests | Unit tests mock the profile entity; no kernel test loads real field config | Add a kernel test with the profile field config |
+| Rate limiting | Per-IP limits are shared by everyone behind one NAT; the site-wide cap (500 a day) can be used up by one determined client, which then naps Droopy for everyone | Put a gateway or bot protection in front of the endpoint if that happens |
 | Observability | Only provider failures are logged; there are no usage or quality metrics, by design | Add privacy-preserving counters (answered, napping, 429) if needed |
 | Streaming | Answers arrive whole | Stream with server-sent events and parse tags at the end |

@@ -126,6 +126,7 @@ no salary, plain text, English.
   kept but flagged in the preview.
 - The summary is flagged when it uses personal pronouns or omits the years
   figure.
+- A highlight with a number its cited fact doesn't contain is flagged too.
 - Clamp lengths (summary ≤ 600 characters, ≤ 3 highlights, each ≤ 160,
   ≤ 6 gaps, each ≤ 200) and replace glyphs the PDF fonts lack (non-breaking
   hyphens, minus sign, arrows, non-breaking spaces). The owner's edits get
@@ -152,8 +153,9 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
   of the profile build while a plan is set, so a tailored render is never
   cached or served as the public CV (and vice versa).
 - The public "Download CV (PDF)" is unchanged (the context is empty there).
-- Must still fit one A4 page; if a long summary pushes it to two, the preview
-  warns (word count) rather than shrinking type further.
+- Must still fit one A4 page; the preview shows a live word count, and if the
+  rendered PDF runs past one page the download is held back once with a
+  warning and a "Download anyway" button, rather than shrinking type further.
 
 ## Constraints
 
@@ -217,3 +219,18 @@ field; theme switch and render-cache bypass during the PDF render.
 
 **Could not verify:** how often providers return unusable JSON in practice
 (no logging of answers, by design).
+
+**Fixed the same day:**
+- Plan jobs store the work experience paragraph id, and
+  `TailoringPlanValidator::locateJob()` matches by it, so reordering
+  experience during a draft can no longer move bullets.
+- `CvPdfGenerator` returns a `CvPdf` with the page count; a draft longer than
+  one page triggers a warning and a "Download anyway" button.
+- `CvTailor` enforces the 6,000-character limit and 20 drafts per hour per
+  client (flood event `portfolio_core.cv_tailor`), throwing
+  `TailoringLimitException` (`TOO_LONG`, `TOO_MANY`).
+- Highlights are also flagged for numbers that are not in the cited fact.
+- Playwright covers anonymous 403, the owner's page and the `/tailored-cv`
+  shortcut (`tests/e2e/tailored-cv.spec.js`). The full generate-to-download
+  path was checked by hand with a live provider (draft, two-page warning,
+  "Download anyway", `Ricardo-Contreras-CV-Acme-Corp.pdf`).
