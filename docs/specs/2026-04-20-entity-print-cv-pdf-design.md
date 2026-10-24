@@ -139,4 +139,4 @@ No architectural change. Template gains a skills section.
 | `web/themes/custom/portfolio_theme/templates/content/node--profile.html.twig` | new/updated |
 | `web/themes/custom/portfolio_theme/scss/layout/_cv-pdf.scss` | new |
 | `web/themes/custom/portfolio_theme/css/layout/cv-pdf.css` | new (compiled) |
-| `PROMPT.md` | updated (Feature Inventory) |
+| `README.md` | updated (Feature Inventory) |

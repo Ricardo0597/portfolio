@@ -53,3 +53,20 @@ Thumbs.db
 
 # Stray lockfile written by the nodejs container
 /.ddev/nextjs/
+
+# Working documents kept out of the public repo: the original build script,
+# step-by-step implementation plans and personal study notes. Design specs
+# (docs/specs/) and technical studies (docs/studies/) are public.
+/PROMPT.md
+/docs/plans/
+/docs/notes/
+
+# Local tooling output
+/.playwright-mcp/
+/.superpowers/
+/web/brainstorm/
+/.ddev/share-providers/
+/.claude/settings.local.json
+/test-results/
+/playwright-report/
+/node_modules/
