@@ -6,7 +6,6 @@
   const HISTORY_KEY = 'droopy:history';
   const SEEN_KEY = 'droopy:seen';
   const MAX_HISTORY = 6;
-  const SECTIONS = ['about', 'skills', 'experience', 'education', 'contact'];
 
   /**
    * sessionStorage helpers that never throw.
@@ -43,6 +42,14 @@
         const input = root.querySelector('.droopy__input');
         const send = root.querySelector('.droopy__send');
         const eyes = root.querySelector('.droopy__eyes');
+        // Scroll targets come from the server (AnswerParser::SECTIONS), so
+        // the whitelist lives in one place.
+        let SECTIONS = [];
+        try {
+          SECTIONS = JSON.parse(root.dataset.sections || '[]');
+        } catch (e) {
+          SECTIONS = [];
+        }
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         const phone = window.matchMedia('(max-width: 767px)');
         const defaultPlaceholder = input.placeholder;
@@ -216,7 +223,7 @@
             if (action.type === 'scroll') {
               el = document.createElement('button');
               el.type = 'button';
-              el.textContent = actionLabels[action.target];
+              el.textContent = actionLabels[action.target] || Drupal.t('See @section', { '@section': action.target });
               el.addEventListener('click', () => scrollToSection(action.target));
             } else if (action.type === 'cv' && root.dataset.cvUrl) {
               el = document.createElement('a');

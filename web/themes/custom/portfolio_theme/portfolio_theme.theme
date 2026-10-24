@@ -14,12 +14,16 @@ declare(strict_types=1);
 
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\portfolio_core\Assistant\AnswerParser;
 
 /**
  * Implements hook_preprocess_page().
  */
 function portfolio_theme_preprocess_page(array &$variables): void {
   $variables['logo'] = theme_get_setting('logo.url');
+  // Footer copyright holder: the site name (the owner's name).
+  $variables['site_name'] = \Drupal::config('system.site')->get('name');
+  $variables['#cache']['tags'][] = 'config:system.site';
 
   // Attach Prism syntax highlighting only on pages that have code snippets.
   $node = \Drupal::routeMatch()->getParameter('node');
@@ -63,6 +67,7 @@ function portfolio_theme_preprocess_page(array &$variables): void {
       '#component' => 'portfolio_theme:droopy-guide',
       '#props' => [
         'endpoint' => Url::fromRoute('portfolio_core.ask')->toString(),
+        'sections' => AnswerParser::SECTIONS,
         'cv_url' => $profile ? Url::fromRoute('entity_print.view', [
           'export_type' => 'pdf',
           'entity_type' => 'node',

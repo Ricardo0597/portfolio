@@ -14,6 +14,11 @@ props:
     email:
       type: string
       title: 'Contact email'
+    sections:
+      type: array
+      title: 'Section ids the scroll action may target (AnswerParser::SECTIONS)'
+      items:
+        type: string
     tailor_url:
       type: string
       title: 'Tailored CV tool URL (set only for users with the permission)'

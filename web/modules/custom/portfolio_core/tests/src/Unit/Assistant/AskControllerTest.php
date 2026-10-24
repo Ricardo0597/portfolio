@@ -106,15 +106,28 @@ final class AskControllerTest extends UnitTestCase {
   }
 
   /**
-   * A valid question is counted in both windows and answered.
+   * A valid question is counted in every window and answered.
    */
   public function testValidQuestionCountedAndAnswered(): void {
     $flood = $this->flood();
-    $flood->expects($this->exactly(2))->method('register');
+    $flood->expects($this->exactly(3))->method('register');
     $response = $this->controller($flood, new LlmResult('Yes! [[email]]', 'groq'))->ask($this->request('{"question":"Available?"}'));
     $this->assertSame(200, $response->getStatusCode());
     $this->assertSame('no-store, private', $response->headers->get('Cache-Control'));
     $this->assertSame(['answer' => 'Yes!', 'actions' => [['type' => 'email']], 'provider' => 'groq'], json_decode($response->getContent(), TRUE));
+  }
+
+  /**
+   * The site-wide cap is shared by all visitors and refuses with 429.
+   */
+  public function testSiteWideCapRefusesEveryone(): void {
+    $flood = $this->createMock(FloodInterface::class);
+    $flood->method('isAllowed')->willReturnCallback(
+      fn(string $event, int $threshold, int $window, ?string $identifier): bool => $identifier !== 'site',
+    );
+    $flood->expects($this->never())->method('register');
+    $response = $this->controller($flood)->ask($this->request('{"question":"Hi"}'));
+    $this->assertSame(429, $response->getStatusCode());
   }
 
   /**

@@ -24,10 +24,25 @@ final class AskController implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
+  /**
+   * Per-IP limits: [threshold, window in seconds].
+   */
   private const FLOOD = [
     'portfolio_core.ask_minute' => [10, 60],
     'portfolio_core.ask_day' => [60, 86400],
   ];
+
+  /**
+   * Site-wide daily cap shared by every visitor.
+   *
+   * Many IPs together cannot drain the providers' free-tier quota.
+   */
+  private const SITE_FLOOD = ['portfolio_core.ask_site_day', 500, 86400];
+
+  /**
+   * Flood identifier for the site-wide cap.
+   */
+  private const SITE_IDENTIFIER = 'site';
 
   /**
    * Constructs an AskController.
@@ -71,8 +86,13 @@ final class AskController implements ContainerInjectionInterface {
     }
 
     $ip = (string) $request->getClientIp();
-    foreach (self::FLOOD as $event => [$limit, $window]) {
-      if (!$this->flood->isAllowed($event, $limit, $window, $ip)) {
+    $limits = self::FLOOD;
+    $identifiers = array_fill_keys(array_keys($limits), $ip);
+    [$site_event, $site_limit, $site_window] = self::SITE_FLOOD;
+    $limits[$site_event] = [$site_limit, $site_window];
+    $identifiers[$site_event] = self::SITE_IDENTIFIER;
+    foreach ($limits as $event => [$limit, $window]) {
+      if (!$this->flood->isAllowed($event, $limit, $window, $identifiers[$event])) {
         return $this->json([
           'answer' => (string) $this->t("I've answered a lot of questions — let me catch my breath! 💧 Try again in a bit, or email Ricardo directly."),
           'actions' => [['type' => 'email']],
@@ -88,8 +108,8 @@ final class AskController implements ContainerInjectionInterface {
       return $this->json(['error' => $e->getMessage()], 400);
     }
 
-    foreach (self::FLOOD as $event => [, $window]) {
-      $this->flood->register($event, $window, $ip);
+    foreach ($limits as $event => [, $window]) {
+      $this->flood->register($event, $window, $identifiers[$event]);
     }
 
     $messages = [...$input['history'], ['role' => 'user', 'content' => $input['question']]];
