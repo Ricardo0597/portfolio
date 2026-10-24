@@ -115,7 +115,7 @@ Rules:
 | Feature | Spec | Study |
 |---|---|---|
 | Droopy AI guide | `docs/specs/2026-10-18-droopy-ai-guide-design.md` | `docs/studies/droopy-ai-guide.md` |
-| Tailored CV | `docs/specs/2026-10-22-tailored-cv-design.md` | — |
+| Tailored CV | `docs/specs/2026-10-22-tailored-cv-design.md` | `docs/studies/tailored-cv.md` |
 | Single-page profile | `docs/specs/2026-10-18-single-page-rebrand-design.md` | — |
 | Next.js Tech Lab | `docs/specs/2026-05-13-nextjs-headless-design.md` | — |
 | PDF CV | `docs/specs/2026-04-20-entity-print-cv-pdf-design.md`, `docs/specs/2026-04-22-cv-pdf-pattern-refactor-design.md` | — |
@@ -611,6 +611,8 @@ gotchas for working on it:
 
 ### Tailored CV (private)
 
+How it works end to end, and why: **`docs/studies/tailored-cv.md`**.
+
 - `/admin/portfolio/tailored-cv` (`TailoredCvForm`, permission `use tailored cv`,
   menu: Content › Tailored CV): paste a job description → AI draft → edit →
   download `<Site-Name>-CV-<Company>.pdf`. Nothing is saved to content or
@@ -629,7 +631,7 @@ gotchas for working on it:
 - Droopy shortcut: logged in with the permission, typing `/tailored-cv` shows a
   link to the tool (`tailor_url` prop + `user.permissions` cache context).
 
-**Production checklist (before enabling on a hosted site):**
+### Production checklist (before enabling Droopy or the tailored CV on a hosted site)
 1. Set `GROQ_API_KEY` / `GEMINI_API_KEY` as host environment variables.
 2. Set `REVERSE_PROXY_ADDRESSES` (comma-separated proxy IPs/CIDRs) on the host
    so `getClientIp()` returns the visitor's IP; otherwise every visitor shares

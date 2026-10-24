@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-22
 **Branch:** `feature/tailored-cv`
-**Status:** Approved 2026-10-22 (admin page + logged-in Droopy shortcut)
+**Status:** Implemented (merged to `main` 2026-10-23); see the drift notes at the end
 
 ## Intent
 
@@ -20,12 +20,15 @@ selects, orders and phrases; it does not invent.
 1. A private page where Ricardo pastes a job description (and an optional
    company name) and gets a tailored draft in about the time Droopy answers.
 2. The draft reorders and selects existing content for the role:
-   - a professional summary rewritten to lead with what the role asks for;
+   - a professional summary rewritten to lead with what the role asks for,
+     in CV style (no personal pronouns) and stating the total years of
+     experience;
    - two or three "Key highlights" taken from his facts;
-   - skills reordered so the role's skills come first;
+   - the role's skills ticked and moved first, unrelated skills unticked;
    - for each job, his existing achievement bullets chosen and reordered.
-3. A preview where he can edit the summary and highlights, untick bullets and
-   see the role's gaps (shown in the preview only, never on the CV).
+3. A preview where he can edit the summary and highlights, tick or untick
+   skills and bullets and see the role's gaps (shown in the preview only,
+   never on the CV).
 4. One-click download of a PDF using the current CV template, named
    `Ricardo-Contreras-CV-<Company>.pdf` (or `-Tailored.pdf` without a company).
 5. Free to run: the same Groq → Gemini provider chain as Droopy.
@@ -61,10 +64,12 @@ selects, orders and phrases; it does not invent.
   1. **Input:** job description (textarea, up to 6,000 characters, same limit
      as Droopy's fit mode), optional company name, "Generate draft".
   2. **Preview:** summary (editable textarea), highlights (up to 3 editable
-     lines, each showing the fact it came from), skills in the proposed order
-     (read-only), each job's bullets as checkboxes, pre-ticked and in the
-     proposed order, a "Gaps for this role" box (read-only, not printed),
-     buttons "Download PDF" and "Regenerate".
+     lines, each showing the fact it came from), skills per category as
+     checkboxes (the role's skills ticked and first), each job's bullets as
+     checkboxes (chosen ones ticked and first, the rest unticked below), a
+     "Gaps for this role" box (read-only, not printed), a live word count
+     under the summary, buttons "Download PDF" and "Regenerate". The company
+     field stays editable and is read again at download time.
 
 ### Droopy shortcut
 
@@ -84,7 +89,7 @@ selects, orders and phrases; it does not invent.
 Reuse `AssistantContextBuilder`'s facts (profile, jobs, skills, availability,
 extra knowledge). The tailoring prompt receives them **with stable ids**:
 each job `jN`, each bullet `jN.bM`, each skill by its exact label, each extra
-knowledge line `nK`.
+knowledge line `nK`, each certification `cK`.
 
 ### Tailoring plan (AI output)
 
@@ -92,8 +97,8 @@ A new mode on the existing chain. The model must return one JSON object:
 
 ```json
 {
-  "summary": "string, ≤ 80 words, same first-person voice as the profile summary, facts only",
-  "highlights": [{"text": "string ≤ 20 words", "source": "nK | jN.bM"}],
+  "summary": "string, ≤ 80 words, CV style without personal pronouns, states the total years, facts only",
+  "highlights": [{"text": "string ≤ 20 words", "source": "nK | cK | jN.bM"}],
   "skills": ["exact skill labels in priority order"],
   "jobs": [{"id": "jN", "bullets": ["jN.bM", "..."]}],
   "gaps": ["requirement not covered by the facts"]
@@ -110,9 +115,21 @@ no salary, plain text, English.
 - Parse the first JSON object in the answer; invalid → error message
   "Couldn't build a draft, try again" (no partial output).
 - Drop bullet ids, job ids, skill labels and highlight sources that don't
-  exist. Skills not mentioned keep their original order after the chosen ones.
-- Jobs the model omitted keep all their bullets in the original order.
-- Clamp lengths (summary ≤ 600 characters, ≤ 3 highlights, each ≤ 160).
+  exist. Chosen skills are ticked and lead their category (categories are
+  ordered by their best-ranked skill); skills not mentioned follow unticked.
+  If the model picks no known skill, every skill stays ticked.
+- Jobs the model omitted keep all their bullets, ticked, in the original
+  order. In a chosen job, picked bullets come first (ticked), the rest follow
+  unticked so the owner can re-tick them.
+- Highlights whose source is a bullet that will print are dropped (they would
+  repeat it). A highlight that names a skill its cited fact doesn't mention is
+  kept but flagged in the preview.
+- The summary is flagged when it uses personal pronouns or omits the years
+  figure.
+- Clamp lengths (summary ≤ 600 characters, ≤ 3 highlights, each ≤ 160,
+  ≤ 6 gaps, each ≤ 200) and replace glyphs the PDF fonts lack (non-breaking
+  hyphens, minus sign, arrows, non-breaking spaces). The owner's edits get
+  the same normalisation.
 - The summary and highlight text are the only AI-written words; the preview
   labels them "AI-written — check before downloading".
 
@@ -128,7 +145,12 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
 - The download handler sets the context, then renders the profile node
   through Entity Print's `PrintBuilder::printHtml()` and the Dompdf engine,
   and returns the PDF with its own file name. (Built this way instead of
-  `deliverPrintable()`, which picks the file name itself.)
+  `deliverPrintable()`, which picks the file name itself.) It switches to the
+  default front-end theme for the render (the CV template lives there; the
+  page runs in the admin theme) and back afterwards.
+- `portfolio_core_node_build_defaults_alter()` removes the render-cache keys
+  of the profile build while a plan is set, so a tailored render is never
+  cached or served as the public CV (and vice versa).
 - The public "Download CV (PDF)" is unchanged (the context is empty there).
 - Must still fit one A4 page; if a long summary pushes it to two, the preview
   warns (word count) rather than shrinking type further.
@@ -168,3 +190,30 @@ Reuse Entity Print and `node--profile--pdf.html.twig`:
   11, the 10→11/PHP migration and Acquia Cloud; highlights cite real facts;
   PDF downloads with the company name, one page, public CV unchanged;
   anonymous user gets 403 on the page.
+
+## Code/doc drift found 2026-10-23
+
+Reconciled against the code while writing `docs/studies/tailored-cv.md`.
+
+**Corrected in this spec:** status; summary voice (pronoun-free CV style with
+the years figure, not first person); skills as checkboxes instead of a
+read-only order; unticked rather than dropped bullets in chosen jobs;
+certifications as highlight sources (`cK`); highlights that repeat a printed
+bullet are dropped; preview warnings (pronouns, missing years, unsupported
+skills); gaps limits; glyph normalisation; live word count; editable company
+field; theme switch and render-cache bypass during the PDF render.
+
+**Code issues found, not fixed:**
+- The 6,000-character job description limit is the form's `#maxlength`
+  (enforced server-side by Form API); `CvTailor` has no limit of its own, so a
+  future public caller (e.g. through Droopy) must add one, plus flood control.
+- The one-page fit is not checked: the preview shows a word count, but nothing
+  measures the rendered PDF.
+- No functional or end-to-end test covers the form or the downloaded PDF; the
+  pieces are unit-tested (`tests/src/Unit/Cv/`, 42 tests).
+- Fact ids are positional (`j1` is the first job in field order), so reordering
+  experience on the profile between "Generate" and "Download" would point the
+  plan at different jobs. The 6-hour form cache makes this unlikely but possible.
+
+**Could not verify:** how often providers return unusable JSON in practice
+(no logging of answers, by design).
