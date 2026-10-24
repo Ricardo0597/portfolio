@@ -2,7 +2,16 @@
 
 Personal portfolio site built on Drupal 11. The site serves two purposes: professional presentation and a living technical showcase where each major feature is implemented using a different Drupal pattern — the codebase itself is the portfolio.
 
-The public site is a single-page profile at `/` (hero, about, skills, experience, education, contact) with a downloadable PDF CV and **Droopy**, an AI guide that answers visitors' questions about Ricardo. Projects, articles, feature demos and skill pages are built but currently disabled (see [Disabled sections](#disabled-sections)).
+The public site is a single-page profile at `/` (hero, about, skills, experience, education, contact) with a downloadable PDF CV and **Droopy**, an AI guide that answers visitors' questions about Ricardo. Projects, articles, feature demos and skill pages are built but currently disabled (see [Disabled sections](#disabled-sections)). A separate Next.js app, the **Tech Lab** at `/headless`, consumes Drupal's JSON:API.
+
+## How this repo is built
+
+Features are built with an AI coding agent working under explicit rules, and every step leaves a trace in the repo:
+
+- **[`CLAUDE.md`](CLAUDE.md)** sets the rules: coding standards, the light/dark token system, the git workflow, testing and the spec → plan → test-first → verify → review → document loop.
+- **[`docs/specs/`](docs/specs/)** holds one design spec per feature (intent, non-goals, risks, decisions), each with dated notes on where the code drifted from the plan.
+- **[`docs/studies/`](docs/studies/)** holds technical studies for outside developers, starting with [Droopy](docs/studies/droopy-ai-guide.md). They are written with a project skill ([`.claude/skills/technical-study`](.claude/skills/technical-study/SKILL.md)).
+- **Tests:** PHPUnit for every service, Playwright smoke tests for what visitors see, and CI that runs `composer audit`, the unit tests and Drupal coding standards on every push.
 
 ## Tech Stack
 
@@ -17,6 +26,8 @@ The public site is a single-page profile at `/` (hero, about, skills, experience
 - **AI:** Groq (`openai/gpt-oss-120b`) with Gemini (`gemini-flash-lite-latest`) fallback — free tiers, plain HTTP via Guzzle
 - **CI:** GitHub Actions — `composer audit`, PHPUnit, phpcs (Drupal + DrupalPractice)
 - **CSS:** Custom properties (design tokens), no frameworks
+- **Tech Lab:** Next.js app in [`nextjs/`](https://github.com/Ricardo0597/portfolio-headless) (git submodule), served at `/headless` by a DDEV `nodejs` container
+- **Tests:** PHPUnit (unit), Playwright (end-to-end smoke tests against DDEV)
 
 ## Local Setup
 
@@ -28,7 +39,7 @@ The public site is a single-page profile at `/` (hero, about, skills, experience
 ### Install
 
 ```bash
-git clone git@github.com:Ricardo0597/portfolio.git
+git clone --recurse-submodules git@github.com:Ricardo0597/portfolio.git
 cd portfolio
 ddev start
 ddev composer install
@@ -72,7 +83,11 @@ ddev theme-watch        # watch mode for SCSS
 # Expose site publicly (ngrok)
 ddev share              # expose site via ngrok tunnel, prints a public URL
 
-# Tests and coding standards (also run in CI)
+# End-to-end smoke tests (Playwright, against the running DDEV site)
+npm install
+npx playwright test
+
+# Unit tests and coding standards (also run in CI)
 ddev exec ./vendor/bin/phpunit -c web/core web/modules/custom/portfolio_core/
 ddev exec ./vendor/bin/phpcs --standard=Drupal,DrupalPractice \
   --extensions=php,module,inc,install,theme,yml --ignore=node_modules,*.css,*.js \
@@ -83,9 +98,14 @@ ddev exec ./vendor/bin/phpcs --standard=Drupal,DrupalPractice \
 
 ```
 portfolio/
+├── .claude/skills/technical-study/ # project skill that writes docs/studies/
 ├── .github/workflows/ci.yml        # audit, unit tests, phpcs
 ├── config/sync/                    # Drupal config (source of truth)
-├── docs/superpowers/               # design specs and implementation plans
+├── docs/
+│   ├── specs/                      # design spec per feature, with drift notes
+│   └── studies/                    # technical studies for outside developers
+├── nextjs/                         # git submodule: Next.js Tech Lab (/headless)
+├── tests/e2e/                      # Playwright smoke tests
 ├── web/
 │   ├── modules/custom/
 │   │   └── portfolio_core/         # single custom module
@@ -114,14 +134,14 @@ portfolio/
     └── commands/web/               # theme-build, theme-watch
 ```
 
-## Drupal Patterns Demonstrated
+## Feature Inventory
 
 Each feature is an intentional showcase of a different Drupal pattern:
 
 | Feature | Pattern |
 |---|---|
 | Featured skills block | Block Plugin + Dependency Injection |
-| `/api/portfolio/projects` | REST Resource Plugin + CacheableJsonResponse |
+| `/api/portfolio/projects` | REST Resource Plugin + cacheable `ResourceResponse` |
 | `skill_level_label`, `reading_time` Twig filters | Twig Extension service |
 | Project search + filters | Search API + Facets + Views |
 | Project/Article listings | Preprocess hooks + SDC view mode templates |
@@ -137,6 +157,19 @@ Each feature is an intentional showcase of a different Drupal pattern:
 | Structured data (listing pages) | `hook_views_post_render` + JSON-LD `ItemList` |
 | Light/dark switch | `theme-toggle` SDC + CSS custom property token swap, follows OS preference, `localStorage` persistence |
 | Mobile navigation | Animated hamburger drawer + `aria-expanded` + Drupal behavior |
+| Project full page | `node--project--full.html.twig` + preprocess |
+| Admin local task tabs | Template override + BEM CSS |
+| Tech Lab (`/headless`) | Next.js consuming JSON:API through an nginx proxy in DDEV ([spec](docs/specs/2026-05-13-nextjs-headless-design.md)) |
+
+### Public endpoints
+
+| Endpoint | Method | Notes |
+|---|---|---|
+| `/api/portfolio/projects?_format=json` | GET | Custom REST resource, anonymous, cacheable |
+| `/api/portfolio/ask` | POST | Droopy; JSON in and out, never cached, rate-limited |
+| `/jsonapi/...` | GET | Core JSON:API, read-only |
+| `/node/{id}?_format=json` | GET | Core REST, GET only (no write methods, no Basic Auth) |
+| `/print/pdf/node/{id}` | GET | Entity Print PDF of the profile (the CV) |
 
 ## Content Types
 
@@ -156,6 +189,7 @@ A floating mascot that answers questions about Ricardo from the profile's facts 
 - **Fallback:** providers are tried in the order set in `portfolio_core.assistant`; if all fail the visitor gets a "napping" answer with an email link.
 - **Limits:** 10 questions/minute and 60/day per IP (core flood); foreign `Origin` → 403.
 - **Safety:** answers are rendered as text only; the model can trigger UI actions only through whitelisted tags (`[[scroll:…]]`, `[[cv]]`, `[[email]]`).
+- **How it works and how to replicate it:** [technical study](docs/studies/droopy-ai-guide.md).
 
 ## Tailored CV (private)
 

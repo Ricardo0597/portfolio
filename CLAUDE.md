@@ -7,8 +7,9 @@ Personal portfolio site built on Drupal 11. The site serves two purposes:
 2. Living technical showcase: every major feature is deliberately implemented
    using a different Drupal pattern so the codebase itself is the portfolio.
 
-This file is the single source of truth for Claude Code. Read it completely
-before taking any action on this project.
+This file is the single source of truth for AI coding agents (Claude Code
+reads it automatically) and for humans who want to know how the repo is
+built. Read it completely before taking any action on this project.
 
 ---
 
@@ -16,7 +17,7 @@ before taking any action on this project.
 
 - **Tool:** DDEV
 - **PHP:** 8.3
-- **Node:** 20
+- **Node:** 24 in the DDEV web container (theme build, Playwright); 20 in the `nodejs` container that serves the Next.js Tech Lab
 - **Docroot:** `web/`
 - **Project URL:** https://portfolio.ddev.site
 
@@ -53,8 +54,16 @@ portfolio/                          ← project root
 ├── .ddev/
 │   ├── config.yaml
 │   └── commands/
+├── .claude/
+│   └── skills/
+│       └── technical-study/        ← project skill: writes docs/studies/*
+├── .github/workflows/ci.yml        ← composer audit, PHPUnit, phpcs
 ├── config/
 │   └── sync/                       ← exported config lives here
+├── docs/                           ← see "Docs map" below
+├── nextjs/                         ← git submodule: portfolio-headless (Tech Lab at /headless)
+├── tests/
+│   └── e2e/                        ← Playwright smoke tests (run against DDEV)
 ├── web/
 │   ├── core/
 │   ├── modules/
@@ -68,11 +77,82 @@ portfolio/                          ← project root
 │   └── sites/
 │       └── default/
 ├── CLAUDE.md                       ← this file
-├── PROMPT.md                       ← build specification
-├── README.md
+├── README.md                       ← overview, setup, Feature Inventory
+├── package.json                    ← Playwright only
+├── playwright.config.js
 ├── composer.json
 └── composer.lock
 ```
+
+Clone with `git clone --recurse-submodules`, or run
+`git submodule update --init` after a plain clone. Changes to the Next.js app
+are committed in `nextjs/` (its own repo) first, then the new pointer is
+committed here.
+
+---
+
+## Docs Map
+
+| Path | Public | What goes there |
+|---|---|---|
+| `README.md` | yes | What the site is, setup, architecture, the **Feature Inventory** table |
+| `CLAUDE.md` | yes | How we work: standards, workflow, commands, testing, gotchas |
+| `docs/specs/YYYY-MM-DD-<topic>-design.md` | yes | Design spec per feature: intent, goals, non-goals, risks, decisions, and dated "Code/doc drift found" sections |
+| `docs/studies/<feature>.md` | yes | Technical study per shipped feature, written for outside developers who may replicate it |
+| `docs/plans/YYYY-MM-DD-<topic>.md` | no (git-ignored) | Step-by-step implementation plans; working documents that go stale once the code lands |
+| `docs/notes/` | no (git-ignored) | Personal study notes |
+| `PROMPT.md` | no (git-ignored) | The original phase-by-phase bootstrap script |
+
+Rules:
+- Specs and studies must be true of the code as it is today. When code
+  changes a documented behaviour, update the spec in the same commit, or add a
+  dated drift section to it.
+- Never put secrets, production data or private facts in any doc.
+- Studies are written with the `technical-study` skill
+  (`.claude/skills/technical-study/SKILL.md`), which first reconciles the spec
+  against the code, then writes `docs/studies/<feature>.md`.
+
+| Feature | Spec | Study |
+|---|---|---|
+| Droopy AI guide | `docs/specs/2026-10-18-droopy-ai-guide-design.md` | `docs/studies/droopy-ai-guide.md` |
+| Tailored CV | `docs/specs/2026-10-22-tailored-cv-design.md` | — |
+| Single-page profile | `docs/specs/2026-10-18-single-page-rebrand-design.md` | — |
+| Next.js Tech Lab | `docs/specs/2026-05-13-nextjs-headless-design.md` | — |
+| PDF CV | `docs/specs/2026-04-20-entity-print-cv-pdf-design.md`, `docs/specs/2026-04-22-cv-pdf-pattern-refactor-design.md` | — |
+| Light/dark switch | `docs/specs/2026-04-24-theme-mode-toggle-design.md` | — |
+| ItemList JSON-LD | `docs/specs/2026-04-27-itemlist-schema-listing-pages-design.md` | — |
+
+---
+
+## AI-Assisted Development Workflow
+
+Features are built with an AI coding agent under the rules in this file. The
+agent proposes; the owner decides and reviews. Every feature goes through the
+same loop:
+
+1. **Brainstorm** the idea into a design spec (`superpowers:brainstorming`):
+   intent, goals, non-goals, anti-goals, risks, and the decisions the agent
+   made that the owner must check. Save it to `docs/specs/`.
+2. **Plan** the implementation as small, test-first tasks
+   (`superpowers:writing-plans`), saved to `docs/plans/` (private).
+3. **Build test-first** (`superpowers:test-driven-development`): PHPUnit for
+   services, plugins and controllers; Playwright for anything a visitor can
+   see or click.
+4. **Verify before claiming done** (`superpowers:verification-before-completion`):
+   unit tests, phpcs, `ddev drush config:status` clean, Playwright suite green,
+   and a manual check in the browser (both themes, 1280px and 375px).
+5. **Review** (`superpowers:requesting-code-review` or `/code-review`), then
+   fix or explicitly reject each finding.
+6. **Reconcile docs**: update the spec's status and drift notes, `CLAUDE.md`
+   gotchas and the README Feature Inventory.
+7. **Write the technical study** (`technical-study` skill) for features worth
+   showing to outside developers.
+
+Agents must:
+- Ask before outward-facing actions (push, PR, publishing) unless told to proceed.
+- Never put API keys, tokens or personal data in code, config, docs or commits.
+- Clean up Playwright MCP output (`.playwright-mcp/`) after browser sessions.
+- Report test results as they are, including failures.
 
 ---
 
@@ -87,7 +167,7 @@ portfolio/                          ← project root
 ```
 feat: add Skill content type with taxonomy reference
 fix: correct pathauto pattern for project nodes
-docs: document REST endpoint in PROMPT.md
+docs: add technical study for Droopy
 chore: enable and configure metatag module
 refactor: extract skill card into SDC component
 ```
@@ -322,16 +402,21 @@ portfolio_core/
 ├── portfolio_core.module
 ├── portfolio_core.routing.yml
 ├── portfolio_core.services.yml
+├── portfolio_core.permissions.yml
 ├── src/
-│   ├── Controller/
+│   ├── Assistant/                  ← Droopy: LLM clients, chain, prompt, parser, validator
+│   ├── Controller/                 ← AskController
+│   ├── Cv/                         ← tailored CV: prompt, plan validator, PDF generator
+│   ├── EventSubscriber/            ← DisabledSectionsSubscriber, EntityPrintCssSubscriber
+│   ├── Form/                       ← TailoredCvForm
 │   ├── Plugin/
-│   │   ├── Block/
-│   │   └── rest/
-│   ├── TwigExtension/
-│   └── Service/
+│   │   ├── Block/                  ← CurrentSkillsBlock
+│   │   └── rest/                   ← ProjectsResource
+│   ├── Service/                    ← ProfileDataService
+│   └── TwigExtension/
 └── tests/
     └── src/
-        └── Unit/
+        └── Unit/                   ← Assistant/, Cv/, and service tests
 ```
 
 ---
@@ -353,6 +438,7 @@ portfolio_theme/
 ├── portfolio_theme.libraries.yml
 ├── portfolio_theme.theme
 ├── components/                     ← Single Directory Components
+│   ├── droopy-guide/
 │   ├── skill-card/
 │   ├── project-card/
 │   ├── article-teaser/
@@ -439,8 +525,7 @@ search_api_db
 facets
 restui
 serialization
-hal
-decoupled_router
+entity_print
 ```
 
 ### Core modules to enable
@@ -449,7 +534,6 @@ decoupled_router
 rest
 serialization
 jsonapi
-contact
 ```
 
 `basic_auth` is deliberately **not** installed: nothing uses it, and every
@@ -486,42 +570,44 @@ removing it from the config and running `ddev drush cim -y`.
 ## AI Assistant (Droopy)
 
 Droopy (`components/droopy-guide/`) is the floating mascot that answers
-questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
+questions about Ricardo via `POST /api/portfolio/ask` (`AskController`). How it
+works end to end, and why: **`docs/studies/droopy-ai-guide.md`**. Rules and
+gotchas for working on it:
 
 - **Config:** `portfolio_core.assistant` — `enabled` (kill switch: hides the
   widget, endpoint returns 404), `providers` order, model ids, max tokens.
 - **Keys:** never in config or git. `$settings['portfolio_assistant']['groq_api_key']`
   / `['gemini_api_key']`, else env vars `GROQ_API_KEY` / `GEMINI_API_KEY`.
   Locally put them in `.ddev/.env` (git-ignored) and run `ddev restart`.
-- **Services** (`src/Assistant/`): `AssistantKeys`, `AssistantContextBuilder`
-  (system prompt from profile facts — incl. total years, today's date and
-  `field_assistant_notes` — cached with the profile's tags plus
-  `node_list:skill` and `taxonomy_term_list:skill_category`),
-  `GroqClient` / `GeminiClient` (`LlmClientInterface`), `LlmChain`
-  (fallback; NULL → "napping" answer), `AnswerParser` (whitelisted
-  `[[scroll:…]]`, `[[cv]]`, `[[email]]` action tags, case-insensitive; strips
-  unknown/truncated tags and Markdown emphasis), `AskRequestValidator`.
+- **Answers are text only** (`textContent`), never HTML. Page actions come only
+  from whitelisted `[[scroll:…]]`, `[[cv]]`, `[[email]]` tags. The section list
+  exists twice (`AnswerParser::SECTIONS` and `SECTIONS` in `droopy-guide.js`):
+  change both.
+- **Facts** come from the profile node and skills (`AssistantContextBuilder`),
+  cached with the profile's tags plus `node_list:skill` and
+  `taxonomy_term_list:skill_category`. A new fact source needs its cache tag.
 - **Models:** Groq `openai/gpt-oss-120b` with `reasoning_effort: low`; Gemini
   `gemini-flash-lite-latest` with `thinkingConfig.thinkingLevel: low` (Gemini 3+
   rejects `thinkingBudget`; `gemini-2.5-flash` is closed to new accounts).
 - **Limits:** 10 questions/minute and 60/day per IP (core flood), question
   ≤ 1000 chars (6000 in fit mode), history ≤ 6 turns, foreign `Origin` → 403.
-- Answers are rendered as text only (`textContent`), never HTML.
-- The header trash button ("Clear conversation", shown once there are messages)
-  empties the log and the stored history and brings the chips back.
-- Certifications live in `field_certifications` (link: title with year + verification URL); they feed the page, both CVs, Droopy and the Person JSON-LD `hasCredential`.
-- Skills are ordered by category term weight, then skill level (highest first), then name.
-- Availability facts live on the profile node (`field_available_from`,
-  `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
+  The Origin check compares hosts only and also accepts the first
+  `X-Forwarded-Host` (ngrok rewrites `Host`).
 - **Extra knowledge:** when Droopy says "I don't have information about…" for
   something true, add one fact per line to the profile's
   `field_assistant_notes` ("Extra knowledge for Droopy"). It feeds only the
   assistant prompt and is never rendered on the page or the PDF CV.
+- Certifications live in `field_certifications` (link: title with year +
+  verification URL); they feed the page, both CVs, Droopy and the Person JSON-LD
+  `hasCredential`.
+- Skills are ordered by category term weight, then skill level (highest
+  first), then name.
+- Availability facts live on the profile node (`field_available_from`,
+  `field_work_mode`, `field_engagement_types`, `field_schedule_flexibility`).
+- **Tests:** PHPUnit in `tests/src/Unit/Assistant/`; Playwright in
+  `tests/e2e/droopy.spec.js` mocks the endpoint, so it never spends provider quota.
 - Note: in this environment `drush cset` does not persist; change config via
   the UI, `drush php:eval`, or `config/sync` + `drush cim`.
-- The Origin check compares hosts only (proxy-safe), also accepting the first
-  `X-Forwarded-Host` (tunnels such as ngrok rewrite `Host`), and lets requests
-  without an `Origin` header through; flood control is the real quota protection.
 
 ### Tailored CV (private)
 
@@ -587,7 +673,7 @@ questions about Ricardo via `POST /api/portfolio/ask` (`AskController`).
 - Namespace all custom routes under `/api/portfolio/`
 - Return JSON responses using `JsonResponse` or `CacheableJsonResponse`.
 - Always implement `CacheableResponseInterface` on cacheable endpoints.
-- Document each endpoint in PROMPT.md under "Feature Inventory".
+- Document each endpoint in the README "Feature Inventory".
 
 ---
 
@@ -651,8 +737,28 @@ Keys must be unique per page. Conventions:
   ```
   `phpcbf` with the same arguments fixes most violations automatically.
 - At minimum, write unit tests for any custom service or plugin logic.
+- **End-to-end (Playwright):** `tests/e2e/` holds smoke tests for what a
+  visitor sees: the profile page and its JSON-LD, the theme switch, the PDF CV,
+  disabled-section redirects, the public APIs and Droopy (open/close, text-only
+  answers, action whitelist, napping fallback, foreign-Origin 403). Every test
+  runs on a desktop and a phone viewport.
+  ```bash
+  ddev start                 # the suite runs against https://portfolio.ddev.site
+  npm install                # once, at the project root
+  npx playwright test        # E2E_BASE_URL=... to target another site
+  npx playwright show-report
+  ```
+  - Mock `/api/portfolio/ask` with `page.route()`; never call real providers
+    from tests.
+  - Droopy floats forever, so its tests set
+    `contextOptions: { reducedMotion: 'reduce' }` to keep it clickable.
+  - `@playwright/test` is pinned to match the locally installed Chromium; on a
+    new machine run `npx playwright install chromium`.
+  - The suite is not in CI yet: CI has no Drupal site to test against.
 - **CI:** `.github/workflows/ci.yml` runs `composer audit`, the unit tests and
   phpcs on every push to `main` and every pull request. It never deploys.
+- **Before every commit:** unit tests and phpcs pass; Playwright passes when
+  front-end or routing code changed.
 - **Dependency updates:** keep core on the current minor
   (`--with "drupal/core:~11.3.0"` etc.) unless a security fix requires the next
   one; `drupal/admin_toolbar` needs core ≥ 11.4 to be re-resolved, so exclude it
@@ -662,10 +768,10 @@ Keys must be unique per page. Conventions:
 
 ## Deployment
 
-- Hosting target: Acquia Cloud (free tier) or Platform.sh.
-- CI/CD: GitHub Actions.
-- Deploy pipeline: push to `main` → GitHub Actions → platform deploy.
-- Config import runs as part of deploy: `drush cim -y && drush cr`.
+- Not deployed yet. Hosting target: Acquia Cloud (free tier) or Platform.sh.
+- CI (GitHub Actions) checks code only; there is no deploy pipeline yet.
+- A deploy must run `drush updb -y && drush cim -y && drush cr`, and follow the
+  production checklist in the AI Assistant section.
 
 ---
 
@@ -673,12 +779,15 @@ Keys must be unique per page. Conventions:
 
 Follow this sequence for every feature:
 
-1. Plan: confirm approach against this file before writing code.
-2. Build: implement in `portfolio_core` or `portfolio_theme` as appropriate.
+1. Spec: write or update `docs/specs/<date>-<topic>-design.md` (see the
+   AI-Assisted Development Workflow above).
+2. Build test-first in `portfolio_core` or `portfolio_theme`.
 3. Export config: `ddev drush cex -y`.
-4. Test locally: verify at https://portfolio.ddev.site.
+4. Verify: unit tests, phpcs, `config:status` clean, Playwright, and a manual
+   check at https://portfolio.ddev.site.
 5. Commit: stage explicitly, use Conventional Commits format.
-6. Document: update the "Feature Inventory" section in PROMPT.md.
+6. Document: update the README Feature Inventory, the spec's status and drift
+   notes and, for showcase features, a study in `docs/studies/`.
 
 ---
 
