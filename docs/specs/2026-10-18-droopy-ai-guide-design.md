@@ -78,7 +78,8 @@ The hero gets a small "● Available for work" badge when
   Drupal behavior with `once()`, no jQuery).
 - Embedded once in `page.html.twig` when the assistant is enabled
   (`portfolio_core.assistant:enabled`); passed `cv_url`, `email`, and the
-  suggested questions from preprocess.
+  suggested questions from preprocess, plus `tailor_url` only for users with
+  the `use tailored cv` permission (typing `/tailored-cv` shows a link).
 - **Mascot:** inline SVG built from the four paths in `images/logo.svg`
   (drop, left eye, right eye, smile) with `stroke="currentColor"` so it works
   in both themes. Animations (CSS + small JS):
@@ -99,6 +100,8 @@ The hero gets a small "● Available for work" badge when
   focus moves to the input on open, `Esc` closes and returns focus to
   Droopy; answers announced via `aria-live="polite"`. Desktop: 380px panel
   anchored right; ≤767px: full-width bottom sheet, max 75dvh (75vh fallback).
+- **Clear conversation:** a trash button in the header (shown once there are
+  messages) empties the log and the stored history and brings the chips back.
 - **Job fit toggle:** a permanent "Job fit" button above the input switches
   fit mode on and off (the fit chip below does the same).
 - **Chips** (shown before the first question): "Is he available?",
@@ -130,7 +133,7 @@ access allowed.
 
 - `AssistantContextBuilder` — builds the system prompt from
   `ProfileDataService` + profile node fields (bio, skills by category, work
-  experience, education, languages, links) + availability facts. Cached
+  experience, education, languages, links, certifications) + availability facts. Cached
   with the profile node's cache tags plus `node_list:skill` and
   `taxonomy_term_list:skill_category` so edits apply instantly. Facts also
   include total years of experience, the profile's `field_assistant_notes`
@@ -139,8 +142,9 @@ access allowed.
 - `LlmClientInterface::complete(string $system, array $messages, int $max_tokens): string`
   with `GroqClient` and `GeminiClient` (Guzzle `http_client`), each throwing
   `LlmUnavailableException` on 429/5xx/timeout (8 s).
-- `LlmChain` — tries providers in configured order, returns
-  `{text, provider}`; on all failing returns the napping message.
+- `LlmChain` — tries providers in configured order, skipping any without a
+  key, and returns `LlmResult {text, provider}`; when all fail it returns
+  `NULL` and the controller answers with the napping message.
 - `AnswerParser` — extracts action tags the model is instructed to append
   (`[[scroll:experience]]`, `[[cv]]`, `[[email]]`), whitelists them
   (sections: about, skills, experience, education, contact), strips them
@@ -185,7 +189,7 @@ public CV data and visitor questions are sent, and the disclaimer covers it.
 
 - CLAUDE.md rules (DI, strict types, `t()`, BEM, tokens, light-mode rules,
   no jQuery, `once()`), config export, explicit staging.
-- Endpoint documented in PROMPT.md Feature Inventory under `/api/portfolio/`.
+- Endpoint documented in the README Feature Inventory under `/api/portfolio/`.
 - Must not hurt page load: widget JS/CSS small, SVG inline, no third-party
   scripts; nothing fetched until the first question.
 
@@ -253,3 +257,19 @@ model settings, `X-Forwarded-Host`).
 free-tier limits (taken from provider pages and third-party summaries at design
 time, not measured).
 
+## Code/doc drift found 2026-10-23
+
+Reconciled again while writing `docs/studies/droopy-ai-guide.md`.
+
+**Corrected in this spec:** certifications are part of the facts; the header
+"Clear conversation" button; the `tailor_url` prop and `/tailored-cv` shortcut;
+`LlmChain` returns `NULL` (the napping answer comes from the controller).
+
+**New since the last check:** Playwright smoke tests (`tests/e2e/droopy.spec.js`)
+cover open/close, text-only rendering with an injected `<img>`, the action
+whitelist, the napping fallback and the foreign-`Origin` 403, with the endpoint
+mocked so no provider quota is used.
+
+**Still open (code, not fixed):** the duplicated section whitelist
+(`AnswerParser::SECTIONS` and `SECTIONS` in `droopy-guide.js`); no unit test for
+`AssistantContextBuilder::facts()`; two entry points to fit mode.
