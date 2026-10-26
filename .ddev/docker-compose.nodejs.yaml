@@ -1,6 +1,11 @@
 services:
   nodejs:
     image: node:20-alpine
+    # Run as the host user so npm never leaves root-owned files in
+    # nextjs/node_modules (host-side npm install would then fail with EACCES).
+    user: "${DDEV_UID}:${DDEV_GID}"
+    environment:
+      - HOME=/tmp
     working_dir: /app
     volumes:
       - ../nextjs:/app
