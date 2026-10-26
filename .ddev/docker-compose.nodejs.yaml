@@ -6,6 +6,8 @@ services:
     user: "${DDEV_UID}:${DDEV_GID}"
     environment:
       - HOME=/tmp
+      # The Tech Lab runs ONNX in the browser; skip onnxruntime-node's CUDA download.
+      - ONNXRUNTIME_NODE_INSTALL=skip
     working_dir: /app
     volumes:
       - ../nextjs:/app
