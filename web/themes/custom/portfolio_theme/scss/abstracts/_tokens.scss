@@ -43,7 +43,7 @@ $space-12: 3rem;
 $space-16: 4rem;
 
 $container-max:    1200px;
-$content-max:      880px;
+$content-max:      1000px; // fits the header row (logo, six links, switch: ~950px)
 $header-height:    6.5rem; // sticky header (72px logo + padding) plus breathing room for anchors
 $sidebar-width:    280px;
 $border-radius:    8px;

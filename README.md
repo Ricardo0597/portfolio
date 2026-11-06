@@ -18,7 +18,7 @@ Features are built with an AI coding agent working under explicit rules, and eve
 ## Tech Stack
 
 - **CMS:** Drupal 11
-- **PHP:** 8.3
+- **PHP:** 8.4
 - **Database:** MariaDB 11.8
 - **Local environment:** DDEV
 - **Theme:** Custom (`portfolio_theme`) — no base theme, SDC components, Dart Sass, BEM

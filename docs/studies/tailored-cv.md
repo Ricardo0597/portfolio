@@ -12,7 +12,7 @@ result, and Entity Print renders it with the same template as the public CV.
 
 | Aspect | What we built |
 |---|---|
-| Platform | Drupal 11.3, PHP 8.3, Form API, Entity Print with the Dompdf engine, one custom module (`portfolio_core`) |
+| Platform | Drupal 11.3, PHP 8.4, Form API, Entity Print with the Dompdf engine, one custom module (`portfolio_core`) |
 | Source of truth | The published `profile` node: summary, work experience paragraphs with achievement bullets, skills by category, certifications, availability, and the owner-only "Extra knowledge" lines |
 | Trigger | The owner pastes a job description at `/admin/portfolio/tailored-cv` and presses "Generate draft" |
 | AI | The same Groq → Gemini fallback chain as the site's chat assistant ([Droopy study](droopy-ai-guide.md)), 1,200-token budget, one JSON object per answer |

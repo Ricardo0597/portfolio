@@ -33,6 +33,29 @@ test.describe('single-page profile', () => {
     await expect(html).toHaveAttribute('data-theme', 'light');
   });
 
+  test('header and footer line up with the content column', async ({ page }) => {
+    await page.goto('/');
+    const edges = await page.evaluate(() => {
+      // Content box (inside padding) of an element.
+      const box = (selector) => {
+        const el = document.querySelector(selector);
+        const rect = el.getBoundingClientRect();
+        const style = getComputedStyle(el);
+        return {
+          left: Math.round(rect.left + parseFloat(style.paddingLeft)),
+          right: Math.round(rect.right - parseFloat(style.paddingRight)),
+        };
+      };
+      return {
+        header: box('.site-header__inner'),
+        content: box('.about'),
+        footer: box('.site-footer__inner'),
+      };
+    });
+    expect(edges.header).toEqual(edges.content);
+    expect(edges.footer).toEqual(edges.content);
+  });
+
   test('downloads the CV as a PDF', async ({ request }) => {
     const response = await request.get('/print/pdf/node/1');
     expect(response.status()).toBe(200);
