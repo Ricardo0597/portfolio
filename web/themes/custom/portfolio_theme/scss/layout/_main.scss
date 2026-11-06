@@ -30,6 +30,13 @@
   padding: 0 var(--space-6);
 }
 
+// Header and footer share the profile's content column so their edges line
+// up with the hero and every section.
+.site-header__inner,
+.site-footer__inner {
+  max-width: calc(var(--content-max) + 2 * var(--space-6));
+}
+
 // ─── Header ───────────────────────────────────────────────────────────────────
 
 .site-header {
@@ -772,4 +779,9 @@ footer[role='contentinfo'] {
   }
 
   // .site-header stays sticky; sticky elements also anchor the absolute nav.
+}
+
+// Phones: the open burger menu keeps the same gutter as the page.
+@media (max-width: 600px) {
+  .site-nav { padding-inline: var(--space-4); }
 }

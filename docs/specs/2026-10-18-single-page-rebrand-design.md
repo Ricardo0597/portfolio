@@ -232,3 +232,16 @@ Also (config):
 - Scroll-spy highlights the right link; anchors land below sticky header.
 - PHPUnit passes, including the new subscriber test.
 - Schema validator: `Person` on `/`.
+
+## Code/doc drift found (2026-11-06)
+
+- The header and footer used the full 1200px container while the content
+  column was 880px, so on desktop the logo sat 136px left of the hero and
+  sections (48px at 1024px). The header row (logo, six links, theme switch)
+  needs about 950px, so it cannot fit an 880px column.
+- Fix: `$content-max` is now 1000px, and `.site-header__inner` /
+  `.site-footer__inner` are capped at the same column, so header, sections
+  and footer share both edges at every width. On phones the open burger menu
+  uses the 16px page gutter instead of 24px.
+- Guarded by the Playwright test "header and footer line up with the
+  content column" (`tests/e2e/site.spec.js`).
