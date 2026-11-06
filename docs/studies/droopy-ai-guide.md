@@ -12,7 +12,7 @@ a friendly "napping" message when both fail.
 
 | Aspect | What we built |
 |---|---|
-| Platform | Drupal 11.3, PHP 8.3, one custom module (`portfolio_core`) and one custom theme (`portfolio_theme`) |
+| Platform | Drupal 11.3, PHP 8.4, one custom module (`portfolio_core`) and one custom theme (`portfolio_theme`) |
 | Knowledge source | The published `profile` node and the `skill` nodes: bio, skills by category, work experience, education, languages, certifications, availability, links, plus an owner-only "Extra knowledge for Droopy" field |
 | Retrieval | None. The whole profile fits in the system prompt, so there is no RAG or vector store |
 | LLM providers | Groq (`openai/gpt-oss-120b`) first, Google Gemini (`gemini-flash-lite-latest`) second, both on free tiers, called over HTTPS with core's Guzzle client |

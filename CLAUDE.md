@@ -16,7 +16,7 @@ built. Read it completely before taking any action on this project.
 ## Local Environment
 
 - **Tool:** DDEV
-- **PHP:** 8.3
+- **PHP:** 8.4
 - **Node:** 24 in the DDEV web container (theme build, Playwright); 20 in the `nodejs` container that serves the Next.js Tech Lab
 - **Docroot:** `web/`
 - **Project URL:** https://portfolio.ddev.site
@@ -198,7 +198,7 @@ git add config/sync/
 
 ### PHP
 
-- Drupal 11, PHP 8.3 strictly.
+- Drupal 11, PHP 8.4 strictly.
 - Follow Drupal coding standards: https://www.drupal.org/docs/develop/standards
 - Use dependency injection. No `\Drupal::service()` static calls inside classes.
 - Static calls are acceptable only inside procedural hooks (`.module` files)
